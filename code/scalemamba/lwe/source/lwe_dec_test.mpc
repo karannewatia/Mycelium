@@ -8,7 +8,7 @@ lgN = 11
 r = Ring(lgN, w)
 
 N = 20
-lgM = SED_THIS_TO_PLAINTEXT_LEN
+lgM = 3
 l = 1
 lwe = LWE(r, N, lgM, l)
 
@@ -27,4 +27,3 @@ def set_val(i):
   s[i] = sint(1)
 
 x = lwe.dec(u, v, s)
-
