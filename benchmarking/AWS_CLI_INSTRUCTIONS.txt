@@ -1,0 +1,38 @@
+AWS CLI INSTRUCTION
+
+Instructions for installing AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/install-linux.html
+
+
+First you need to create an account that you will use to access AWS through the CLI. You have to do this in the management console.
+
+1. First create a group: go to https://console.aws.amazon.com/iam/home#/groups
+	a. Click “Create New Group”
+	b. Enter a name.
+	c. Select an appropriate policy for the group. (If one does not exist, you can also make your own policies.) 
+	d. Review and click “Create Group.”
+	
+2. Then create a user for this group.
+	a. Go to https://console.aws.amazon.com/iam/home#/users
+	b. Click “Add User.”
+	c. Enter the user name. Select “Programattic Access.”
+	d. Choose the group you created.
+	e. Ignore the tags section. You don’t need any.
+	f. Review and click “Create User.”
+	g. This will bring you to a page which has the user’s security credentials. Stay on this page. You will need these.
+
+3. Then configure your client to use those security credentials.
+	a. Open terminal
+	b. Enter:
+		$ aws configure
+	c. Enter the security credentials from the command console.
+
+  
+4. AWS will probably have set up a default Virtual Private Cloud (VPC) for you and a default Security Group for you as well. However, you should modify the security group to allow you to SSH to your server.
+	a. Go to the console: https://console.aws.amazon.com/ec2/v2/home?region=us-east-1. (or appropriate region)
+	b. Click Security Groups (on the left-hand menu)
+	c. Select the “default” group.
+	d. Select “Inbound”
+	e. Click “Edit”
+	f. Click “Add rule”
+	g. Add an SSH rule (TCP, 22) accessible from anywhere
+

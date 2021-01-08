@@ -1,0 +1,164 @@
+execfile('/root/SCALE-MAMBA/Programs/sort/sort.mpc')
+execfile('/root/SCALE-MAMBA/Programs/test_util/test_util.mpc')
+execfile('/root/SCALE-MAMBA/Programs/shuffle/shuffle.mpc')
+
+testi = 0
+
+if(False):
+
+    testi = new_test(testi)
+
+    keys = sint.Array(4)
+    keys[0] = sint(7)
+    keys[1] = sint(2)
+    keys[2] = sint(9)
+    keys[3] = sint(5)
+
+    data = sint.Array(4)
+    data[0] = sint(19)
+    data[1] = sint(4)
+    data[2] = sint(2)
+    data[3] = sint(1)
+
+    cmp_swap(keys, data, 0, 1)
+
+    check(4, data[0])
+
+if(False):
+    testi = new_test(testi)
+
+    check(32, greatestPowerOfTwoLessThan(42))
+
+
+if(False):
+    testi = new_test(testi)
+
+    keys = sint.Array(4)
+    keys[0] = sint(3)
+    keys[1] = sint(1)
+    keys[2] = sint(2)
+    keys[3] = sint(4)
+
+    data = sint.Array(4)
+    data[0] = sint(1)
+    @for_range(3)
+    def loop(i):
+        data[i+1] = data[i] * 10
+
+    bitonic_merge(keys, data, 0, 4)
+
+    tot = data[0]*1 + data[1]*2 + data[2]*3 + data[3]*4
+
+    check(4213, tot)
+
+
+#testi = new_test(testi)
+
+#keys = [sint(7), sint(3), sint(4), sint(2), sint(9), sint(1), sint(6), sint(8)]
+#data = [sint(1), sint(10), sint(100), sint(1000), sint(10000), sint(100000), sint(1000000), sint(10000000)]
+
+#bitonic_sort(keys, data, 0, 8, 1)
+
+#print_ln("Expect [%s, %s, %s, %s, %s, %s, %s, %s]", 1, 2, 3, 4, 6, 7, 8, 9)
+#print_ln("Actual [%s, %s, %s, %s, %s, %s, %s, %s]", keys[0].reveal(), keys[1].reveal(), keys[2].reveal(), keys[3].reveal(), keys[4].reveal(), keys[5].reveal(), keys[6].reveal(), keys[7].reveal())
+
+
+if(False):
+    testi = new_test(testi)
+
+    n = 8
+    keys = sint.Array(n)
+    data = sint.Array(n)
+
+    @for_range(n)
+    def loop(i):
+        keys[i] = sint(n - i)
+        data[i] = sint(n - i)
+
+    bitonic_sort(keys, data, 0, n)
+
+    allFine = sint.Array(1)
+    allFine[0] = sint(1)
+
+    @for_range(n-1)
+    def loop(i):
+        allFine[0] = (keys[i] < keys[i+1]) * allFine[0]
+
+    check(1, allFine[0])
+
+
+if(False):
+    testi = new_test(testi)
+
+    import random
+    random.seed(10)
+
+    n = 2048
+    keys = sint.Array(n)
+    data = sint.Array(n)
+
+    for i in range(n):
+        keys[i] = sint(random.randint(-500,500))
+        data[i] = sint(random.randint(-500,500))
+
+    merge_sort(keys, data, n)
+
+    allFine = sint.Array(1)
+    allFine[0] = sint(1)
+
+    @for_range(n-1)
+    def loop(i):
+        if_then((keys[i] > keys[i+1]).reveal())
+        print_ln("Error keys[%s] = %s, keys[%s] = %s", i, keys[i].reveal(), i+1, keys[i+1].reveal())
+        allFine[0] = sint(0)
+        end_if()
+
+    check(1, allFine[0])
+
+
+if(True):
+    testi = new_test(testi)
+
+    import random
+    random.seed(11)
+
+    n = 1024
+
+    keys = sint.Array(n)
+    data = sint.Array(n)
+
+    for i in range(n):
+       keys[i] = sint(random.randint(-500, 500))
+       data[i] = sint(random.randint(-500, 500))
+
+    bitonic_sort(keys, data, 0, n)
+
+
+if(False):
+
+    testi = new_test(testi)
+
+    import random
+    random.seed(12)
+
+    k = 8
+    n = 1 << k
+
+    keys = sint.Array(n)
+    data = sint.Array(n)
+
+    for i in range(n):
+        keys[i] = sint(random.randint(-100000, 100000))
+        data[i] = sint(random.randint(-100000, 100000))
+
+    allIsWell = cint.Array(1)
+    allIsWell[0] = cint(1)
+    shuffle_player(keys, data, k, 0, allIsWell)
+    shuffle_player(keys, data, k, 1, allIsWell)
+
+    if_then(allIsWell[0])
+    merge_sort(keys, data, n)
+    else_then()
+    print_ln("Bad inputs supplied to permutation switches.")
+    end_if()
+

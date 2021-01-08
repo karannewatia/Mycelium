@@ -1,0 +1,30 @@
+execfile('/root/SCALE-MAMBA/Programs/ec_elgamal/ec_elgamal.mpc')
+execfile('/root/SCALE-MAMBA/Programs/ecurve/ecurve.mpc')
+
+N_PLAYERS = SED_THIS_TO_NUMBER_OF_PLAYERS  
+
+g = cint.Array(3)
+g[0] = cint(76049884773772239630286819839663813044215220798366048289168112050194373987235)
+g[1] = cint(111998029357810440620223172064231485820163014246983600027697176972731586228871)
+g[2] = cint(0)
+
+# MAMBA doesn't have a way to learn the number of players or the threshold
+# Need to use sed to replaced these before compilation. 
+# This hack allows the program to access these. 
+N=SED_THIS_TO_NUMBER_OF_PLAYERS
+t=SED_THIS_TO_THRESHOLD
+
+
+print_ln("Benchmarking the Unembed operation (discrete log on message space using BSGS)...")
+
+len = SED_THIS_TO_PLAINTEXT_LEN
+M = embed(g, 58, len)
+
+m, allIsGood = unembedBSGSLocal(g, M, len, N_PLAYERS)
+
+print_ln("All Good = %s", allIsGood)
+if_then(allIsGood)
+print_ln("m = %s", m.reveal())
+else_then()
+do_nothing()
+end_if()

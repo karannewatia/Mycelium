@@ -1,0 +1,100 @@
+execfile('/root/SCALE-MAMBA/Programs/shuffle/shuffle.mpc')
+execfile('/root/SCALE-MAMBA/Programs/test_util/test_util.mpc')
+
+testi=0
+
+if(False):
+
+	testi = new_test(testi)
+
+	k = 5
+	n = 1 << k
+
+	elems = sint.Array(n)
+	@for_range(n)
+	def set_elem(i):
+	    elems[i] = sint(i)
+
+	nGates = n * k - (1 << k-1)
+	gates = sint.Array(nGates)
+
+	@for_range(nGates)
+	def set_gate(i):
+	    gates[i] = sint(1)
+
+	shuffle(elems, gates, k)
+
+	@for_range(n)
+	def print_elem(i):
+	    print_ln("shuffled[%s] = %s", i, elems[i].reveal())
+
+if(False):
+
+	testi = new_test(testi)
+
+	k = 11
+	n = 1 << k
+
+	elems = sint.Array(n)
+	@for_range(n)
+	def set_elem(i):
+	    elems[i] = sint(i)
+
+	nGates = n*k * (1 << k-1)
+	gates = sint.Array(nGates)
+
+	@for_range(nGates)
+	def set_gate(i):
+	    gates[i] = sint(1)
+
+	shuffle(elems, gates, k)
+
+	print_ln("Complete")
+
+
+if(True):
+	
+	testi = new_test(testi)
+
+	k = 5
+	n = 1 << k
+
+	elems = sint.Array(n)
+        data = sint.Array(n)
+	@for_range(n)
+	def set_elem(i):
+	    elems[i] = sint(i)
+            data[i] = sint(i) + cint(50)
+
+        allIsWell = cint.Array(1)
+        allIsWell[0] = cint(1)  # i.e. true
+
+	shuffle_player(elems, data, k, 0, allIsWell)
+
+        if_then(allIsWell[0])
+	@for_range(n)
+	def print_elem(i):
+	    print_ln("shuffled[%s] = %s", i,  elems[i].reveal())
+        else_then()
+        print_ln("User input contains an error.")
+        end_if()
+
+if(True):
+
+	testi = new_test(testi)
+
+	k = 13
+	elems = sint.Array(1 << k)
+        data = sint.Array(1 << k)
+	@for_range(1 << k)
+	def set_elem(i):
+	    elems[i] = sint(i)
+            data[i] = sint(i)
+
+        allIsWell = cint.Array(1)
+        allIsWell[0] = cint(1)  # true
+
+	shuffle_player(elems, data, k, 0, allIsWell)
+        shuffle_player(elems, data, k, 1, allIsWell)
+
+	print_ln("Complete")

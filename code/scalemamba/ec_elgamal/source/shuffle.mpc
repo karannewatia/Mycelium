@@ -1,0 +1,73 @@
+
+# This isn't quite a Waksman network. It includes the top-right element in every recursion. 
+# Assumes d>1, |elems| = 2^d, and that gates \in {0, 1}^{2^d * d - 2^(d-1)}, 
+#   is a setting of wires which, if the party who supplied them is honest, 
+#   represents a random permutation
+def shuffle(elems, gates, d):
+  @for_range(2*d - 1)
+  def loop(t):
+    i = t + (t >=d) * (2*d -1 - 2*t)  # i = 0, ..., d-2, d-1, d-2, ... 0
+    @for_range(1 << (d-1))
+    def inner_loop(j):
+      b = gates[(1 << (d-1)) *i + j]
+      k = 2*(j >> i) + (j % (1 << i))
+
+      # if(b) swap(elems[k], elems[k + (1 << i))
+      diff = elems[k + (1 << i)] - elems[k]
+      bDiff = b * diff
+      elems[k] = elems[k] + bDiff
+      elems[k + (1 << i)] = elems[k + (1 << i)] - bDiff
+
+
+def shuffle_fixed(elems, d):
+  @for_range(2*d - 1)
+  def loop(t):
+    i = t + (t >=d) * (2*d -1 - 2*t)  # i = 0, ..., d-2, d-1, d-2, ... 0
+    @for_range(1 << (d-1))
+    def inner_loop(j):
+      b = sint(1)
+      k = 2*(j >> i) + (j % (1 << i))
+
+      # if(b) swap(elems[k], elems[k + (1 << i))
+      diff = elems[k + (1 << i)] - elems[k]
+      bDiff = b * diff
+      elems[k] = elems[k] + bDiff
+      elems[k + (1 << i)] = elems[k + (1 << i)] - bDiff
+
+
+# It seems that if statements cannot have empty else blocks. 
+def do_nothing():
+  w = sint(0)
+
+# Allows a player to input the bits of the switches.
+def shuffle_player(elems, data, d, l, allIsWell):
+  allIsWell[0] = cint(1)
+  @for_range(2*d - 1)
+  def loop(t):
+    i = t + (t >=d) * (2*d -1 - 2*t)  # i = 0, ..., d-2, d-1, d-2, ... 0
+    @for_range(1 << (d-1))
+    def inner_loop(j):
+      b = sint.get_private_input_from(l)
+      check = b*(1-b)
+      if_then(check.reveal())    # if (check.reveal() != 0)
+      allIsWell[0] = cint(0)    # Someone cheated. Abort protocol when you can.
+      else_then()
+      do_nothing()
+      end_if()
+
+      k = 2*(j >> i) + (j % (1 << i))
+
+      # if(b) 
+      #    swap(elems[k], elems[k + (1 << i)])
+      #    swap(data[k], data[k + (1 << i)])
+      diff = elems[k + (1 << i)] - elems[k]
+      bDiff = b * diff
+      elems[k] = elems[k] + bDiff
+      elems[k + (1 << i)] = elems[k + (1 << i)] - bDiff
+
+      dataDiff = data[k + (1 << i)] - data[k]
+      bDataDiff = b * dataDiff
+      data[k] = data[k] + bDataDiff
+      data[k + (1 << i)] = data[k + (1 << i)] - bDataDiff
+
+

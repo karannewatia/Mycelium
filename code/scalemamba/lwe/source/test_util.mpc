@@ -1,0 +1,11 @@
+def new_test(testi):
+    print_ln('---------------------------------------------------------------------------------')
+    print_ln('Test %s', testi)
+    print_ln('---------------------------------------------------------------------------------')
+    return testi + 1
+
+def check(expected, actual):
+    if type(actual) == sint:
+        actual = actual.reveal()
+    print_ln("Expect %s", expected)
+    print_ln("Actual %s", actual)

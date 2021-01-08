@@ -1,0 +1,228 @@
+# For use with Secp256k1
+a = 0
+b = 7
+
+def reveal(p):
+  pClear = cint.Array(3)
+  pClear[0] = p[0].reveal()
+  pClear[1] = p[1].reveal()
+  pClear[2] = p[2].reveal()
+  return pClear
+
+
+# Assumes that x[i] are all in {0, 1}, and x is of length len
+# Returns g*x, where x also denotes the constant represented by array x
+# with the least-significant bit first
+# $3*2^len < q$ must hold, since we are using only case5 addition.
+# (See protocol description for explanation.) 
+def multiply(g, x, len):  
+  g2is = cint.Matrix(len+2, 3)
+  g2is[0][0] = g[0].reveal()
+  g2is[0][1] = g[1].reveal()
+  g2is[0][2] = g[2].reveal()
+  
+  @for_range(len+1)
+  def range_loop(i):
+    g2i = [g2is[i][0], g2is[i][1], g2is[i][2]]
+    g2inext = doubleClear(g2i)
+    g2is[i+1][0] = g2inext[0]
+    g2is[i+1][1] = g2inext[1]
+    g2is[i+1][2] = g2inext[2]
+
+  sumInit = [g2is[len][0], g2is[len][1], g2is[len][2]]
+
+  sums = sint.Matrix(len+1, 3)
+  sums[0][0] = sumInit[0]
+  sums[0][1] = sumInit[1]
+  sums[0][2] = sumInit[2]
+  
+  @for_range(len)
+  def range_body(i):
+    r = sint.Array(3)
+
+    r[0] = x[i]*(g2is[i+1][0] - g2is[i][0]) + g2is[i][0]
+    r[1] = x[i]*(g2is[i+1][1] - g2is[i][1]) + g2is[i][1]
+    r[2] = x[i]*(g2is[i+1][2] - g2is[i][2]) + g2is[i][2]
+
+    sumi = [sums[i][0], sums[i][1], sums[i][2]]
+    sumiPlus = addCase5Only(sumi, r)
+    sums[i+1][0] = sumiPlus[0]
+    sums[i+1][1] = sumiPlus[1]
+    sums[i+1][2] = sumiPlus[2]
+
+  sumLast = [sums[len][0], sums[len][1], sums[len][2]]  
+ 
+  # sumInit + \sum_{i=0}^(len-1) 2^i g = 2^len g + (2^len - 1) g = 2^(len+1) g - g
+  offset = addCase5Only([g2is[len+1][0], g2is[len+1][1], g2is[len+1][2]], [g[0], -g[1], g[2]])
+
+  product = sub(sumLast, offset)
+  
+  return product
+
+
+# Assumes that x[i] are all in {0, 1}
+# g is a len-by-3 matrix, where each row is an EC group elem
+def innerProd(g, x, len):
+  # Set prod to the identity element
+  prods = sint.Matrix((len + 1), 3)
+  prods[0][0] = sint(0)
+  prods[0][1] = sint(0)
+  prods[0][2] = sint(1)
+  @for_range(len)
+  def range_body(i):
+    # if x[i] == 1, r = g[i], else r= [0, 0, 1] (the identity element)
+    r = sint.Array(3)
+    r[0] = x[i]*g[i][0] 
+    r[1] = x[i]*g[i][1]
+    r[2] = x[i]*g[i][2] + (1-x[i])
+
+    prodi = [prods[i][0], prods[i][1], prods[i][2]]
+    prodiPlusOne = add(prodi, r)
+    prods[i+1][0] = prodiPlusOne[0]
+    prods[i+1][1] = prodiPlusOne[1]
+    prods[i+1][2] = prodiPlusOne[2]
+
+  prod = [prods[len][0], prods[len][1], prods[len][2]]
+  return prod    
+
+
+# Assumes p != O
+def doubleClear(p):
+
+  s = (3*p[0]*p[0] + a) / (2*p[1])
+  
+  rx = (s*s - p[0] - p[0])
+  ry = -(p[1] + s*(rx - p[0]))
+
+  return [rx, ry, cint(0)]
+    
+
+# Assumes that case 5 of the elliptic curve addition rule holds.
+# i.e. neither p nor q is the identity, p != -q and p != q.
+# Since they are not the identity, we only need the first two array elems
+def addCase5Only(p, q):
+  px = p[0]
+  py = p[1]
+
+  qx = q[0]
+  qy = q[1]
+
+  dy = qy - py
+  dx = qx - px
+
+  s = dy/dx
+
+  rx = s*s - px - qx
+  ry = - (py + s*(rx - px))
+
+  return [rx, ry, cint(0)]
+
+def sub(p, q):
+  return add(p, [q[0], -q[1], q[2]])
+
+def add(p, q):
+
+  rx = cint(0)
+  ry = cint(0)
+  rO = cint(0)
+
+  px = p[0]
+  py = p[1]
+  pO = p[2]  # If p is identity (O), this is 1, else 0.
+
+  qx = q[0]
+  qy = q[1]
+  qO = q[2]
+
+  # Case 1: p = O
+  case1 = pO
+  rx = rx + qx*case1
+  ry = ry + qy*case1
+
+  # Case 2: q = O  (and p != O)
+  case2 = qO * (1 - case1)
+  rx = rx + px*case2
+  ry = ry + py*case2
+  
+  # Case 3: p = -q (note, if p,q != O, then p.x = q.x, p.y != q.y => p = -q
+  eqx = (px == qx)
+  eqy = (py == qy)
+
+  case3 = eqx * (1 - eqy) * (1 - (case1 + case2))
+  rO = rO + case3
+ 
+  # Case 4: p = q (non-vertical tangient line)
+  case4 = eqx * eqy * (1 - (case1 + case2 + case3))
+  div = case4 * (2*py) + (1 - case4)   # To avoid div by 0, if not in this case, div=1
+  s = (3*px*px + a) / div
+  rx = rx + case4*(s*s - px - qx)
+  ry = ry - case4*(py + s*(rx - px))
+
+  # Case 5: Other
+  case5 = 1 - (case1 + case2 + case3 + case4)
+  dy = qy - py
+  dx = qx - px
+
+  div = case5 * dx + (1 - case5)   # To avoid div by 0, if not in this case, div=1
+  s = dy/div
+
+  rx = rx + case5*(s*s - px - qx)
+  ry = ry - case5*(py + s*(rx - px))
+
+  return [rx, ry, rO]
+
+# Need a separate function since comparing
+# a cint to a cint produces a regint.
+# Need to cast it to a cint here.
+def addClear(p, q):
+
+  rx = cint(0)
+  ry = cint(0)
+  rO = cint(0)
+
+  px = p[0]
+  py = p[1]
+  pO = p[2]  # If p is identity (O), this is 1, else 0.
+
+  qx = q[0]
+  qy = q[1]
+  qO = q[2]
+
+  # Case 1: p = O
+  case1 = pO
+  rx = rx + qx*case1
+  ry = ry + qy*case1
+
+  # Case 2: q = O  (and p != O)
+  case2 = qO * (1 - case1)
+  rx = rx + px*case2
+  ry = ry + py*case2
+  
+  # Case 3: p = -q (note, if p,q != O, then p.x = q.x, p.y != q.y => p = -q
+  eqx = cint(px == qx)
+  eqy = cint(py == qy)
+
+  case3 = eqx * (1 - eqy) * (1 - (case1 + case2))
+  rO = rO + case3
+ 
+  # Case 4: p = q (non-vertical tangient line)
+  case4 = eqx * eqy * (1 - (case1 + case2 + case3))
+  div = case4 * (2*py) + (1 - case4)   # To avoid div by 0, if not in this case, div=1
+  s = (3*px*px + a) / div
+  rx = rx + case4*(s*s - px - qx)
+  ry = ry - case4*(py + s*(rx - px))
+
+  # Case 5: Other
+  case5 = 1 - (case1 + case2 + case3 + case4)
+  dy = qy - py
+  dx = qx - px
+
+  div = case5 * dx + (1 - case5)   # To avoid div by 0, if not in this case, div=1
+  s = dy/div
+
+  rx = rx + case5*(s*s - px - qx)
+  ry = ry - case5*(py + s*(rx - px))
+
+  return [rx, ry, rO]
+
+
