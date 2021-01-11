@@ -1,0 +1,30 @@
+execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
+
+# For use with n=2048, p= 38280596832649217
+w = cint(23337084472520380)
+
+n=2048
+lgN = 11
+r = Ring(lgN, w)
+
+N = 20
+lgM = SED_THIS_TO_PLAINTEXT_LEN
+l = SED_THIS_TO_N_REPEATS
+lwe = LWE(r, N, lgM, l)
+
+u = cint.Array(n)
+v = cint.Array(n)
+s = sint.Array(n)
+
+# Decryption is oblivious, so input values don't matter.
+# Even if this ciphertext/secret pair would never be generated,
+#   it is still ok for it to be the input for the benchmarking,
+#   because it will decrypt to *some* value, and cost is oblivious.
+@for_range(n)
+def set_val(i):
+  u[i] = cint(1)
+  v[i] = cint(1)
+  s[i] = sint(1)
+
+x = lwe.dec(u, v, s)
+
