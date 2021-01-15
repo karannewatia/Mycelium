@@ -1,9 +1,9 @@
 # A simple script for finding a lgP-bit prime, p, such that p-1 is divisible by 2**(lgM + 1)
 
 import sympy
-import random 
+import random
 
-lgP = 56
+lgP = 256
 
 p = 4
 

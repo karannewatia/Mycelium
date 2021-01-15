@@ -26,7 +26,7 @@ class LWE(object):
     a = r.ringRandClear()
     s = r.ringBinom(N)
     e = r.ringBinom(N)
-    b = r.reveal(r.ringAdd(r.ringMulFast(a, s), e))
+    b = r.reveal(r.ringAdd(r.ringMulFast(a, s), 2*e))
 
     res = [a, b, s]
     return res
@@ -41,20 +41,20 @@ class LWE(object):
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
-    # u = a*e0 + e1 (mod q)
+    # u = a*e0 + 2*e1 (mod q)
     u = r.ringMulFast(a, e0)
-    u = r.ringAdd(u, e1)
- 
-    # v = b*e0 + e2 + round(p/m)z (mod p) 
+    u = r.ringAdd(u, 2*e1)
+
+    # v = b*e0 + 2*e2 + round(p/m)z (mod p)
     mthP = cint(-1)/cint(m)
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
       zMthP[i] = z[i] * mthP
-  
+
     v = r.ringMulFast(b, e0)
-    v = r.ringAdd(v, e2)
+    v = r.ringAdd(v, 2*e2)
     v = r.ringAdd(v, zMthP)
 
     res = [r.reveal(u), r.reveal(v)]
@@ -76,5 +76,3 @@ class LWE(object):
       z[i] = m - 1 - ((zNotchesI - 1) % m)
 
     return z
-
-
