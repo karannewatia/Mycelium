@@ -26,7 +26,10 @@ class LWE(object):
     a = r.ringRandClear()
     s = r.ringBinom(N)
     e = r.ringBinom(N)
-    b = r.reveal(r.ringAdd(r.ringMulFast(a, s), 2*e))
+    @for_range(cint(1024))
+    def range_body(i):
+      e[i] *= cint(2)
+    b = r.reveal(r.ringAdd(r.ringMulFast(a, s), e))
 
     res = [a, b, s]
     return res
@@ -41,9 +44,13 @@ class LWE(object):
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
+    @for_range(cint(1024))
+    def range_body(i):
+      e1[i] *= cint(2)
+
     # u = a*e0 + 2*e1 (mod q)
     u = r.ringMulFast(a, e0)
-    u = r.ringAdd(u, 2*e1)
+    u = r.ringAdd(u, e1)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
     mthP = cint(-1)/cint(m)
@@ -53,8 +60,12 @@ class LWE(object):
     for i in range(0, len(z)):
       zMthP[i] = z[i] * mthP
 
+    @for_range(cint(1024))
+    def range_body(i):
+      e2[i] *= cint(2)
+      
     v = r.ringMulFast(b, e0)
-    v = r.ringAdd(v, 2*e2)
+    v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
     res = [r.reveal(u), r.reveal(v)]
