@@ -13,7 +13,7 @@ class Ring(object):
   # w is a 2nth primitive root of unity
   # All are public (non-secret) values
   def __init__(self, nBitsN, w):
-    self.n = (1 << nBitsN) % p
+    self.n = 1 << nBitsN
     self.nBitsN = nBitsN
     self.w = w
     return
@@ -39,8 +39,8 @@ class Ring(object):
     #r = sint(0)
     r = 0
     for i in range(0, 2*n):
-      r = (r + self.randBit()) % p
-    return (r - n) % p
+      r = r + self.randBit()
+    return r - n
 
 
   # RING OPERATIONS
@@ -102,10 +102,10 @@ class Ring(object):
   def bitRev(self, j, nBits):
     s = 0
     for i in range(nBits):
-      s = (s << 1) % p
-      s += (j%2) % p
-      j = (j >> 1) % p
-    return s
+      s = s << 1
+      s += j%2
+      j = j >> 1
+    return s % p
 
   # compute a ** b where a, b are cints
   def cPow(self, a, b, nBitsB):
@@ -114,9 +114,10 @@ class Ring(object):
     bRev = self.bitRev(b, nBitsB)
     for i in range(nBitsB):
       p1 = (p1**2) % p
-      p1 = (((p1 + (bRev % 2)) % p) * (((p1 * a) % p - p1) % p)) % p
-      bRev = (bRev >> 1) % p
-    return p1
+      # p1 = (((p1 + (bRev % 2)) % p) * (((p1 * a) % p - p1) % p)) % p
+      p1 = p1 + (bRev % 2)*(p1 * a - p1)
+      bRev = bRev >> 1
+    return p1 % p
 
   # Find what wExp would be in the recursion
   # wExp is defined as follows
@@ -132,12 +133,14 @@ class Ring(object):
   def getWExp(self, d, i):
     n = self.n
     nBits = self.nBitsN
-    base = ((self.bitRev(i, nBits)*2) % p + 1) % p
-    return ((base << d)) % p % n
+    # base = ((self.bitRev(i, nBits)*2) % p + 1) % p
+    # return ((base << d)) % p % n
+    base = self.bitRev(i, nBits)*2 + 1
+    return (base << d) % n
 
   # Return x_i, where i = 0 (false) or 1 (true)
   def mux(self, i, x0, x1):
-    return (((x0 + i) % p) * ((x1 - x0) % p)) % p
+    return x0 + i * (x1 - x0)
 
   # Fast Ring multiplication
   # From Bernstein, Daniel. "Fast multiplication and its applications."
@@ -170,7 +173,7 @@ class Ring(object):
     #def splitRow(k):
     for k in range(1, nBitsN+1):
       d = nBitsN - k       # Number of recursions left until base layer
-      gapSize = (1 << d) % p
+      gapSize = 1 << d
 
       # @for_range(n)
       # def splitCell(i):
@@ -178,7 +181,7 @@ class Ring(object):
         # c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
         # isRight = cint((i >> d) % 2)
         c = self.cPow(self.w, self.getWExp(d, i), nBitsN)
-        isRight = ((i >> d) % p) % 2
+        isRight = (i >> d) % 2
 
         AsUp = As[k-1][i]
         if (i-gapSize) >= 0:
@@ -190,8 +193,10 @@ class Ring(object):
         else:
             AsUpR = 0
 
-        AsIfLeft = (((AsUp + AsUpR) % p) * c) % p
-        AsIfRight = (AsUpL - AsUp*c) % p
+        # AsIfLeft = (((AsUp + AsUpR) % p) * c) % p
+        # AsIfRight = (AsUpL - AsUp*c) % p
+        AsIfLeft = AsUp + AsUpR * c
+        AsIfRight = AsUpL - AsUp*c
 
         As[k][i] = self.mux(isRight, AsIfLeft, AsIfRight)
 
@@ -218,8 +223,10 @@ class Ring(object):
         else:
             BsUpR = 0
 
-        BsIfLeft = (((BsUp + BsUpR) % p) * c) % p
-        BsIfRight = (BsUpL - BsUp*c) % p
+        # BsIfLeft = (((BsUp + BsUpR) % p) * c) % p
+        # BsIfRight = (BsUpL - BsUp*c) % p
+        BsIfLeft = BsUp + BsUpR * c
+        BsIfRight = BsUpL - BsUp*c
 
         Bs[k][i] = self.mux(isRight, BsIfLeft, BsIfRight)
 
@@ -241,11 +248,11 @@ class Ring(object):
         c = self.cPow(self.w, self.getWExp(d-1, i), nBitsN)
         isRight = ((i >> (d-1)) % p) % 2
         if (i+gapSize) < n:
-            RsLeft = (Rs[k+1][i] + Rs[k+1][i + gapSize]) % p
+            RsLeft = Rs[k+1][i] + Rs[k+1][i + gapSize] #% p
         else:
             RsLeft = 0
         if (i-gapSize) >= 0:
-            RsRight = ((Rs[k+1][i - gapSize] - Rs[k+1][i]) / c ) % p
+            RsRight = (Rs[k+1][i - gapSize] - Rs[k+1][i]) / c  #% p
         else:
             RsRight = 0
         Rs[k][i] = self.mux(isRight, RsLeft, RsRight)
@@ -267,9 +274,7 @@ class Ring(object):
 
     #@for_range(n)
     #def range_body(i):
-    for i in range(n):
       #zero[i] = sint(0)
-      zero[i] = 0
 
     return zero
 
@@ -308,7 +313,7 @@ class Ring(object):
     #@for_range(n)
     #def range_body(i):
     for i in range(n):
-      res[i] = self.modBinom(N)
+      res[i] = self.modBinom(N) % p
     return res
 
   def ringRevealPrettyPrint(self, a):
