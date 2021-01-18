@@ -34,6 +34,27 @@ class LWE(object):
     res = [a, b, s]
     return res
 
+  #calculate the decompose gadget
+  def decompose_gadget(num_rows, num_columns, mod_val):
+    g = cint.Array(num_columns)
+    return g
+
+  #do key switching
+  def key_switching(g, s):
+    r = self.r
+    N = self.N
+    s1 = r.ringBinom(N)
+    e = r.ringBinom(N)
+    u = r.ringRandClear()
+
+    #v = -u*s1 + g*s + e
+    #k = (u|v)
+
+    #todo: figure out how to calculate and return (c0', c1')
+
+    return s1
+
+
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [u, v]
   def enc(self, a, b, z):
@@ -63,7 +84,7 @@ class LWE(object):
     @for_range(cint(1024))
     def range_body(i):
       e2[i] *= cint(2)
-      
+
     v = r.ringMulFast(b, e0)
     v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
@@ -87,3 +108,13 @@ class LWE(object):
       z[i] = m - 1 - ((zNotchesI - 1) % m)
 
     return z
+
+  def add(self, u1, u2):
+    r = self.r
+    res = r.reveal(r.ringAdd(u1, u2))
+    return res
+
+  def mul(self, u1, u2):
+    r = self.r
+    res = r.reveal(r.ringMulFast(u1, u2))
+    return res
