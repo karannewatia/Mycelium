@@ -16,6 +16,8 @@ class LWE(object):
     self.lgM = lgM
     self.m = 2 ** lgM    # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
+    self.n = 1024
+    self.lgP = 256
     return
 
   # Returns [a, b, s]
@@ -26,7 +28,7 @@ class LWE(object):
     a = r.ringRandClear()
     s = r.ringBinom(N)
     e = r.ringBinom(N)
-    @for_range(cint(1024))
+    @for_range(self.n)
     def range_body(i):
       e[i] *= cint(2)
     b = r.reveal(r.ringAdd(r.ringMulFast(a, s), e))
@@ -34,36 +36,90 @@ class LWE(object):
     res = [a, b, s]
     return res
 
-  #calculate the decompose gadget
-  def decompose_gadget(num_columns, mod_val):
-    g = cint.Array(num_columns)
-    #how to calculate g
-    #shape of g?
+  #Returns res
+  #calculate the binary representation of the given number
+  def to_binary(num):
+    res = cint.Array(self.lgP)
+    @for_range(self.lgP)
+    def range_body(i):
+      res[i] = cint(0)
+
+    i = self.lgP-1
+    #while(num > 1):
+    @while_do(lambda x: x > 1, num)
+    def loop_body(k):
+      res[i] = num % 2
+      num = num / 2
+      i = i - 1
+      return num
+
+    res[i] = num % 2
+    return res
+
+  #Returns g
+  #calculate the decompose gadget g
+  def decompose_gadget():
+    g = cint.Array(self.lgP)
+    @for_range(self.lgP-1, 0, -1)
+    def range_body(i):
+      g[i] = 2**i
     return g
 
-
-  #do key switching
+  #Returns [s1, u, v]
+  #do key switching: generate new secret key s1 and key switching key k = (u|v)
   def key_switching(g, s):
     r = self.r
     N = self.N
-    s1 = r.ringBinom(N)
-    e = r.ringBinom(N)
-    u = r.ringRandClear()
 
     #v = -u*s1 + g*s + e
-    #calculate -u*s1 and g*s using ringMulFast, then add them together and
-    # also add e using ringAdd
 
-    #k = (u|v) #joining two row vectors, shape of k ?
+    s1 = r.ringBinom(N)
 
-    return s1 #we also have to return k
+    u = cint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      u[i] = r.ringRandClear()
+      @for_range(self.n)
+      def range_body_inner(j):
+        u[i][j] = -u[i][j]
 
+    e = sint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      e[i] = r.ringBinom(N)
 
-  def new_ciphertext(g, c0, c1, k):
-    #how to calculate g^-1. is it just a bit encoding
-    #shape of g^-1 ?
-    #calculate and return c0', c1'
-    return 0
+    gs = sint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      @for_range(self.n)
+      def range_body_inner(j):
+        gs[i][j] = g[i] * s[j]
+
+    v = cint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      v[i] = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(u[i], s1), gs[i]), e[i]))
+
+    #k = (u|v)
+    res = [s1, u, v]
+    return res
+
+  #Generate the new ciphertext
+  #Returns [c0_new, c1_new]
+  def new_ciphertext(c0, c1, u, v):
+    #(c0', c1') = (c0, 0) + g^-1 * K, where K = (u|v)
+
+    g_inverse = cint.Matrix(self.n, self.lgP)
+    @for_range(self.n)
+    def range_body(i):
+      g_inverse[i] = to_binary(c1[i])
+
+    #g_inverse_K = ?? TODO
+
+    c0_new = cint.Array(self.n)
+    c1_new = cint.Array(self.n)
+    #update c0_new, c1_new TODO
+    return [c0_new, c1_new]
 
 
   # z is plaintext (array) of l elems each modulo m
@@ -76,7 +132,7 @@ class LWE(object):
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
-    @for_range(cint(1024))
+    @for_range(self.n)
     def range_body(i):
       e1[i] *= cint(2)
 
@@ -92,7 +148,7 @@ class LWE(object):
     for i in range(0, len(z)):
       zMthP[i] = z[i] * mthP
 
-    @for_range(cint(1024))
+    @for_range(self.n)
     def range_body(i):
       e2[i] *= cint(2)
 
