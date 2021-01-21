@@ -16,8 +16,8 @@ class LWE(object):
     self.lgM = lgM
     self.m = 2 ** lgM    # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
-    self.n = 1024
-    self.lgP = 256
+    self.n = 128
+    self.lgP = 32
     return
 
   # Returns [a, b, s]
@@ -36,38 +36,39 @@ class LWE(object):
     res = [a, b, s]
     return res
 
-  #Returns res
-  #calculate the binary representation of the given number
-  def to_binary(num):
+  #Calculate the binary representation of the given number
+  def to_binary(self, number):
     res = cint.Array(self.lgP)
     @for_range(self.lgP)
     def range_body(i):
       res[i] = cint(0)
+    num = cint.Array(1)
+    num[0] = cint(number)
 
-    i = self.lgP-1
-    #while(num > 1):
-    @while_do(lambda x: x > 1, num)
-    def loop_body(k):
-      res[i] = num % 2
-      num = num / 2
-      i = i - 1
-      return num
+    @for_range(self.lgP-1, -1, -1)
+    def range_body(i):
+      if_then(num[0] > 1)
+      res[i] = num[0] % 2
+      num[0] = num[0] >> 1
+      else_then()
+      res[i] = num[0] % 2
+      num[0] = 0
+      end_if()
 
-    res[i] = num % 2
     return res
 
   #Returns g
   #calculate the decompose gadget g
-  def decompose_gadget():
+  def decompose_gadget(self):
     g = cint.Array(self.lgP)
-    @for_range(self.lgP-1, 0, -1)
+    @for_range(self.lgP-1, -1, -1)
     def range_body(i):
-      g[i] = 2**i
+      g[(self.lgP-1) - i] = 2**i
     return g
 
   #Returns [s1, u, v]
   #do key switching: generate new secret key s1 and key switching key k = (u|v)
-  def key_switching(g, s):
+  def key_switching(self, g, s):
     r = self.r
     N = self.N
 
@@ -78,15 +79,18 @@ class LWE(object):
     u = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
-      u[i] = r.ringRandClear()
+      tmp_u = r.ringRandClear()
       @for_range(self.n)
       def range_body_inner(j):
-        u[i][j] = -u[i][j]
+        u[i][j] = -tmp_u[j]
 
     e = sint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
-      e[i] = r.ringBinom(N)
+      tmp_e = r.ringBinom(N)
+      @for_range(self.n)
+      def range_body_inner(j):
+        e[i][j] = tmp_e[j]
 
     gs = sint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
@@ -98,7 +102,10 @@ class LWE(object):
     v = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
-      v[i] = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(u[i], s1), gs[i]), e[i]))
+      tmp_v = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(u[i], s1), gs[i]), e[i]))
+      @for_range(self.n)
+      def range_body_inner(j):
+        v[i][j] = tmp_v[j]
 
     #k = (u|v)
     res = [s1, u, v]
@@ -106,21 +113,34 @@ class LWE(object):
 
   #Generate the new ciphertext
   #Returns [c0_new, c1_new]
-  def new_ciphertext(c0, c1, u, v):
+  def new_ciphertext(self, c0, c1, u, v):
     #(c0', c1') = (c0, 0) + g^-1 * K, where K = (u|v)
 
     g_inverse = cint.Matrix(self.n, self.lgP)
-    @for_range(self.n)
-    def range_body(i):
-      g_inverse[i] = to_binary(c1[i])
-
-    #g_inverse_K = ?? TODO
-
     c0_new = cint.Array(self.n)
     c1_new = cint.Array(self.n)
-    #update c0_new, c1_new TODO
-    return [c0_new, c1_new]
+    @for_range(self.n)
+    def range_body(i):
+      c0_new[i] = c0[i]
+      c1_new[i] = cint(0)
+      @for_range(self.lgP)
+      def range_body_inner(j):
+        tmp_binary = self.to_binary(c1[i])
+        g_inverse[i][j] = tmp_binary[j]
 
+    @for_range(self.lgP)
+    def range_body(i):
+      gt = cint.Array(self.n)
+      @for_range(self.n)
+      def range_body_inner(j):
+        gt[j] = g_inverse[j][i]
+      tmp0 = r.ringAddClear(r.ringMulFastClear(gt, u[i]), c0_new)
+      tmp1 = r.ringAddClear(r.ringMulFastClear(gt, v[i]), c1_new)
+      @for_range(self.n)
+      def range_body_inner(j):
+        c0_new[j] = tmp0[j]
+        c1_new[j] = tmp1[j]
+    return [c0_new, c1_new]
 
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [u, v]
@@ -179,9 +199,4 @@ class LWE(object):
   def add(self, u1, u2):
     r = self.r
     res = r.reveal(r.ringAdd(u1, u2))
-    return res
-
-  def mul(self, u1, u2):
-    r = self.r
-    res = r.reveal(r.ringMulFast(u1, u2))
     return res

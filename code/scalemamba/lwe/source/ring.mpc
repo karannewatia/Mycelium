@@ -2,7 +2,7 @@ class Ring(object):
 
   # Defines parameters for the ring Z/pZ/<X^n + 1>
   # i.e. A ring of polynomials where coefficients are
-  #   in Z/pZ, and where polynomial multiplication is 
+  #   in Z/pZ, and where polynomial multiplication is
   #   reduced over X^n+1
   # p is the prime modulus natively used by SCALE-MAMBA
   # Require also that p = 1 (mod 2n)
@@ -50,6 +50,13 @@ class Ring(object):
       res[i] = a[i] + b[i]
     return res
 
+  def ringAddClear(self, a, b):
+    res = cint.Array(self.n)
+    @for_range(self.n)
+    def range_body(i):
+      res[i] = a[i] + b[i]
+    return res
+
   # Ring subtraction (i.e. pointwise vector subtraction mod p)
   def ringSub(self, a, b):
     res = sint.Array(self.n)
@@ -68,7 +75,7 @@ class Ring(object):
     @for_range(2*n)
     def range_body_zero(i):
       conv[i] = sint(0)
-    
+
     @for_range(n**2)
     def range_body_mul(i):
       j = i % n
@@ -79,7 +86,7 @@ class Ring(object):
     @for_range(n-1)
     def range_body_wrap(i):
       res[i] = conv[i] - conv[i + n]
-    
+
     res[n-1] = conv[n-1]
     return res
 
@@ -123,7 +130,7 @@ class Ring(object):
     return x0 + i * (x1 - x0)
 
   # Fast Ring multiplication
-  # From Bernstein, Daniel. "Fast multiplication and its applications." 
+  # From Bernstein, Daniel. "Fast multiplication and its applications."
   # See https://cr.yp.to/papers.html#multapps
   # a, b: operands (elements of Z/pZ/<X^n + 1>
   # a must be a cint array, b must me a sint array
@@ -180,7 +187,7 @@ class Ring(object):
         BsIfRight = BsUpL - BsUp*c
 
         Bs[k][i] = self.mux(isRight, BsIfLeft, BsIfRight)
-    
+
     @for_range(n)
     def baseRs(i):
       Rs[nBitsN][i] = As[nBitsN][i] * Bs[nBitsN][i]
@@ -204,6 +211,79 @@ class Ring(object):
 
     return res
 
+  # We require: p = 1 (mod 2n), w^n = -1 (mod p)
+  def ringMulFastClear(self, a, b):
+    n = self.n
+    nBitsN = self.nBitsN
+
+    Rs = cint.Matrix(nBitsN+1, n)
+    As = cint.Matrix(nBitsN+1, n)
+    Bs = cint.Matrix(nBitsN+1, n)
+
+    @for_range(n)
+    def topAB(i):
+      As[0][i] = a[i]
+      Bs[0][i] = b[i]
+
+    @for_range(1, nBitsN+1)
+    def splitRow(k):
+      d = nBitsN - k       # Number of recursions left until base layer
+      gapSize = 1 << d
+      @for_range(n)
+      def splitCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
+        isRight = cint((i >> d) % 2)
+
+	AsUp = As[k-1][i]
+	AsUpL = As[k-1][i-gapSize]
+	AsUpR = As[k-1][i+gapSize]
+
+        AsIfLeft = AsUp + AsUpR * c
+        AsIfRight = AsUpL - AsUp*c
+
+        As[k][i] = self.mux(isRight, AsIfLeft, AsIfRight)
+
+    @for_range(1, nBitsN+1)
+    def splitRow(k):
+      d = nBitsN - k       # Number of recursions left until base layer
+      gapSize = 1 << d
+      @for_range(n)
+      def splitCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
+        isRight = cint(((i >> d) % 2))
+
+	BsUp = Bs[k-1][i]
+	BsUpL = Bs[k-1][i-gapSize]
+	BsUpR = Bs[k-1][i+gapSize]
+
+        BsIfLeft = BsUp + BsUpR * c
+        BsIfRight = BsUpL - BsUp*c
+
+        Bs[k][i] = self.mux(isRight, BsIfLeft, BsIfRight)
+
+    @for_range(n)
+    def baseRs(i):
+      Rs[nBitsN][i] = As[nBitsN][i] * Bs[nBitsN][i]
+
+    @for_range(1, nBitsN+1)
+    def combRow(d):
+      k = nBitsN - d
+      gapSize = 1 << (d-1)
+      @for_range(n)
+      def combCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d-1), cint(i)), nBitsN)
+        isRight = cint((i >> (d-1)) % 2)
+	RsLeft = Rs[k+1][i] + Rs[k+1][i + gapSize]
+        RsRight = (Rs[k+1][i - gapSize] - Rs[k+1][i]) / c
+        Rs[k][i] = self.mux(isRight, RsLeft, RsRight)
+
+    res = cint.Array(n)
+    @for_range(n)
+    def setRes(i):
+      res[i] = Rs[0][i] / n
+
+    return res
+
   # Returns 0:
   def zero(self):
     n = self.n
@@ -216,7 +296,7 @@ class Ring(object):
     return zero
 
   # Random ring element
-  # Returns a vector of length n 
+  # Returns a vector of length n
   # Each item is chosen uniformally at random from [0, p)
   # Assumes n is even
   def ringRand(self):
@@ -235,7 +315,7 @@ class Ring(object):
     res = self.reveal(rand)
     return res
 
-  # Returns a vector of length n 
+  # Returns a vector of length n
   # Each item is chosen independently at random from (B(2N, 0.5) - N) mod p
   def ringBinom(self, N):
     n = self.n
@@ -281,4 +361,3 @@ class Ring(object):
     for i in range(0, n):
       res.append(sint.get_raw_input_from(partyNum))
     return res
-
