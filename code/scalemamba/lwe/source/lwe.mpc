@@ -17,7 +17,7 @@ class LWE(object):
     self.m = 2 ** lgM    # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     self.n = 128
-    self.lgP = 32
+    self.lgP = 64
     return
 
   # Returns [a, b, s]
@@ -82,7 +82,7 @@ class LWE(object):
       tmp_u = r.ringRandClear()
       @for_range(self.n)
       def range_body_inner(j):
-        u[i][j] = -tmp_u[j]
+        u[i][j] = -1*tmp_u[j]
 
     e = sint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
