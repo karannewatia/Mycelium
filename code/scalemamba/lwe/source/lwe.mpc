@@ -16,8 +16,8 @@ class LWE(object):
     self.lgM = lgM
     self.m = 2 ** lgM    # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
-    self.n = 128
-    self.lgP = 64
+    self.n = 16
+    self.lgP = 32
     return
 
   # Returns [a, b, s]
@@ -80,12 +80,14 @@ class LWE(object):
     s1 = r.ringBinom(N)
 
     u = cint.Matrix(self.lgP, self.n)
+    u_neg = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
       tmp_u = r.ringRandClear()
       @for_range(self.n)
       def range_body_inner(j):
-        u[i][j] = cint(-1)*tmp_u[j]
+        u[i][j] = tmp_u[j]
+        u_neg[i][j] = cint(-1)*tmp_u[j]
 
     e = sint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
@@ -105,7 +107,7 @@ class LWE(object):
     v = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
-      tmp_v = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(u[i], s1), gs[i]), e[i]))
+      tmp_v = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(u_neg[i], s1), gs[i]), e[i]))
       @for_range(self.n)
       def range_body_inner(j):
         v[i][j] = tmp_v[j]
@@ -126,26 +128,27 @@ class LWE(object):
     def range_body(i):
       c0_new[i] = c0[i]
       c1_new[i] = cint(0)
-      @for_range(self.lgP)
       tmp_binary = self.to_binary(c1[i])
+      @for_range(self.lgP)
       def range_body_inner(j):
         if_then(c1[i] < cint(0))
         tmp_binary[j] = cint(-1) * tmp_binary[j]
         end_if()
         g_inverse[i][j] = tmp_binary[j]
-
     @for_range(self.lgP)
     def range_body(i):
       gt = cint.Array(self.n)
       @for_range(self.n)
       def range_body_inner(j):
         gt[j] = g_inverse[j][i]
+
       tmp0 = r.ringAddClear(r.ringMulFastClear(gt, u[i]), c0_new)
       tmp1 = r.ringAddClear(r.ringMulFastClear(gt, v[i]), c1_new)
       @for_range(self.n)
       def range_body_inner(j):
         c0_new[j] = tmp0[j]
         c1_new[j] = tmp1[j]
+
     return [c0_new, c1_new]
 
   # z is plaintext (array) of l elems each modulo m
@@ -192,6 +195,7 @@ class LWE(object):
     m = 1 << lgM
     clearM = cint(m)
     zNoisy = r.ringSub(v, r.ringMulFast(u, s))
+    #zNoisy = r.ringAdd(c0, r.ringMulFast(c1, s))
     halfMthP = cint(-1)/(2*m)
     z = sint.Array(self.l)
     @for_range(self.l)

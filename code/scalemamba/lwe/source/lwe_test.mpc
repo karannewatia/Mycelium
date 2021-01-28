@@ -1,13 +1,13 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 
-#p = 12798806949013487617
-w = cint(2022204394112658921)
+#p = 3843321857
+w = cint(3457723958)
 
-lgN = 7
+lgN = 4
 r = Ring(lgN, w)
 
 N = 1
-lgM = 20
+lgM = 10
 l = 4
 lwe = LWE(r, N, lgM, l)
 
@@ -18,15 +18,19 @@ for i in range(l):
 
 [a, b, s] = lwe.key_gen()
 [u, v] = lwe.enc(a, b, x)
-#x2 = lwe.dec(u, v, s)
+x2 = lwe.dec(u, v, s)
 
-g = lwe.decompose_gadget()
-print_ln("decompose gadget done")
-[s1, v1, u1] = lwe.key_switching(g, s)
-print_ln("key switching done")
-[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
-print_ln("new ciphertext done")
-x2 = lwe.dec(u2, v2, s1)
+#[b, a, s] = lwe.key_gen()
+#[c1, c0] = lwe.enc(b, a, x)
+#x2 = lwe.dec(c0, c1, s)
+
+#g = lwe.decompose_gadget()
+#print_ln("decompose gadget done")
+#[s1, u1, v1] = lwe.key_switching(g, s)
+#print_ln("key switching done")
+#[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
+#print_ln("new ciphertext done")
+#x2 = lwe.dec(u2, v2, s1)
 
 
 #[u1, v1] = lwe.enc(a, b, x)
