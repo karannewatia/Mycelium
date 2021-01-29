@@ -1,5 +1,5 @@
 import random
-p=91373611627975532689656720489413429524532579978358356112637016726871503536129
+p=3843321857
 
 class Ring(object):
 
@@ -17,6 +17,12 @@ class Ring(object):
     self.nBitsN = nBitsN
     self.w = w
     return
+
+  def get_mod(self, a):
+    if a >= 0:
+        return a % p
+    else:
+        return a % -p
 
   # Return a random element in [0, p)
   def randElem(self):
@@ -39,8 +45,8 @@ class Ring(object):
     #r = sint(0)
     r = 0
     for i in range(0, 2*n):
-      r = r + self.randBit()
-    return r - n
+      r = self.get_mod(r + self.randBit())
+    return self.get_mod(r - n)
 
 
   # RING OPERATIONS
@@ -55,7 +61,7 @@ class Ring(object):
     #@for_range(self.n)
     #def range_body(i):
     for i in range(self.n):
-      res[i] = (a[i] + b[i]) % p
+      res[i] = self.get_mod(a[i] + b[i])
     return res
 
   # Ring subtraction (i.e. pointwise vector subtraction mod p)
@@ -65,7 +71,7 @@ class Ring(object):
     #@for_range(self.n)
     #def range_body(i):
     for i in range(self.n):
-      res[i] = (a[i] - b[i]) % p
+      res[i] = self.get_mod(a[i] - b[i])
     return res
 
   # Ring multiplication (i.e. convolution)
@@ -87,14 +93,14 @@ class Ring(object):
     for i in range(n**2):
       j = i % n
       k = i / n
-      conv[j+k] = ((conv[j+k]) % p + ( a[j] * b[k] ) % p) % p
+      conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
 
     #res = sint.Array(n)
     res = [0 for i in range(n)]
     #@for_range(n-1)
     #def range_body_wrap(i):
     for i in range(n-1):
-      res[i] = (conv[i] - conv[i + n]) % p
+      res[i] = self.get_mod(conv[i] - conv[i + n])
 
     res[n-1] = conv[n-1]
     return res
@@ -102,10 +108,10 @@ class Ring(object):
   def bitRev(self, j, nBits):
     s = 0
     for i in range(nBits):
-      s = s << 1
-      s += j%2
+      s = self.get_mod(s << 1)
+      s += self.get_mod(j%2)
       j = j >> 1
-    return s % p
+    return self.get_mod(s)
 
   # compute a ** b where a, b are cints
   def cPow(self, a, b, nBitsB):
@@ -113,11 +119,11 @@ class Ring(object):
     p1 = 1
     bRev = self.bitRev(b, nBitsB)
     for i in range(nBitsB):
-      p1 = (p1**2) % p
+      p1 = self.get_mod(p1**2)
       # p1 = (((p1 + (bRev % 2)) % p) * (((p1 * a) % p - p1) % p)) % p
-      p1 = p1 + (bRev % 2)*(p1 * a - p1)
+      p1 = self.get_mod(p1 + self.get_mod(bRev % 2) * self.get_mod(p1 * a - p1))
       bRev = bRev >> 1
-    return p1 % p
+    return self.get_mod(p1)
 
   # Find what wExp would be in the recursion
   # wExp is defined as follows
@@ -135,8 +141,8 @@ class Ring(object):
     nBits = self.nBitsN
     # base = ((self.bitRev(i, nBits)*2) % p + 1) % p
     # return ((base << d)) % p % n
-    base = self.bitRev(i, nBits)*2 + 1
-    return (base << d) % n
+    base = self.get_mod(self.bitRev(i, nBits)*2 + 1)
+    return self.get_mod(base << d) % n
 
   # Return x_i, where i = 0 (false) or 1 (true)
   def mux(self, i, x0, x1):
@@ -173,7 +179,7 @@ class Ring(object):
     #def splitRow(k):
     for k in range(1, nBitsN+1):
       d = nBitsN - k       # Number of recursions left until base layer
-      gapSize = 1 << d
+      gapSize = self.get_mod(1 << d)
 
       # @for_range(n)
       # def splitCell(i):
@@ -195,8 +201,8 @@ class Ring(object):
 
         # AsIfLeft = (((AsUp + AsUpR) % p) * c) % p
         # AsIfRight = (AsUpL - AsUp*c) % p
-        AsIfLeft = AsUp + AsUpR * c
-        AsIfRight = AsUpL - AsUp*c
+        AsIfLeft = self.get_mod(AsUp + self.get_mod(AsUpR * c))
+        AsIfRight = self.get_mod(AsUpL - self.get_mod(AsUp*c))
 
         As[k][i] = self.mux(isRight, AsIfLeft, AsIfRight)
 
@@ -204,14 +210,14 @@ class Ring(object):
     # def splitRow(k):
     for k in range(1, nBitsN+1):
       d = nBitsN - k       # Number of recursions left until base layer
-      gapSize = (1 << d) % p
+      gapSize = self.get_mod(1 << d)
       # @for_range(n)
       # def splitCell(i):
       for i in range(n):
         # c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
         # isRight = cint(((i >> d) % 2))
         c = self.cPow(self.w, self.getWExp(d, i), nBitsN)
-        isRight = ((i >> d) % p) % 2
+        isRight = self.get_mod(i >> d) % 2
 
         BsUp = Bs[k-1][i]
         if (i-gapSize) >= 0:
@@ -225,34 +231,34 @@ class Ring(object):
 
         # BsIfLeft = (((BsUp + BsUpR) % p) * c) % p
         # BsIfRight = (BsUpL - BsUp*c) % p
-        BsIfLeft = BsUp + BsUpR * c
-        BsIfRight = BsUpL - BsUp*c
+        BsIfLeft = self.get_mod(BsUp + self.get_mod(BsUpR * c))
+        BsIfRight = self.get_mod(BsUpL - self.get_mod(BsUp*c))
 
         Bs[k][i] = self.mux(isRight, BsIfLeft, BsIfRight)
 
     # @for_range(n)
     # def baseRs(i):
     for i in range(n):
-      Rs[nBitsN][i] = As[nBitsN][i] * Bs[nBitsN][i]
+      Rs[nBitsN][i] = self.get_mod(As[nBitsN][i] * Bs[nBitsN][i])
 
     # @for_range(1, nBitsN+1)
     # def combRow(d):
     for d in range(1, nBitsN+1):
       k = nBitsN - d
-      gapSize = (1 << (d-1)) % p
+      gapSize = self.get_mod(1 << (d-1))
       # @for_range(n)
       # def combCell(i):
       for i in range(n):
         # c = self.cPow(self.w, self.getWExp(cint(d-1), cint(i)), nBitsN)
         # isRight = cint((i >> (d-1)) % 2)
         c = self.cPow(self.w, self.getWExp(d-1, i), nBitsN)
-        isRight = ((i >> (d-1)) % p) % 2
+        isRight = self.get_mod(i >> (d-1)) % 2
         if (i+gapSize) < n:
-            RsLeft = Rs[k+1][i] + Rs[k+1][i + gapSize] #% p
+            RsLeft = self.get_mod(Rs[k+1][i] + self.get_mod(Rs[k+1][i + gapSize]))
         else:
             RsLeft = 0
         if (i-gapSize) >= 0:
-            RsRight = (Rs[k+1][i - gapSize] - Rs[k+1][i]) / c  #% p
+            RsRight = self.get_mod(Rs[k+1][i - gapSize] - Rs[k+1][i]) / c
         else:
             RsRight = 0
         Rs[k][i] = self.mux(isRight, RsLeft, RsRight)
@@ -262,7 +268,7 @@ class Ring(object):
     # @for_range(n)
     # def setRes(i):
     for i in range(n):
-      res[i] = (Rs[0][i] / n) % p
+      res[i] = self.get_mod(Rs[0][i] / n)
 
     return res
 
@@ -313,7 +319,7 @@ class Ring(object):
     #@for_range(n)
     #def range_body(i):
     for i in range(n):
-      res[i] = self.modBinom(N) % p
+      res[i] = self.modBinom(N)
     return res
 
   def ringRevealPrettyPrint(self, a):

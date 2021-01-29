@@ -1,6 +1,7 @@
 #execfile('/root/SCALE-MAMBA/Programs/ring/ring.mpc')
 from ring import Ring
-p=91373611627975532689656720489413429524532579978358356112637016726871503536129
+p=3843321857
+import math
 
 class LWE(object):
 
@@ -15,9 +16,15 @@ class LWE(object):
     # m = Modulus of ciphertext additions
     # Require p = 1 (mod 2m), and m to be a power of 2
     self.lgM = lgM
-    self.m = (2 ** lgM) % p   # Plaintext modulus (size per element)
+    self.m = (2 ** lgM)   # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     return
+
+  def get_mod(self, a):
+    if a >= 0:
+        return a % p
+    else:
+        return a % -p
 
   # Returns [a, b, s]
   # (a, b) is the public key, s is the secret key
@@ -27,9 +34,10 @@ class LWE(object):
     a = r.ringRandClear()
     s = r.ringBinom(N)
     e = r.ringBinom(N)
+    a_neg = [-i for i in a]
     b = r.reveal(r.ringAdd(r.ringMulFast(a, s), e)) #2*e
 
-    res = [a, b, s]
+    res = [a,b,s] #[a, b, s]
     return res
 
   # z is plaintext (array) of l elems each modulo m
@@ -53,7 +61,7 @@ class LWE(object):
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = (z[i] * mthP) % p
+      zMthP[i] = round(p/m + 0.5)*z[i] #self.get_mod(z[i] * mthP)
 
     v = r.ringMulFast(b, e0)
     v = r.ringAdd(v, e2)
@@ -70,15 +78,19 @@ class LWE(object):
     #clearM = cint(m)
     clearM = m
     zNoisy = r.ringSub(v, r.ringMulFast(u, s))
+    #zNoisy = r.ringAdd(u, r.ringMulFast(v, s))
+
     #halfMthP = cint(-1)/(2*m)
-    halfMthP = -1/((2*m) % p)
+    halfMthP = round(p/(2*m) + 0.5) #-1/(2*m)
     #z = sint.Array(self.l)
     z = [0 for i in range(self.l)]
     #@for_range(self.l)
     #def round(i):
     for i in range(self.l):
-      zRangeI = (zNoisy[i] + halfMthP) % p
-      zNotchesI = (zRangeI * clearM) % p
-      z[i] = ((m - 1) % p - ((zNotchesI - 1) % m)) % p
+        #z[i] = round(zNoisy[i]/m + 0.5)
+      zRangeI = self.get_mod(zNoisy[i] + halfMthP)
+      zNotchesI = self.get_mod(zRangeI * clearM)
+      z[i] = m - 1 - ((zNotchesI - 1) % m)
+      z[i] = self.get_mod(z[i])
 
     return z
