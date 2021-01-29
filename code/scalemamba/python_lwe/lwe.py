@@ -1,7 +1,6 @@
 #execfile('/root/SCALE-MAMBA/Programs/ring/ring.mpc')
 from ring import Ring
 p=3843321857
-import math
 
 class LWE(object):
 
@@ -24,7 +23,7 @@ class LWE(object):
     if a >= 0:
         return a % p
     else:
-        return a % -p
+        return a % p
 
   # Returns [a, b, s]
   # (a, b) is the public key, s is the secret key
@@ -35,7 +34,7 @@ class LWE(object):
     s = r.ringBinom(N)
     e = r.ringBinom(N)
     a_neg = [-i for i in a]
-    b = r.reveal(r.ringAdd(r.ringMulFast(a, s), e)) #2*e
+    b = r.reveal(r.ringAdd(r.ringMul(a, s), e)) #2*e
 
     res = [a,b,s] #[a, b, s]
     return res
@@ -51,19 +50,19 @@ class LWE(object):
     e2 = r.ringBinom(N)
 
     # u = a*e0 + 2*e1 (mod q)
-    u = r.ringMulFast(a, e0)
+    u = r.ringMul(a, e0)
     u = r.ringAdd(u, e1)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
     #mthP = cint(-1)/cint(m)
-    mthP = -1/m
+    mthP = p/m
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = round(p/m + 0.5)*z[i] #self.get_mod(z[i] * mthP)
+      zMthP[i] = self.get_mod(z[i] * mthP)
 
-    v = r.ringMulFast(b, e0)
+    v = r.ringMul(b, e0)
     v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
@@ -75,19 +74,13 @@ class LWE(object):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
-    #clearM = cint(m)
     clearM = m
-    zNoisy = r.ringSub(v, r.ringMulFast(u, s))
-    #zNoisy = r.ringAdd(u, r.ringMulFast(v, s))
+    zNoisy = r.ringSub(v, r.ringMul(u, s))
 
-    #halfMthP = cint(-1)/(2*m)
-    halfMthP = round(p/(2*m) + 0.5) #-1/(2*m)
-    #z = sint.Array(self.l)
+    halfMthP = p/(2*m)
+
     z = [0 for i in range(self.l)]
-    #@for_range(self.l)
-    #def round(i):
     for i in range(self.l):
-        #z[i] = round(zNoisy[i]/m + 0.5)
       zRangeI = self.get_mod(zNoisy[i] + halfMthP)
       zNotchesI = self.get_mod(zRangeI * clearM)
       z[i] = m - 1 - ((zNotchesI - 1) % m)

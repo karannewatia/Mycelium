@@ -17,19 +17,14 @@ lgM = 10
 l = 4
 lwe = LWE(r, N, lgM, l)
 
-#x = sint.Array(l)
 x = [0 for i in range(l)]
 for i in range(l):
-  #x[i] = sint(i)
   x[i] = i
   print(x[i])
 
 [a, b, s] = lwe.key_gen()
-
 [u, v] = lwe.enc(a, b, x)
-
 x2 = lwe.dec(u, v, s)
 
 for i in range(l):
-  #x2[i].reveal_to(0)
   print(x2[i])

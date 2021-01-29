@@ -22,7 +22,7 @@ class Ring(object):
     if a >= 0:
         return a % p
     else:
-        return a % -p
+        return a % p
 
   # Return a random element in [0, p)
   def randElem(self):
@@ -120,8 +120,7 @@ class Ring(object):
     bRev = self.bitRev(b, nBitsB)
     for i in range(nBitsB):
       p1 = self.get_mod(p1**2)
-      # p1 = (((p1 + (bRev % 2)) % p) * (((p1 * a) % p - p1) % p)) % p
-      p1 = self.get_mod(p1 + self.get_mod(bRev % 2) * self.get_mod(p1 * a - p1))
+      p1 = self.get_mod(self.get_mod(p1 + self.get_mod(bRev % 2)) * self.get_mod(p1 * a - p1))
       bRev = bRev >> 1
     return self.get_mod(p1)
 
@@ -258,7 +257,7 @@ class Ring(object):
         else:
             RsLeft = 0
         if (i-gapSize) >= 0:
-            RsRight = self.get_mod(Rs[k+1][i - gapSize] - Rs[k+1][i]) / c
+            RsRight = self.get_mod(self.get_mod(Rs[k+1][i - gapSize] - Rs[k+1][i]) / c)
         else:
             RsRight = 0
         Rs[k][i] = self.mux(isRight, RsLeft, RsRight)
