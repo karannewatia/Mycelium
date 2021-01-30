@@ -17,7 +17,7 @@ class LWE(object):
     self.lgM = lgM
     self.m = (2 ** lgM)   # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
-    self.n = 16
+    self.n = 4 #16
     self.lgP = 32
     return
 
