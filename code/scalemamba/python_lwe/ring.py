@@ -1,4 +1,5 @@
 import random
+random.seed(100)
 p=3843321857
 
 class Ring(object):
