@@ -9,7 +9,7 @@ class LWE(object):
   # Namely, if you wish to do t ciphertext additions
   #   and p is the size of the SCALE-MAMBA field, then need:
   #   t*2*N^2 < p / (2*m)
-  def __init__(self, r, N, lgM, l):
+  def __init__(self, r, N, lgM, l, n, lgP):
     self.r = r  # Ring used
     self.N = N  # Half-width of binomial distributions
     # m = Modulus of ciphertext additions
@@ -17,8 +17,8 @@ class LWE(object):
     self.lgM = lgM
     self.m = (2 ** lgM)   # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
-    self.n = 4 #16
-    self.lgP = 32
+    self.n = n
+    self.lgP = lgP
     return
 
   def get_mod(self, a):
@@ -73,11 +73,15 @@ class LWE(object):
       for i in range(self.lgP):
         v[i] = r.ringAdd(r.ringAdd(r.ringMul(u_neg[i], s1), gs[i]), e[i])
 
+      uvs = [[0 for i in range(self.n)] for j in range(self.lgP)]
+      for i in range(self.lgP):
+        uvs[i] = r.ringAdd(r.ringMul(u[i], s1), v[i])
+
       # #k = (u|v)
-      res = [s1, u, v, e]
+      res = [s1, u, v, e, uvs, gs]
       return res
 
-  def new_ciphertext(self, c0, c1, u, v, g, e):
+  def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs):
       #(c0', c1') = (c0, 0) + g^-1 * K, where K = (u|v)
       r = self.r
 
@@ -87,6 +91,9 @@ class LWE(object):
       g_inv_g_tmp = [[0 for i in range(self.lgP)] for j in range(self.n)]
       g_inv_g = [0 for i in range(self.n)]
       g_inv_e = [0 for i in range(self.n)]
+      g_inv_uvs = [0 for i in range(self.n)]
+      g_inv_uvs_c0 = [0 for i in range(self.n)]
+      g_inv_gs = [0 for i in range(self.n)]
 
       for i in range(self.n):
         tmp_binary = self.to_binary(c1[i])
@@ -104,8 +111,13 @@ class LWE(object):
         c0_new = r.ringAdd(r.ringMul(gt, u[i]), c0_new)
         c1_new = r.ringAdd(r.ringMul(gt, v[i]), c1_new)
         g_inv_e = r.ringAdd(r.ringMul(gt, e[i]), g_inv_e)
+        g_inv_uvs = r.ringAdd(r.ringMul(gt, uvs[i]), g_inv_uvs)
+        g_inv_gs = r.ringAdd(r.ringMul(gt, gs[i]), g_inv_gs)
 
-      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e]
+      g_inv_uvs_c0 = r.ringAdd(g_inv_uvs, c0)
+      g_inv_gs_e = r.ringAdd(g_inv_gs, g_inv_e)
+
+      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e]
 
 
   # Returns [a, b, s]
@@ -164,6 +176,7 @@ class LWE(object):
     m = 1 << lgM
     clearM = m
     zNoisy = r.ringSub(v, r.ringMul(u, s))
+    c0c1s = r.ringAdd(u, r.ringMul(v, s))
 
     halfMthP = p/(2*m)
 
@@ -174,7 +187,7 @@ class LWE(object):
       z[i] = m - 1 - ((zNotchesI - 1) % m)
       z[i] = self.get_mod(z[i])
 
-    return z
+    return [z, c0c1s]
 
   def add(self, u1, u2):
     r = self.r
