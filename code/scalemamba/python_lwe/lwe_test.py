@@ -77,7 +77,7 @@ print("#################### <g inverse, gs> + <g inverse, e> ###################
 print(g_inv_gs_e)
 print("#################### <g inverse, k0 + k1s'> + c0 #####################")
 print(g_inv_uvs_c0)
-print("#################### c0' + c1's'  #####################")
+print("#################### c0' + c1's' (zNoisy) #####################")
 print(c0c1s)
 
 ###### check addition on ciphertext #######

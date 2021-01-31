@@ -176,7 +176,7 @@ class LWE(object):
     m = 1 << lgM
     clearM = m
     zNoisy = r.ringSub(v, r.ringMul(u, s))
-    c0c1s = r.ringAdd(u, r.ringMul(v, s))
+    #c0c1s = r.ringAdd(u, r.ringMul(v, s))
 
     halfMthP = p/(2*m)
 
@@ -187,7 +187,7 @@ class LWE(object):
       z[i] = m - 1 - ((zNotchesI - 1) % m)
       z[i] = self.get_mod(z[i])
 
-    return [z, c0c1s]
+    return [z, zNoisy]
 
   def add(self, u1, u2):
     r = self.r
