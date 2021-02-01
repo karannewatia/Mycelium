@@ -78,7 +78,7 @@ class LWE(object):
         uvs[i] = r.ringAdd(r.ringMul(u[i], s1), v[i])
 
       # #k = (u|v)
-      res = [s1, u, v, e, uvs, gs]
+      res = [s1, v, u, e, uvs, gs]
       return res
 
   def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs, s1):
@@ -108,6 +108,7 @@ class LWE(object):
         gt = [0 for i in range(self.n)]
         for j in range(self.n):
           gt[j] = g_inverse[j][i]
+
         c0_new = r.ringAdd(r.ringMul(gt, u[i]), c0_new)
         c1_new = r.ringAdd(r.ringMul(gt, v[i]), c1_new)
         g_inv_e = r.ringAdd(r.ringMul(gt, e[i]), g_inv_e)
@@ -134,14 +135,14 @@ class LWE(object):
     e = r.ringBinom(N)
     a_neg = [-i for i in a]
     e = [2*i for i in e]
-    b = r.reveal(r.ringAdd(r.ringMul(a, s), e)) #2*e
+    b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e)) #2*e
 
-    res = [a,b,s] #[a, b, s]
+    res = [b,a,s] #[a, b, s]
     return res
 
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [u, v]
-  def enc(self, a, b, z):
+  def enc(self, b, a, z):
     r = self.r
     N = self.N
     m = self.m
@@ -170,17 +171,17 @@ class LWE(object):
     v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
-    res = [r.reveal(u), r.reveal(v)]
+    res = [r.reveal(v), r.reveal(u)]
     return res
 
 
-  def dec(self, u, v, s):
+  def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
     clearM = m
-    zNoisy = r.ringSub(v, r.ringMul(u, s))
-    #c0c1s = r.ringAdd(u, r.ringMul(v, s))
+    #zNoisy = r.ringSub(v, r.ringMul(u, s))
+    zNoisy = r.ringAdd(v, r.ringMul(u, s))
 
     halfMthP = p/(2*m)
 
