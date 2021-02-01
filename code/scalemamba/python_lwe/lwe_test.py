@@ -19,7 +19,6 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 x = [0 for i in range(l)]
 for i in range(l):
   x[i] = i
-  #print(x[i])
 
 print("####### plaintext ###########")
 print(x)
@@ -53,7 +52,7 @@ for i in range(32):
 print("############# k0 + k1s' ####################")
 for i in range(32):
     print(uvs[i])
-[v2, u2, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e] = lwe.new_ciphertext(v, u, v1, u1, g, e, uvs, gs)
+[v2, u2, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1] = lwe.new_ciphertext(v, u, v1, u1, g, e, uvs, gs, s1)
 print("################# g inverse ##################")
 for i in range(4):
     print(g_inverse[i])
@@ -67,6 +66,7 @@ print("################# new ciphertext u2 ##################")
 print(u2)
 print("#################### new ciphertext v2 #####################")
 print(v2)
+
 [x2, c0c1s] = lwe.dec(u2, v2, s1)
 print("#################### gs #####################")
 for i in range(32):
@@ -77,6 +77,8 @@ print("#################### <g inverse, gs> + <g inverse, e> ###################
 print(g_inv_gs_e)
 print("#################### <g inverse, k0 + k1s'> + c0 #####################")
 print(g_inv_uvs_c0)
+print("#################### c0 + tmp_a + tmp_b s' #####################")
+print(c0_tmpa_tmpb_s1)
 print("#################### c0' + c1's' (zNoisy) #####################")
 print(c0c1s)
 

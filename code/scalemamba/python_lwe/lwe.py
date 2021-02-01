@@ -81,12 +81,12 @@ class LWE(object):
       res = [s1, u, v, e, uvs, gs]
       return res
 
-  def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs):
+  def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs, s1):
       #(c0', c1') = (c0, 0) + g^-1 * K, where K = (u|v)
       r = self.r
 
       g_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
-      c0_new = [c0[i] for i in range(self.n)]
+      c0_new = [0 for i in range(self.n)]
       c1_new = [0 for i in range(self.n)]
       g_inv_g_tmp = [[0 for i in range(self.lgP)] for j in range(self.n)]
       g_inv_g = [0 for i in range(self.n)]
@@ -114,10 +114,14 @@ class LWE(object):
         g_inv_uvs = r.ringAdd(r.ringMul(gt, uvs[i]), g_inv_uvs)
         g_inv_gs = r.ringAdd(r.ringMul(gt, gs[i]), g_inv_gs)
 
+      c0_tmpa_tmpb_s1 = [0 for i in range(self.n)]
+      c0_tmpa_tmpb_s1 = r.ringAdd(r.ringAdd(r.ringMul(c1_new, s1), c0_new), c0)
+
+      c0_new = r.ringAdd(c0_new, c0)
       g_inv_uvs_c0 = r.ringAdd(g_inv_uvs, c0)
       g_inv_gs_e = r.ringAdd(g_inv_gs, g_inv_e)
 
-      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e]
+      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1]
 
 
   # Returns [a, b, s]
