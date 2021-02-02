@@ -81,7 +81,7 @@ class LWE(object):
       res = [s1, v, u, e, uvs, gs]
       return res
 
-  def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs, s1):
+  def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs, s1, s):
       #(c0', c1') = (c0, 0) + g^-1 * K, where K = (u|v)
       r = self.r
 
@@ -121,8 +121,12 @@ class LWE(object):
       c0_new = r.ringAdd(c0_new, c0)
       g_inv_uvs_c0 = r.ringAdd(g_inv_uvs, c0)
       g_inv_gs_e = r.ringAdd(g_inv_gs, g_inv_e)
+      g_inv_gs_e_c0 = r.ringAdd(g_inv_gs_e, c0)
+      zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), g_inv_e)
+      c1s = r.ringMul(c1, s)
+      g_inv_g_s = r.ringMul(g_inv_g, s)
 
-      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1]
+      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1, zNoisy, g_inv_gs_e_c0, c1s, g_inv_g_s]
 
 
   # Returns [a, b, s]
@@ -133,8 +137,8 @@ class LWE(object):
     a = r.ringRandClear()
     s = r.ringBinom(N)
     e = r.ringBinom(N)
-    a_neg = [-i for i in a]
-    e = [2*i for i in e]
+    a_neg = [self.get_mod(-i) for i in a]
+    e = [self.get_mod(2*i) for i in e]
     b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e)) #2*e
 
     res = [b,a,s] #[a, b, s]
@@ -150,8 +154,8 @@ class LWE(object):
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
-    e1 = [2*i for i in e1]
-    e2 = [2*i for i in e2]
+    e1 = [self.get_mod(2*i)for i in e1]
+    e2 = [self.get_mod(2*i) for i in e2]
 
 
     # u = a*e0 + 2*e1 (mod q)
@@ -191,6 +195,30 @@ class LWE(object):
       zNotchesI = self.get_mod(zRangeI * clearM)
       z[i] = m - 1 - ((zNotchesI - 1) % m)
       z[i] = self.get_mod(z[i])
+      # d = p/m
+      # z[i] = round(zNoisy[i]/d)
+
+    return [z, zNoisy]
+
+  def dec_new(self, c0, c1, c2, s):
+    r = self.r
+    lgM = self.lgM
+    m = 1 << lgM
+    clearM = m
+    #zNoisy = r.ringSub(v, r.ringMul(u, s))
+    s1 = r.ringMul(s,s)
+    zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+
+    halfMthP = p/(2*m)
+
+    z = [0 for i in range(self.l)]
+    for i in range(self.l):
+      zRangeI = self.get_mod(zNoisy[i] + halfMthP)
+      zNotchesI = self.get_mod(zRangeI * clearM)
+      z[i] = m - 1 - ((zNotchesI - 1) % m)
+      z[i] = self.get_mod(z[i])
+      # d = p/m
+      # z[i] = round(zNoisy[i]/d)
 
     return [z, zNoisy]
 
@@ -198,3 +226,8 @@ class LWE(object):
     r = self.r
     res = r.ringAdd(u1, u2)
     return res
+
+  def mul(self, u1, u2):
+      r = self.r
+      res = r.ringMul(u1, u2)
+      return res

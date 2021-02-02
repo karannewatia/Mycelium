@@ -18,7 +18,7 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = i
+  x[i] = i #random.randrange(0, 500)
 
 print("####### plaintext ###########")
 print(x)
@@ -35,8 +35,8 @@ print("############## original ciphertext u ################")
 print(u)
 print("############## original ciphertext v #################")
 print(v)
-
-###### key switching #######
+#
+# ###### key switching #######
 g = lwe.decompose_gadget()
 print("############## decompose gadget g ###################")
 print(g)
@@ -52,7 +52,7 @@ for i in range(32):
 print("############# k0 + k1s' ####################")
 for i in range(32):
     print(uvs[i])
-[v2, u2, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1] = lwe.new_ciphertext(v, u, v1, u1, g, e, uvs, gs, s1)
+[v2, u2, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1, zNoisy, g_inv_gs_e_c0, c1s, g_inv_g_s] = lwe.new_ciphertext(v, u, v1, u1, g, e, uvs, gs, s1, s)
 print("################# g inverse ##################")
 for i in range(4):
     print(g_inverse[i])
@@ -75,18 +75,34 @@ print("#################### <g inverse, gs> #####################")
 print(g_inv_gs)
 print("#################### <g inverse, gs> + <g inverse, e> #####################")
 print(g_inv_gs_e)
+print("#################### c0 + <g inverse, gs> + <g inverse, e> #####################")
+print(g_inv_gs_e_c0)
 print("#################### <g inverse, k0 + k1s'> + c0 #####################")
 print(g_inv_uvs_c0)
 print("#################### c0 + tmp_a + tmp_b s' #####################")
 print(c0_tmpa_tmpb_s1)
-print("#################### c0' + c1's' (zNoisy) #####################")
+print("#################### c1s #####################")
+print(c1s)
+print("#################### <g_inverse, g> s #####################")
+print(g_inv_g_s)
+print("#################### c0 + c1s + <g inverse, e> (zNoisy) #####################")
+print(zNoisy)
+print("#################### c0' + c1's' (zNoisy') #####################")
 print(c0c1s)
 
 ###### check addition on ciphertext #######
-# [u1, v1] = lwe.enc(a, b, x)
+# [v1, u1] = lwe.enc(b, a, x)
 # u2 = lwe.add(u, u1)
 # v2 = lwe.add(v, v1)
-# x2 = lwe.dec(u2, v2, s)
+# x2 = lwe.dec(v2, u2, s)
+#
+
+# [v1, u1] = lwe.enc(b, a, x)
+# c0 = lwe.mul(v, v1)
+# c2 = lwe.mul(u, u1)
+# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#
+# x2 = lwe.dec_new(c0, c1, c2, s)
 
 #x2 = lwe.dec(v, u, s)
 print("################# decrypted text ###################")
