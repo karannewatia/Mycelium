@@ -1,6 +1,7 @@
 import random
 random.seed(100)
-p=3843321857
+p=17#3843321857
+import numpy as np
 
 class Ring(object):
 
@@ -65,6 +66,15 @@ class Ring(object):
       res[i] = self.get_mod(a[i] + b[i])
     return res
 
+  def ringAddNew(self, a, b):
+    #res = sint.Array(self.n)
+    res = [0 for i in range(self.n)]
+    #@for_range(self.n)
+    #def range_body(i):
+    for i in range(self.n):
+      res[i] = a[i] + b[i]
+    return res
+
   # Ring subtraction (i.e. pointwise vector subtraction mod p)
   def ringSub(self, a, b):
     #res = sint.Array(self.n)
@@ -75,11 +85,20 @@ class Ring(object):
       res[i] = self.get_mod(a[i] - b[i])
     return res
 
+  def ringMulTest(self, a, b):
+    #res = sint.Array(self.n)
+    res = [0 for i in range(self.n)]
+    #@for_range(self.n)
+    #def range_body(i):
+    for i in range(self.n):
+      res[i] = self.get_mod(a[i] * b[i])
+    return res
+
   # Ring multiplication (i.e. convolution)
   # Polynomials are represented with lowest powers first
   #   e.g. (1 + 2x + 3x^2) is represented as [1, 2, 3]
   # Reduce polynomial modulo x^(len(a)) + 1
-  def ringMul(self, a, b):
+  def ringMul(self, a, b, flag=False):
     n = self.n
     #conv = sint.Array(2*n)
     conv = [0 for i in range(2*n)]
@@ -95,13 +114,47 @@ class Ring(object):
       j = i % n
       k = i / n
       conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
-
+    if (flag):
+        check = np.polymul(a[::-1],b[::-1])
+        check = check[::-1]
+        for x in range(len(check)):
+            check[x] = self.get_mod(check[x])
+        #print("Size numpy: ", len(check), len(conv))
+        print("numpy, conv, a, b ", check, conv, a, b)
+        print("Checking numpy: ", len(check) == len(conv) and check == conv)
     #res = sint.Array(n)
     res = [0 for i in range(n)]
     #@for_range(n-1)
     #def range_body_wrap(i):
     for i in range(n-1):
       res[i] = self.get_mod(conv[i] - conv[i + n])
+
+    res[n-1] = conv[n-1]
+    return res
+
+  def ringMulNew(self, a, b):
+    n = self.n
+    #conv = sint.Array(2*n)
+    conv = [0 for i in range(2*n)]
+    #@for_range(2*n)
+    #def range_body_zero(i):
+    for i in range(2*n):
+      #conv[i] = sint(0)
+      conv[i] = 0
+
+    #@for_range(n**2)
+    #def range_body_mul(i):
+    for i in range(n**2):
+      j = i % n
+      k = i / n
+      conv[j+k] = conv[j+k] + a[j] * b[k]
+
+    #res = sint.Array(n)
+    res = [0 for i in range(n)]
+    #@for_range(n-1)
+    #def range_body_wrap(i):
+    for i in range(n-1):
+      res[i] = conv[i] - conv[i + n]
 
     res[n-1] = conv[n-1]
     return res
