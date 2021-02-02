@@ -1,6 +1,7 @@
 #execfile('/root/SCALE-MAMBA/Programs/ring/ring.mpc')
 from ring import Ring
-p=3843321857
+import numpy as np
+p=17#3843321857
 
 class LWE(object):
 
@@ -66,8 +67,9 @@ class LWE(object):
 
       gs = [[0 for i in range(self.n)] for j in range(self.lgP)]
       for i in range(self.lgP):
-        for j in range(self.n):
-            gs[i][j] = self.get_mod(g[i] * s[j])
+          gs[i] = r.ringMul([g[i], 0 ,0 ,0], s)
+        # for j in range(self.n):
+        #     gs[i][j] = self.get_mod(g[i] * s[j])
 
       v = [[0 for i in range(self.n)] for j in range(self.lgP)]
       for i in range(self.lgP):
@@ -119,6 +121,7 @@ class LWE(object):
       c0_tmpa_tmpb_s1 = r.ringAdd(r.ringAdd(r.ringMul(c1_new, s1), c0_new), c0)
 
       c0_new = r.ringAdd(c0_new, c0)
+
       g_inv_uvs_c0 = r.ringAdd(g_inv_uvs, c0)
       g_inv_gs_e = r.ringAdd(g_inv_gs, g_inv_e)
       g_inv_gs_e_c0 = r.ringAdd(g_inv_gs_e, c0)
@@ -136,6 +139,7 @@ class LWE(object):
     N = self.N
     a = r.ringRandClear()
     s = r.ringBinom(N)
+    #s = [1,0,0,0]
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     e = [self.get_mod(2*i) for i in e]
@@ -156,6 +160,10 @@ class LWE(object):
 
     e1 = [self.get_mod(2*i)for i in e1]
     e2 = [self.get_mod(2*i) for i in e2]
+    print("e0\n", e0)
+    print("e1\n", e1)
+    print("e2\n", e2)
+
 
 
     # u = a*e0 + 2*e1 (mod q)
