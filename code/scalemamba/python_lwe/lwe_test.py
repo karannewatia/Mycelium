@@ -38,10 +38,10 @@ print("############## original ciphertext v #################")
 print(v)
 #
 # ###### key switching #######
-g = lwe.decompose_gadget()
-[s1, v1, u1] = lwe.key_switching(g,s)
-[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
-x2 = lwe.dec(v2, u2, s1)
+# g = lwe.decompose_gadget()
+# [s1, v1, u1] = lwe.key_switching(g,s)
+# [v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
+# x2 = lwe.dec(v2, u2, s1)
 
 ###### check addition on ciphertext #######
 # [v1, u1] = lwe.enc(b, a, x)
@@ -50,13 +50,27 @@ x2 = lwe.dec(v2, u2, s1)
 # x2 = lwe.dec(v2, u2, s)
 #
 
-###### check multiplication  ciphertext #######
-# [v1, u1] = lwe.enc(b, a, x)
-# c0 = lwe.mul(v, v1)
-# c2 = lwe.mul(u, u1)
-# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#
-# x2 = lwe.dec_new(c0, c1, c2, s)
+###### check multiplication on ciphertext #######
+[v1, u1] = lwe.enc(b, a, x)
+c0 = lwe.mul(v, v1)
+c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+c2 = lwe.mul(u, u1)
+print("################# c2 ###################")
+print(c2)
+[rlk_b, rlk_a] = lwe.rl_keys(s)
+# print("################# rlk a ###################")
+# for i in range(lgP):
+#     print(rlk_a[i])
+# print("################# rlk b ###################")
+# for i in range(lgP):
+#     print(rlk_b[i])
+[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2)
+print("################# c0 relin ###################")
+print(c0_mul)
+print("################# c1 relin ###################")
+print(c1_mul)
+x2 = lwe.dec(c0_mul, c1_mul, s)
+#x2 = lwe.dec_mul(c0, c1, c2, s)
 
 #x2 = lwe.dec(v, u, s)
 

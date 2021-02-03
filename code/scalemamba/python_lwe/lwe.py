@@ -176,29 +176,75 @@ class LWE(object):
       # d = p/m
       # z[i] = round(zNoisy[i]/d)
 
-    return z
+    return [z, zNoisy]
 
-  # def dec_new(self, c0, c1, c2, s):
-  #   r = self.r
-  #   lgM = self.lgM
-  #   m = 1 << lgM
-  #   clearM = m
-  #   #zNoisy = r.ringSub(v, r.ringMul(u, s))
-  #   s1 = r.ringMul(s,s)
-  #   zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
-  #
-  #   halfMthP = p/(2*m)
-  #
-  #   z = [0 for i in range(self.l)]
-  #   for i in range(self.l):
-  #     zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-  #     zNotchesI = self.get_mod(zRangeI * clearM)
-  #     z[i] = m - 1 - ((zNotchesI - 1) % m)
-  #     z[i] = self.get_mod(z[i])
-  #     # d = p/m
-  #     # z[i] = round(zNoisy[i]/d)
-  #
-  #   return [z, zNoisy]
+  def dec_mul(self, c0, c1, c2, s):
+    r = self.r
+    lgM = self.lgM
+    m = 1 << lgM
+    clearM = m
+    #zNoisy = r.ringSub(v, r.ringMul(u, s))
+    s1 = r.ringMul(s,s)
+    zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+
+    halfMthP = p/(2*m)
+
+    z = [0 for i in range(self.l)]
+    for i in range(self.l):
+      zRangeI = self.get_mod(zNoisy[i] + halfMthP)
+      zNotchesI = self.get_mod(zRangeI * clearM)
+      z[i] = m - 1 - ((zNotchesI - 1) % m)
+      z[i] = self.get_mod(z[i])
+      # d = p/m
+      # z[i] = round(zNoisy[i]/d)
+
+    return [z, zNoisy]
+
+  def rl_keys(self, s):
+      r = self.r
+      N = self.N
+      tmp_a = r.ringRandClear()
+      a = [tmp_a for i in range(self.lgP)]
+      # e = r.ringBinom(N)
+      # a_neg = [self.get_mod(-i) for i in tmp_a]
+      # e = [self.get_mod(2*i) for i in e]
+      # tmp_b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e))
+      # b = [tmp_b for i in range(self.lgP)]
+      tmp_b = r.ringRandClear()
+      b = [tmp_b for i in range(self.lgP)]
+      s2 = r.ringMul(s,s)
+
+      for i in range(self.lgP - 1, -1, -1):
+          s2_tmp = [self.get_mod((2**i) * j) for j in s2]
+          b[i] = r.ringAdd(b[i], s2_tmp)
+
+      return [b, a]
+
+  def relinearization(self, b, a, c0, c1, c2):
+      r = self.r
+      c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
+      c0_new = [0 for i in range(self.n)]
+      c1_new = [0 for i in range(self.n)]
+
+      for i in range(self.n):
+        tmp_binary = self.to_binary(c2[i])
+        for j in range(self.lgP):
+          if (c2[i] < 0):
+              tmp_binary[j] = -tmp_binary[j]
+          c2_inverse[i][j] = tmp_binary[j]
+
+      for i in range(self.lgP):
+        ct = [0 for k in range(self.n)]
+        for j in range(self.n):
+          ct[j] = c2_inverse[j][i]
+
+        c0_new = r.ringAdd(r.ringMul(ct, b[i]), c0_new)
+        c1_new = r.ringAdd(r.ringMul(ct, a[i]), c1_new)
+
+      c0_new = r.ringAdd(c0_new, c0)
+      c1_new = r.ringAdd(c1_new, c1)
+
+      return [c0_new, c1_new]
 
   def add(self, u1, u2):
     r = self.r
