@@ -1,7 +1,8 @@
 #execfile('/root/SCALE-MAMBA/Programs/ring/ring.mpc')
 from ring import Ring
 import numpy as np
-p=17#3843321857
+
+p=3843321857
 
 class LWE(object):
 
@@ -67,35 +68,24 @@ class LWE(object):
 
       gs = [[0 for i in range(self.n)] for j in range(self.lgP)]
       for i in range(self.lgP):
-          gs[i] = r.ringMul([g[i], 0 ,0 ,0], s)
-        # for j in range(self.n):
-        #     gs[i][j] = self.get_mod(g[i] * s[j])
+        for j in range(self.n):
+            gs[i][j] = self.get_mod(g[i] * s[j])
 
       v = [[0 for i in range(self.n)] for j in range(self.lgP)]
       for i in range(self.lgP):
         v[i] = r.ringAdd(r.ringAdd(r.ringMul(u_neg[i], s1), gs[i]), e[i])
 
-      uvs = [[0 for i in range(self.n)] for j in range(self.lgP)]
-      for i in range(self.lgP):
-        uvs[i] = r.ringAdd(r.ringMul(u[i], s1), v[i])
-
-      # #k = (u|v)
-      res = [s1, v, u, e, uvs, gs]
+      #k = (u|v)
+      res = [s1, v, u]
       return res
 
-  def new_ciphertext(self, c0, c1, u, v, g, e, uvs, gs, s1, s):
+  def new_ciphertext(self, c0, c1, u, v):
       #(c0', c1') = (c0, 0) + g^-1 * K, where K = (u|v)
       r = self.r
 
       g_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
       c1_new = [0 for i in range(self.n)]
-      g_inv_g_tmp = [[0 for i in range(self.lgP)] for j in range(self.n)]
-      g_inv_g = [0 for i in range(self.n)]
-      g_inv_e = [0 for i in range(self.n)]
-      g_inv_uvs = [0 for i in range(self.n)]
-      g_inv_uvs_c0 = [0 for i in range(self.n)]
-      g_inv_gs = [0 for i in range(self.n)]
 
       for i in range(self.n):
         tmp_binary = self.to_binary(c1[i])
@@ -103,8 +93,6 @@ class LWE(object):
           if (c1[i] < 0):
               tmp_binary[j] = -tmp_binary[j]
           g_inverse[i][j] = tmp_binary[j]
-          g_inv_g_tmp[i][j] = self.get_mod(g_inverse[i][j] * g[j])
-        g_inv_g[i] = self.get_mod(sum(g_inv_g_tmp[i]))
 
       for i in range(self.lgP):
         gt = [0 for k in range(self.n)]
@@ -113,23 +101,10 @@ class LWE(object):
 
         c0_new = r.ringAdd(r.ringMul(gt, u[i]), c0_new)
         c1_new = r.ringAdd(r.ringMul(gt, v[i]), c1_new)
-        g_inv_e = r.ringAdd(r.ringMul(gt, e[i]), g_inv_e)
-        g_inv_uvs = r.ringAdd(r.ringMul(gt, uvs[i]), g_inv_uvs)
-        g_inv_gs = r.ringAdd(r.ringMul(gt, gs[i]), g_inv_gs)
-
-      c0_tmpa_tmpb_s1 = [0 for i in range(self.n)]
-      c0_tmpa_tmpb_s1 = r.ringAdd(r.ringAdd(r.ringMul(c1_new, s1), c0_new), c0)
 
       c0_new = r.ringAdd(c0_new, c0)
 
-      g_inv_uvs_c0 = r.ringAdd(g_inv_uvs, c0)
-      g_inv_gs_e = r.ringAdd(g_inv_gs, g_inv_e)
-      g_inv_gs_e_c0 = r.ringAdd(g_inv_gs_e, c0)
-      zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), g_inv_e)
-      c1s = r.ringMul(c1, s)
-      g_inv_g_s = r.ringMul(g_inv_g, s)
-
-      return [c0_new, c1_new, g_inverse, g_inv_g, g_inv_e, g_inv_uvs, g_inv_uvs_c0, gs, g_inv_gs, g_inv_gs_e, c0_tmpa_tmpb_s1, zNoisy, g_inv_gs_e_c0, c1s, g_inv_g_s]
+      return [c0_new, c1_new]
 
 
   # Returns [a, b, s]
@@ -139,13 +114,12 @@ class LWE(object):
     N = self.N
     a = r.ringRandClear()
     s = r.ringBinom(N)
-    #s = [1,0,0,0]
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     e = [self.get_mod(2*i) for i in e]
-    b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e)) #2*e
+    b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e))
 
-    res = [b,a,s] #[a, b, s]
+    res = [b,a,s]
     return res
 
   # z is plaintext (array) of l elems each modulo m
@@ -160,17 +134,13 @@ class LWE(object):
 
     e1 = [self.get_mod(2*i)for i in e1]
     e2 = [self.get_mod(2*i) for i in e2]
-    print("e0\n", e0)
-    print("e1\n", e1)
-    print("e2\n", e2)
-
-
 
     # u = a*e0 + 2*e1 (mod q)
     u = r.ringMul(a, e0)
     u = r.ringAdd(u, e1)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
+
     #mthP = cint(-1)/cint(m)
     mthP = p/m
 
@@ -206,29 +176,29 @@ class LWE(object):
       # d = p/m
       # z[i] = round(zNoisy[i]/d)
 
-    return [z, zNoisy]
+    return z
 
-  def dec_new(self, c0, c1, c2, s):
-    r = self.r
-    lgM = self.lgM
-    m = 1 << lgM
-    clearM = m
-    #zNoisy = r.ringSub(v, r.ringMul(u, s))
-    s1 = r.ringMul(s,s)
-    zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
-
-    halfMthP = p/(2*m)
-
-    z = [0 for i in range(self.l)]
-    for i in range(self.l):
-      zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-      zNotchesI = self.get_mod(zRangeI * clearM)
-      z[i] = m - 1 - ((zNotchesI - 1) % m)
-      z[i] = self.get_mod(z[i])
-      # d = p/m
-      # z[i] = round(zNoisy[i]/d)
-
-    return [z, zNoisy]
+  # def dec_new(self, c0, c1, c2, s):
+  #   r = self.r
+  #   lgM = self.lgM
+  #   m = 1 << lgM
+  #   clearM = m
+  #   #zNoisy = r.ringSub(v, r.ringMul(u, s))
+  #   s1 = r.ringMul(s,s)
+  #   zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+  #
+  #   halfMthP = p/(2*m)
+  #
+  #   z = [0 for i in range(self.l)]
+  #   for i in range(self.l):
+  #     zRangeI = self.get_mod(zNoisy[i] + halfMthP)
+  #     zNotchesI = self.get_mod(zRangeI * clearM)
+  #     z[i] = m - 1 - ((zNotchesI - 1) % m)
+  #     z[i] = self.get_mod(z[i])
+  #     # d = p/m
+  #     # z[i] = round(zNoisy[i]/d)
+  #
+  #   return [z, zNoisy]
 
   def add(self, u1, u2):
     r = self.r
