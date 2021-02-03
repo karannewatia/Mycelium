@@ -107,7 +107,7 @@ class LWE(object):
         g_inv_g[i] = self.get_mod(sum(g_inv_g_tmp[i]))
 
       for i in range(self.lgP):
-        gt = [0 for i in range(self.n)]
+        gt = [0 for k in range(self.n)]
         for j in range(self.n):
           gt[j] = g_inverse[j][i]
 
