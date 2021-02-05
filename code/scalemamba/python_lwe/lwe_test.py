@@ -38,15 +38,20 @@ print(v)
 
 # u = lwe.mul(u, [0,0,0, -1 % p])
 # v = lwe.mul(v, [0,0,0,-1 % p])
-# u = lwe.shift(u, 5)
-# v = lwe.shift(v, 5)
-# s_new = lwe.shift(s, 5)
-#x2 = lwe.dec(v, u, s)
+# u = lwe.shift(u, 2)
+# v = lwe.shift(v, 2)
+# s_new = lwe.shift(s, 2)
+# x2 = lwe.dec(v, u, s_new)
 
 
 ####### expand #######
 zeros = [0 for i in range(n)]
-ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zeros]))
+expand_outer_loop_count = 2
+c0 = [zeros for i in range(2**expand_outer_loop_count)]
+c1 = [zeros for i in range(2**expand_outer_loop_count)]
+c0[0] = u
+c1[0] = v
+ciphertexts = lwe.expand(expand_outer_loop_count, s, (c0, c1))
 for i in range(len(ciphertexts[0])):
     [x2, zNoisy] = lwe.dec(ciphertexts[1][i], ciphertexts[0][i], s)
     print("################# decrypted text ###################")
