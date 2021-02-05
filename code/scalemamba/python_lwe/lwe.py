@@ -282,13 +282,8 @@ class LWE(object):
       for j in range(l):
           for k in range(2**j):
               c0_0, c0_1 = ciphertexts[0][k], ciphertexts[1][k]
-              if (-2**j == -1):
-                  x2j = [0,0,0,self.get_mod(-1)]
-              elif (-2**j == -2):
-                  x2j = [0,0,self.get_mod(-1),0]
-              else:
-                  print("unimplemented error")
-                  x2j = [1,0,0,0]
+              x2j = [0,0,0,0]
+              x2j[(-2**j) % self.n] = self.get_mod(-1)
               s_new = self.shift(s, 1+(self.n/(2**j)))
               ck_0, ck_1 = self.shift(c0_0, 1+(self.n/(2**j))), self.shift(c0_1, 1+(self.n/(2**j)))
               [ck_1, ck_0, _] = self.switch_key(s_new, s, ck_1, ck_0)

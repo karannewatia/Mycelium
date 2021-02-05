@@ -44,7 +44,7 @@ print(v)
 #x2 = lwe.dec(v, u, s)
 
 
-# ###### expand #######
+####### expand #######
 zeros = [0 for i in range(n)]
 ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zeros]))
 for i in range(len(ciphertexts[0])):
@@ -52,7 +52,7 @@ for i in range(len(ciphertexts[0])):
     print("################# decrypted text ###################")
     print(x2)
 
-# ###### key switching #######
+####### key switching #######
 # g = lwe.decompose_gadget()
 # [s1, v1, u1] = lwe.key_switching(g, s, s)
 # [v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
