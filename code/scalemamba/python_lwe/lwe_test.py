@@ -3,23 +3,24 @@ from lwe import LWE
 import random
 
 p = 3843321857
-w = 2791827151
+w = 385597899
+#w = 2791827151
 
-lgN = 2
+lgN = 4
 r = Ring(lgN, w)
 
 N = 1
 lgM = 10
-l = 4
-n = 4
+l = 16
+n = 16
 lgP = 32
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = i #random.randrange(0, 9)
+  x[i] = 0 #random.randrange(0, 9)
 print("####### plaintext ###########")
-x = [0,0,1,0]
+x[-2] = 1
 print(x)
 
 [b, a, s] = lwe.key_gen()
@@ -36,17 +37,15 @@ print(u)
 print("############## original ciphertext v #################")
 print(v)
 
-# u = lwe.mul(u, [0,0,0, -1 % p])
-# v = lwe.mul(v, [0,0,0,-1 % p])
-# u = lwe.shift(u, 2)
-# v = lwe.shift(v, 2)
-# s_new = lwe.shift(s, 2)
+# u = lwe.shift(u, 7)
+# v = lwe.shift(v, 7)
+# s_new = lwe.shift(s, 7)
 # x2 = lwe.dec(v, u, s_new)
 
 
 ####### expand #######
 zeros = [0 for i in range(n)]
-expand_outer_loop_count = 2
+expand_outer_loop_count = 4
 c0 = [zeros for i in range(2**expand_outer_loop_count)]
 c1 = [zeros for i in range(2**expand_outer_loop_count)]
 c0[0] = u
@@ -93,6 +92,6 @@ for i in range(len(ciphertexts[0])):
 
 
 #x2 = lwe.dec(v, u, s)
-
+#
 # print("################# decrypted text ###################")
 # print(x2)

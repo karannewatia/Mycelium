@@ -260,21 +260,66 @@ class LWE(object):
       [v2, u2] = self.new_ciphertext(v, u, v1, u1)
       return [v2, u2, s1]
 
+  def normalize(self, poly):
+      while poly and poly[-1] == 0:
+          poly.pop()
+      if poly == []:
+          poly.append(0)
+
+  def poly_divmod_helper(self, num, den):
+      #Create normalized copies of the args
+      num = num[:]
+      self.normalize(num)
+      den = den[:]
+      self.normalize(den)
+
+      if len(num) >= len(den):
+          #Shift den towards right so it's the same degree as num
+          shiftlen = len(num) - len(den)
+          den = [0] * shiftlen + den
+      else:
+          return [0], num
+
+      quot = []
+      divisor = float(den[-1])
+      for i in xrange(shiftlen + 1):
+          #Get the next coefficient of the quotient.
+          mult = num[-1] / divisor
+          quot = [mult] + quot
+
+          #Subtract mult * den from num, but don't bother if mult == 0
+          #Note that when i==0, mult!=0; so quot is automatically normalized.
+          if mult != 0:
+              d = [mult * u for u in den]
+              num = [u - v for u, v in zip(num, d)]
+
+          num.pop()
+          den.pop(0)
+
+      self.normalize(num)
+      return quot, num
+
+  def poly_mod(self, num, den):
+      q, r = self.poly_divmod_helper(num, den)
+      for i in range(len(r)):
+          if (r[i] != 0):
+              return int(r[i])
+      return 0
+
   def shift(self, c, k):
       cn = [x for x in c]
       res = [0 for i in range(self.n)]
       res[0] = cn[0]
+      xn_1 = [0 for _ in range(self.n + 1)]
+      xn_1[0] = 1
+      xn_1[-1] = 1
       for i in range(1, self.n):
-          if (k > self.n):
-              cn[i] = self.get_mod(-cn[i])
           pow_0 = i*k
           pow = pow_0 % (self.n)
-          if (pow_0 < self.n):
-              res[pow] = self.get_mod(res[pow] + cn[i])
-          elif (pow % 2 == 1):
-              res[pow] = self.get_mod(res[pow] + cn[i])
-          else:
-              res[pow] = self.get_mod(res[pow] - cn[i])
+          num = [0 for _ in range(pow_0 + 1)]
+          num[-1] = cn[i]
+          ans = self.poly_mod(num, xn_1)
+          res[pow] = self.get_mod(res[pow] + self.get_mod(ans))
       return res
 
   def expand(self, l, s, ciphertexts):
@@ -282,7 +327,7 @@ class LWE(object):
       for j in range(l):
           for k in range(2**j):
               c0_0, c0_1 = ciphertexts[0][k], ciphertexts[1][k]
-              x2j = [0,0,0,0]
+              x2j = [0 for _ in range(self.n)]
               x2j[(-2**j) % self.n] = self.get_mod(-1)
               s_new = self.shift(s, 1+(self.n/(2**j)))
               ck_0, ck_1 = self.shift(c0_0, 1+(self.n/(2**j))), self.shift(c0_1, 1+(self.n/(2**j)))
