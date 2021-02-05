@@ -16,7 +16,7 @@ class LWE(object):
     # m = Modulus of ciphertext additions
     # Require p = 1 (mod 2m), and m to be a power of 2
     self.lgM = lgM
-    self.m = 1021 #(2 ** lgM)   # Plaintext modulus (size per element)
+    self.m = (2 ** lgM)  # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     self.n = n
     self.lgP = lgP
@@ -171,7 +171,6 @@ class LWE(object):
       zRangeI = self.get_mod(zNoisy[i] + halfMthP)
       zNotchesI = self.get_mod(zRangeI * clearM)
       z[i] = m - 1 - ((zNotchesI - 1) % m)
-      z[i] = self.get_mod(z[i])
       # d = p/m
       # z[i] = round(zNoisy[i]/d)
 
@@ -264,14 +263,17 @@ class LWE(object):
   def shift(self, c, k):
       res = [0 for i in range(self.n)]
       res[0] = c[0]
-      # if (k % self.n == 1):
-      #     for i in range(1, self.n):
-      #         res[i] = self.get_mod(-c[i])
-      #     return res
       for i in range(1, self.n):
-          pow = i*k
-          pow = pow % (self.n)
-          res[pow] = self.get_mod(res[pow] - c[i])
+          if (k > self.n):
+              c[i] = self.get_mod(-c[i])
+          pow_0 = i*k
+          pow = pow_0 % (self.n)
+          if (pow_0 < self.n):
+              res[pow] = self.get_mod(res[pow] + c[i])
+          elif (pow % 2 == 1):
+              res[pow] = self.get_mod(res[pow] + c[i])
+          else:
+              res[pow] = self.get_mod(res[pow] - c[i])
       return res
 
   def expand(self, l, s, ciphertexts):
@@ -294,7 +296,7 @@ class LWE(object):
               [_, ck2j_1, ck2j_0] = self.switch_key(s_new, s, ck2j_1, ck2j_0)
               ciphertexts[0][k], ciphertexts[1][k] = ck_0, ck_1
               ciphertexts[0][k + 2**j], ciphertexts[1][k + 2**j] = ck2j_0, ck2j_1
-      inverse = 766
-      for j in range(self.n):
-          ciphertexts[0][j], ciphertexts[1][j] = [self.get_mod(x*inverse) for x in ciphertexts[0][j]], [self.get_mod(x*inverse) for x in ciphertexts[1][j]]
+      # inverse = 766
+      # for j in range(self.n):
+      #     ciphertexts[0][j], ciphertexts[1][j] = [self.get_mod(x*inverse) for x in ciphertexts[0][j]], [self.get_mod(x*inverse) for x in ciphertexts[1][j]]
       return ciphertexts

@@ -21,7 +21,6 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 x = [0 for i in range(l)]
 for i in range(l):
   x[i] = i #random.randrange(0, 9)
-
 print("####### plaintext ###########")
 print(x)
 
@@ -39,12 +38,12 @@ print(u)
 print("############## original ciphertext v #################")
 print(v)
 
-# u = lwe.shift(u, 3)
-# v = lwe.shift(v, 3)
-# s_new = lwe.shift(s, 3)
+u = lwe.shift(u, 3)
+v = lwe.shift(v, 3)
+s = lwe.shift(s, 3)
 
-zeros = [0 for i in range(n)]
-ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zeros]))
+# zeros = [0 for i in range(n)]
+# ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zeros]))
 
 # [v2, u2, s1] = lwe.switch_key(s_new, s, v, u)
 # x2 = lwe.dec(v2, u2, s1)
@@ -84,7 +83,7 @@ ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zero
 # #x2 = lwe.dec_mul(c0, c1, c2, s)
 
 
-#x2 = lwe.dec(v, u, s)
+x2 = lwe.dec(v, u, s)
 
-# print("################# decrypted text ###################")
-# print(x2)
+print("################# decrypted text ###################")
+print(x2)
