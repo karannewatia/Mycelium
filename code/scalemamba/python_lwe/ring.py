@@ -1,7 +1,7 @@
 import random
 import numpy as np
 
-random.seed(10)
+#random.seed(10)
 p=3843321857
 
 
@@ -319,7 +319,7 @@ class Ring(object):
   # Assumes n is even
   def ringRandClear(self):
     rand = self.ringRand()
-    res = self.reveal(rand)
+    res = rand
     return res
 
   # Returns a vector of length n
@@ -342,32 +342,15 @@ class Ring(object):
     print_ln("]")
     return
 
-  def reveal(self, a):
-    n = self.n
-    #aClear = cint.Array(n)
-    aClear = [0 for i in range(n)]
-    #@for_range(n)
-    #def range_body(i):
-    for i in range(n):
-      #aClear[i] = a[i].reveal()
-      aClear[i] = a[i]
-    return aClear
-
-  # a is a ring element
-  # def ringRevealToParty(self, a, partyNum):
-  #   for i in range(0, len(a)):
-  #     a[i].reveal_to(partyNum)
-
-
-  def ringReadFromFile(self, fileName):
-    f = open(fileName, "r")
-    a = []
-    for line in f:
-      if (line[0] != '[') and (line[0] != ']'):
-        x = int(line)
-        #a.append(cint(x))
-        a.append(x)
-    return a
+  # def ringReadFromFile(self, fileName):
+  #   f = open(fileName, "r")
+  #   a = []
+  #   for line in f:
+  #     if (line[0] != '[') and (line[0] != ']'):
+  #       x = int(line)
+  #       #a.append(cint(x))
+  #       a.append(x)
+  #   return a
 
   # def readFromPrivateInput(self, partyNum):
   #   res = []

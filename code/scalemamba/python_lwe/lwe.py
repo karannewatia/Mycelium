@@ -1,4 +1,3 @@
-#execfile('/root/SCALE-MAMBA/Programs/ring/ring.mpc')
 from ring import Ring
 import numpy as np
 
@@ -17,7 +16,7 @@ class LWE(object):
     # m = Modulus of ciphertext additions
     # Require p = 1 (mod 2m), and m to be a power of 2
     self.lgM = lgM
-    self.m = (2 ** lgM)   # Plaintext modulus (size per element)
+    self.m = 1021 #(2 ** lgM)   # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     self.n = n
     self.lgP = lgP
@@ -50,13 +49,13 @@ class LWE(object):
 
       return res
 
-  def key_switching(self, g, s):
+  def key_switching(self, g, s, s0):
       r = self.r
       N = self.N
 
       #v = -u*s1 + g*s + e
 
-      s1 = r.ringBinom(N)
+      s1 = s0 #r.ringBinom(N)
 
       u = [r.ringRandClear() for i in range(self.lgP)]
       u_neg = [[0 for i in range(self.n)] for j in range(self.lgP)]
@@ -117,7 +116,7 @@ class LWE(object):
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     e = [self.get_mod(2*i) for i in e]
-    b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e))
+    b = r.ringAdd(r.ringMul(a_neg, s), e)
 
     res = [b,a,s]
     return res
@@ -153,7 +152,7 @@ class LWE(object):
     v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
-    res = [r.reveal(v), r.reveal(u)]
+    res = [v, u]
     return res
 
 
@@ -255,3 +254,47 @@ class LWE(object):
       r = self.r
       res = r.ringMul(u1, u2)
       return res
+
+  def switch_key(self, s, s0, v , u):
+      g = self.decompose_gadget()
+      [s1, v1, u1] = self.key_switching(g, s, s0)
+      [v2, u2] = self.new_ciphertext(v, u, v1, u1)
+      return [v2, u2, s1]
+
+  def shift(self, c, k):
+      res = [0 for i in range(self.n)]
+      res[0] = c[0]
+      # if (k % self.n == 1):
+      #     for i in range(1, self.n):
+      #         res[i] = self.get_mod(-c[i])
+      #     return res
+      for i in range(1, self.n):
+          pow = i*k
+          pow = pow % (self.n)
+          res[pow] = self.get_mod(res[pow] - c[i])
+      return res
+
+  def expand(self, l, s, ciphertexts):
+      r = self.r
+      for j in range(l):
+          for k in range(2**j):
+              c0_0, c0_1 = ciphertexts[0][k], ciphertexts[1][k]
+              if (-2**j == -1):
+                  x2j = [-1,0,0,0]
+              elif (-2**j == -2):
+                  x2j = [0,0,0,-1]
+              else:
+                  print("unimplemented error")
+                  x2j = [1,0,0,0]
+              c1_0, c1_1 = self.mul(c0_0, x2j), self.mul(c0_1, x2j)
+              s_new = self.shift(s, 1+(self.n/(2**j)))
+              ck_0, ck_1 = r.ringAdd(c0_0, self.shift(c0_0, 1+(self.n/(2**j)))), r.ringAdd(c0_1, self.shift(c0_1, 1+(self.n/(2**j))))
+              [_, ck_1, ck_0] = self.switch_key(s_new, s, ck_1, ck_0)
+              ck2j_0, ck2j_1 = r.ringAdd(c1_0, self.shift(c1_0, 1+(self.n/(2**j)))), r.ringAdd(c1_1, self.shift(c1_1, 1+(self.n/(2**j))))
+              [_, ck2j_1, ck2j_0] = self.switch_key(s_new, s, ck2j_1, ck2j_0)
+              ciphertexts[0][k], ciphertexts[1][k] = ck_0, ck_1
+              ciphertexts[0][k + 2**j], ciphertexts[1][k + 2**j] = ck2j_0, ck2j_1
+      inverse = 766
+      for j in range(self.n):
+          ciphertexts[0][j], ciphertexts[1][j] = [self.get_mod(x*inverse) for x in ciphertexts[0][j]], [self.get_mod(x*inverse) for x in ciphertexts[1][j]]
+      return ciphertexts
