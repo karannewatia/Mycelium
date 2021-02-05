@@ -2,10 +2,7 @@ from ring import Ring
 from lwe import LWE
 import random
 
-### what is x in line 9 of the alg, no multiplicative inverse
-### test expand
-
-#p = 3843321857
+p = 3843321857
 w = 2791827151
 
 lgN = 2
@@ -22,6 +19,7 @@ x = [0 for i in range(l)]
 for i in range(l):
   x[i] = i #random.randrange(0, 9)
 print("####### plaintext ###########")
+x = [0,0,1,0]
 print(x)
 
 [b, a, s] = lwe.key_gen()
@@ -38,15 +36,20 @@ print(u)
 print("############## original ciphertext v #################")
 print(v)
 
-u = lwe.shift(u, 3)
-v = lwe.shift(v, 3)
-s = lwe.shift(s, 3)
+# u = lwe.mul(u, [0,0,0, -1 % p])
+# v = lwe.mul(v, [0,0,0,-1 % p])
+# u = lwe.shift(u, 5)
+# v = lwe.shift(v, 5)
+# s_new = lwe.shift(s, 5)
+#x2 = lwe.dec(v, u, s)
 
-# zeros = [0 for i in range(n)]
-# ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zeros]))
+zeros = [0 for i in range(n)]
+ciphertexts = lwe.expand(2, s, ([u, zeros, zeros, zeros], [v, zeros, zeros, zeros]))
+for i in range(len(ciphertexts[0])):
+    [x2, zNoisy] = lwe.dec(ciphertexts[1][i], ciphertexts[0][i], s)
+    print("################# decrypted text ###################")
+    print(x2)
 
-# [v2, u2, s1] = lwe.switch_key(s_new, s, v, u)
-# x2 = lwe.dec(v2, u2, s1)
 
 # ###### key switching #######
 # g = lwe.decompose_gadget()
@@ -83,7 +86,7 @@ s = lwe.shift(s, 3)
 # #x2 = lwe.dec_mul(c0, c1, c2, s)
 
 
-x2 = lwe.dec(v, u, s)
+#x2 = lwe.dec(v, u, s)
 
-print("################# decrypted text ###################")
-print(x2)
+# print("################# decrypted text ###################")
+# print(x2)
