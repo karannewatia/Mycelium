@@ -1,36 +1,34 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 
 #p = 3843321857
-w = cint(3457723958)
+w = cint(2791827151)
 
-lgN = 4
+lgN = 2
 r = Ring(lgN, w)
 
 N = 1
 lgM = 10
 l = 4
-lwe = LWE(r, N, lgM, l)
+n = 4
+lgP = 32
+lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = sint.Array(l)
 for i in range(l):
   x[i] = sint(i)
   print_ln("%s ", x[i].reveal())
 
-[a, b, s] = lwe.key_gen()
-[u, v] = lwe.enc(a, b, x)
-x2 = lwe.dec(u, v, s)
+[b, a, s] = lwe.key_gen()
+[v, u] = lwe.enc(b, a, x)
+#x2 = lwe.dec(v, u, s)
 
-#[b, a, s] = lwe.key_gen()
-#[c1, c0] = lwe.enc(b, a, x)
-#x2 = lwe.dec(c0, c1, s)
-
-#g = lwe.decompose_gadget()
-#print_ln("decompose gadget done")
-#[s1, u1, v1] = lwe.key_switching(g, s)
-#print_ln("key switching done")
-#[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
-#print_ln("new ciphertext done")
-#x2 = lwe.dec(u2, v2, s1)
+g = lwe.decompose_gadget()
+print_ln("decompose gadget done")
+[s1, v1, u1] = lwe.key_switching(g, s)
+print_ln("key switching done")
+[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
+print_ln("new ciphertext done")
+x2 = lwe.dec(v2, u2, s1)
 
 
 #[u1, v1] = lwe.enc(a, b, x)

@@ -8,7 +8,7 @@ class LWE(object):
   # Namely, if you wish to do t ciphertext additions
   #   and p is the size of the SCALE-MAMBA field, then need:
   #   t*2*N^2 < p / (2*m)
-  def __init__(self, r, N, lgM, l):
+  def __init__(self, r, N, lgM, l, n, lgP):
     self.r = r  # Ring used
     self.N = N  # Half-width of binomial distributions
     # m = Modulus of ciphertext additions
@@ -16,24 +16,26 @@ class LWE(object):
     self.lgM = lgM
     self.m = 2 ** lgM    # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
-    self.n = 16
-    self.lgP = 32
+    self.n = n
+    self.lgP = lgP
     return
 
   # Returns [a, b, s]
-  # (a, b) is the public key, s is the secret key
+  # (b, a) is the public key, s is the secret key
   def key_gen(self):
     r = self.r
     N = self.N
     a = r.ringRandClear()
     s = r.ringBinom(N)
     e = r.ringBinom(N)
+    a_neg = cint.Array(self.n)
     @for_range(self.n)
     def range_body(i):
       e[i] *= cint(2)
-    b = r.reveal(r.ringAdd(r.ringMulFast(a, s), e))
+      a_neg[i] = -a[i]
+    b = r.reveal(r.ringAdd(r.ringMulFast(a_neg, s), e))
 
-    res = [a, b, s]
+    res = [b, a, s]
     return res
 
   #Calculate the binary representation of the given number
@@ -69,7 +71,7 @@ class LWE(object):
       g[(self.lgP-1) - i] = 2**i
     return g
 
-  #Returns [s1, u, v]
+  #Returns [s1, v, u]
   #do key switching: generate new secret key s1 and key switching key k = (u|v)
   def key_switching(self, g, s):
     r = self.r
@@ -87,7 +89,7 @@ class LWE(object):
       @for_range(self.n)
       def range_body_inner(j):
         u[i][j] = tmp_u[j]
-        u_neg[i][j] = cint(-1)*tmp_u[j]
+        u_neg[i][j] = -tmp_u[j]
 
     e = sint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
@@ -112,8 +114,8 @@ class LWE(object):
       def range_body_inner(j):
         v[i][j] = tmp_v[j]
 
-    #k = (u|v)
-    res = [s1, u, v]
+    #k = (v|u)
+    res = [s1, v, u]
     return res
 
   #Generate the new ciphertext
@@ -126,13 +128,13 @@ class LWE(object):
     c1_new = cint.Array(self.n)
     @for_range(self.n)
     def range_body(i):
-      c0_new[i] = c0[i]
+      c0_new[i] = cint(0)
       c1_new[i] = cint(0)
       tmp_binary = self.to_binary(c1[i])
       @for_range(self.lgP)
       def range_body_inner(j):
         if_then(c1[i] < cint(0))
-        tmp_binary[j] = cint(-1) * tmp_binary[j]
+        tmp_binary[j] = -tmp_binary[j]
         end_if()
         g_inverse[i][j] = tmp_binary[j]
     @for_range(self.lgP)
@@ -149,11 +151,13 @@ class LWE(object):
         c0_new[j] = tmp0[j]
         c1_new[j] = tmp1[j]
 
+    c0_new = r.ringAdd(c0_new, c0)
+
     return [c0_new, c1_new]
 
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [u, v]
-  def enc(self, a, b, z):
+  def enc(self, b, a, z):
     r = self.r
     N = self.N
     m = self.m
@@ -185,17 +189,18 @@ class LWE(object):
     v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
-    res = [r.reveal(u), r.reveal(v)]
+    res = [r.reveal(v), r.reveal(u)]
     return res
 
 
-  def dec(self, u, v, s):
+  def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
     clearM = cint(m)
-    zNoisy = r.ringSub(v, r.ringMulFast(u, s))
-    #zNoisy = r.ringAdd(c0, r.ringMulFast(c1, s))
+    #zNoisy = r.ringSub(v, r.ringMulFast(u, s))
+    zNoisy = r.ringAdd(v, r.ringMulFast(u, s))
+
     halfMthP = cint(-1)/(2*m)
     z = sint.Array(self.l)
     @for_range(self.l)
@@ -203,7 +208,6 @@ class LWE(object):
       zRangeI = zNoisy[i] + halfMthP
       zNotchesI = zRangeI * clearM
       z[i] = m - 1 - ((zNotchesI - 1) % m)
-      #z[i] = z[i] % 2
 
     return z
 
