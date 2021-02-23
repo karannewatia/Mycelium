@@ -20,6 +20,38 @@ class LWE(object):
     self.lgP = lgP
     return
 
+  def secret_key_gen(self):
+    s = r.ringBinom(N)
+    return s
+
+  def calc_gs(self, g, s):
+    gs = sint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      @for_range(self.n)
+      def range_body_inner(j):
+        gs[i][j] = g[i] * s[j]
+    return gs
+
+  def calc_u(self, lgN):
+    @for_range(lgN)
+    def _(k):
+      u = cint.Matrix(self.lgP, self.n)
+      @for_range(self.lgP)
+      def range_body(i):
+        tmp_u = r.ringRandClear()
+        @for_range(self.n)
+        def range_body_inner(j):
+          u[i][j] = tmp_u[j]
+
+      e = sint.Matrix(self.lgP, self.n)
+      @for_range(self.lgP)
+      def range_body(i):
+        tmp_e = r.ringBinom(N)
+        @for_range(self.n)
+        def range_body_inner(j):
+          e[i][j] = tmp_e[j]
+
   # Returns [a, b, s]
   # (b, a) is the public key, s is the secret key
   def key_gen(self):
@@ -71,51 +103,49 @@ class LWE(object):
       g[(self.lgP-1) - i] = 2**i
     return g
 
-  #Returns [s1, v, u]
-  #do key switching: generate new secret key s1 and key switching key k = (u|v)
-  def key_switching(self, g, s):
+  #Returns [v, u]
+  #do key switching: generate key switching key k = (v|u)
+  def key_switching(self, gs, s1, u_neg, e):
     r = self.r
     N = self.N
 
     #v = -u*s1 + g*s + e
 
-    s1 = r.ringBinom(N)
+    #u = cint.Matrix(self.lgP, self.n)
+    #u_neg = cint.Matrix(self.lgP, self.n)
+    #@for_range(self.lgP)
+    #def range_body(i):
+      #tmp_u = r.ringRandClear()
+      #@for_range(self.n)
+      #def range_body_inner(j):
+        #u[i][j] = 0 #tmp_u[j]
+        #u_neg[i][j] = 0 #-tmp_u[j]
 
-    u = cint.Matrix(self.lgP, self.n)
-    u_neg = cint.Matrix(self.lgP, self.n)
-    @for_range(self.lgP)
-    def range_body(i):
-      tmp_u = r.ringRandClear()
-      @for_range(self.n)
-      def range_body_inner(j):
-        u[i][j] = tmp_u[j]
-        u_neg[i][j] = -tmp_u[j]
+    #e = sint.Matrix(self.lgP, self.n)
+    #@for_range(self.lgP)
+    #def range_body(i):
+      #tmp_e = r.ringBinom(N)
+      #@for_range(self.n)
+      #def range_body_inner(j):
+        #e[i][j] = 0 #tmp_e[j]
 
-    e = sint.Matrix(self.lgP, self.n)
-    @for_range(self.lgP)
-    def range_body(i):
-      tmp_e = r.ringBinom(N)
-      @for_range(self.n)
-      def range_body_inner(j):
-        e[i][j] = tmp_e[j]
-
-    gs = sint.Matrix(self.lgP, self.n)
-    @for_range(self.lgP)
-    def range_body(i):
-      @for_range(self.n)
-      def range_body_inner(j):
-        gs[i][j] = g[i] * s[j]
+    #gs = sint.Matrix(self.lgP, self.n)
+    #@for_range(self.lgP)
+    #def range_body(i):
+      #@for_range(self.n)
+      #def range_body_inner(j):
+        #gs[i][j] = g[i] * s[j]
 
     v = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
       tmp_v = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(u_neg[i], s1), gs[i]), e[i]))
+      #tmp_v = r.reveal(r.ringAdd(r.ringAdd(s1, gs[i]), e[i]))
       @for_range(self.n)
       def range_body_inner(j):
         v[i][j] = tmp_v[j]
 
-    #k = (v|u)
-    res = [s1, v, u]
+    res = [v, u_neg]
     return res
 
   #Generate the new ciphertext

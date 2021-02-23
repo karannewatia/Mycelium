@@ -1,35 +1,157 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 
-#p = 3843321857
-w = cint(2791827151)
+#p = 16894334278186303489 #237618008720528086661678096280471994369
 
-lgN = 2
+w = cint(1565937618634636312) #cint(9694205632073507076) #cint(16886317379479819630385336263266985780)
+
+lgN = 9 #10 #12
 r = Ring(lgN, w)
 
 N = 1
-lgM = 10
-l = 4
-n = 4
-lgP = 32
+lgM = 25 #50
+l = 512
+n = 512 #1024 #4096
+lgP = 64 #128
 lwe = LWE(r, N, lgM, l, n, lgP)
 
-x = sint.Array(l)
-for i in range(l):
-  x[i] = sint(i)
-  print_ln("%s ", x[i].reveal())
+#x = sint.Array(l)
+#for i in range(l):
+  #x[i] = sint(5)
+  #print_ln("Plaintext is %s ", x[i].reveal())
 
-[b, a, s] = lwe.key_gen()
-[v, u] = lwe.enc(b, a, x)
+############ Key gen ########################
+
+#[b, a, s] = lwe.key_gen()
+
+#print_ln("public key a")
+#for i in range(len(a)):
+  #print_ln("%s ", a[i])
+#print_ln("public key b")
+#for i in range(len(b)):
+  #print_ln("%s ", b[i])
+
+#for i in range(n):
+  #output_shares(0, s[i])
+
+############################################
+
+#[v, u] = lwe.enc(b, a, x)
+#print_ln("########### ciphertext v #############")
+#for i in range(len(v)):
+  #print_ln("%s ", v[i])
+#print_ln("############ ciphertext u ############")
+#for i in range(len(u)):
+  #print_ln("%s ", u[i])
+
+############ Decrypt ########################
+
+#v = cint.Array(n)
+#u = cint.Array(n)
+
+#@for_range(n)
+#def set_V(i):
+  #v[i] = cint.public_input(0)
+#@for_range(n)
+#def set_U(i):
+  #u[i] = cint.public_input(0)
+
+#s = sint.Array(n)
+#@for_range(n)
+#def copy(i):
+  #tmp = [sint()]
+  #input_shares(0, *tmp)
+  #s[i] = tmp[0]
+
 #x2 = lwe.dec(v, u, s)
 
-g = lwe.decompose_gadget()
-print_ln("decompose gadget done")
-[s1, v1, u1] = lwe.key_switching(g, s)
-print_ln("key switching done")
-[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
-print_ln("new ciphertext done")
-x2 = lwe.dec(v2, u2, s1)
+#for i in range(l):
+  #z = x2[i] + sint.get_random_bit() #add noise
+  #print_ln("Decrypt result is: %s ", z.reveal_to(0))
 
+##########################################
+
+#s = lwe.secret_key_gen()
+#for i in range(n):
+  #output_shares(0, s[i])
+
+#@for_range(lgN)
+#def _(i):
+  #tmp_s = lwe.secret_key_gen()
+  #@for_range(n)
+  #def _(j):
+    #output_shares(0, tmp_s[j])
+
+################ Galois key gen ##################
+
+#a = sint.get_private_input_from(0)
+#print_ln("test private input: %s ", a.reveal_to(0))
+
+#a = cint(1)
+#a ^= cint(1)
+
+
+g = cint.Array(lgP)
+s = sint.Array(n)
+
+@for_range(lgP)
+def set_G(i):
+  g[i] = cint.public_input(0)
+
+@for_range(n)
+def copy(i):
+  tmp = [sint()]
+  input_shares(0, *tmp)
+  s[i] = tmp[0]
+
+gs = lwe.calc_gs(g, s)
+
+@for_range(1)
+def galois_key_gen(i):
+  tmp_s = sint.Array(n)
+  @for_range(n)
+  def read_sk(j):
+    tmp = [sint()]
+    input_shares(0, *tmp)
+    tmp_s[j] = tmp[0]
+
+  u_neg = cint.Matrix(lgP, n)
+  e = sint.Matrix(lgP, n)
+
+  @for_range(lgP)
+  def _(c):
+    @for_range(n)
+    def _(d):
+      u_neg[c][d] = cint(0)
+
+  @for_range(lgP)
+  def _(c):
+    @for_range(n)
+    def _(d):
+      e[c][d] = sint(cint.public_input(0))
+      for play_num in range(10):
+        tmp1 = sint.get_private_input_from(play_num)
+        tmp2 = tmp1.reveal()
+        u_neg[c][d] ^= cint(tmp2)
+
+
+  [v1, u1] = lwe.key_switching(gs, tmp_s, u_neg, e)
+
+  #@for_range(lgP)
+  #def _(a):
+    #@for_range(n)
+    #def _(b):
+      #print_ln("%s ", v1[a][b])
+      #print_ln("%s ", -u1[a][b])
+
+
+#############################################
+
+#print_ln("decompose gadget done")
+#[s1, v1, u1] = lwe.key_switching(g, s)
+#print_ln("key switching done")
+#[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
+#print_ln("new ciphertext done")
+#x2 = lwe.dec(v2, u2, s1)
 
 #[u1, v1] = lwe.enc(a, b, x)
 #u2 = lwe.add(u, u1)
@@ -37,6 +159,6 @@ x2 = lwe.dec(v2, u2, s1)
 #x2 = lwe.dec(u2, v2, s)
 
 
-for i in range(l):
-  x2[i].reveal_to(0)
-  print_ln("%s ", x2[i].reveal())
+#for i in range(l):
+  #x2[i].reveal_to(0)
+  #print_ln("%s ", x2[i].reveal())

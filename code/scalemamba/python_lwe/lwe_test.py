@@ -2,25 +2,24 @@ from ring import Ring
 from lwe import LWE
 import random
 
-p = 3843321857
-w = 385597899
-#w = 2791827151
+p = 17 #3843321857
+w = 9 #385597899
 
-lgN = 4
+lgN = 2#4
 r = Ring(lgN, w)
 
 N = 1
-lgM = 10
-l = 16
-n = 16
-lgP = 32
+lgM = 1 #10
+l = 2#16
+n = 4#16
+lgP = 4#32
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = [0 for i in range(l)]
 for i in range(l):
   x[i] = 0 #random.randrange(0, 9)
 print("####### plaintext ###########")
-x[-2] = 1
+x[0] = 1
 print(x)
 
 [b, a, s] = lwe.key_gen()
@@ -44,17 +43,17 @@ print(v)
 
 
 ####### expand #######
-zeros = [0 for i in range(n)]
-expand_outer_loop_count = 4
-c0 = [zeros for i in range(2**expand_outer_loop_count)]
-c1 = [zeros for i in range(2**expand_outer_loop_count)]
-c0[0] = u
-c1[0] = v
-ciphertexts = lwe.expand(expand_outer_loop_count, s, (c0, c1))
-for i in range(len(ciphertexts[0])):
-    [x2, zNoisy] = lwe.dec(ciphertexts[1][i], ciphertexts[0][i], s)
-    print("################# decrypted text ###################")
-    print(x2)
+# zeros = [0 for i in range(n)]
+# expand_outer_loop_count = 4
+# c0 = [zeros for i in range(2**expand_outer_loop_count)]
+# c1 = [zeros for i in range(2**expand_outer_loop_count)]
+# c0[0] = u
+# c1[0] = v
+# ciphertexts = lwe.expand(expand_outer_loop_count, s, (c0, c1))
+# for i in range(len(ciphertexts[0])):
+#     [x2, zNoisy] = lwe.dec(ciphertexts[1][i], ciphertexts[0][i], s)
+#     print("################# decrypted text ###################")
+#     print(x2)
 
 ####### key switching #######
 # g = lwe.decompose_gadget()
@@ -91,7 +90,7 @@ for i in range(len(ciphertexts[0])):
 # #x2 = lwe.dec_mul(c0, c1, c2, s)
 
 
-#x2 = lwe.dec(v, u, s)
-#
-# print("################# decrypted text ###################")
-# print(x2)
+x2 = lwe.dec(v, u, s)
+
+print("################# decrypted text ###################")
+print(x2)

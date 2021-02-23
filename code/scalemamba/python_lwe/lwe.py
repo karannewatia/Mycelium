@@ -1,7 +1,7 @@
 from ring import Ring
 import numpy as np
 
-p=3843321857
+p=17 #3843321857
 
 class LWE(object):
 
@@ -116,6 +116,9 @@ class LWE(object):
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     e = [self.get_mod(2*i) for i in e]
+    print("######## e #######")
+    print(e)
+
     b = r.ringAdd(r.ringMul(a_neg, s), e)
 
     res = [b,a,s]
@@ -138,6 +141,13 @@ class LWE(object):
     u = r.ringMul(a, e0)
     u = r.ringAdd(u, e1)
 
+    print("######## e0 #######")
+    print(e0)
+    print("######## e1 #######")
+    print(e1)
+    print("######## e2 #######")
+    print(e2)
+
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
     #mthP = cint(-1)/cint(m)
@@ -146,7 +156,7 @@ class LWE(object):
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = self.get_mod(z[i] * mthP)
+      zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
 
     v = r.ringMul(b, e0)
     v = r.ringAdd(v, e2)
@@ -168,9 +178,10 @@ class LWE(object):
 
     z = [0 for i in range(self.l)]
     for i in range(self.l):
-      zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-      zNotchesI = self.get_mod(zRangeI * clearM)
-      z[i] = m - 1 - ((zNotchesI - 1) % m)
+      # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
+      # zNotchesI = self.get_mod(zRangeI * clearM)
+      # z[i] = m - 1 - ((zNotchesI - 1) % m)
+      z[i] = zNoisy[i] % 2
       # d = p/m
       # z[i] = round(zNoisy[i]/d)
 

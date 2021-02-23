@@ -1,8 +1,8 @@
 import random
 import numpy as np
 
-#random.seed(10)
-p=3843321857
+random.seed(10)
+p=17#3843321857
 
 
 class Ring(object):
