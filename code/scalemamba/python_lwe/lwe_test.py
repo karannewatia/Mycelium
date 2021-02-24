@@ -10,7 +10,7 @@ r = Ring(lgN, w)
 
 N = 1
 lgM = 1 #10
-l = 2#16
+l = 4#16
 n = 4#16
 lgP = 4#32
 lwe = LWE(r, N, lgM, l, n, lgP)
@@ -20,6 +20,7 @@ for i in range(l):
   x[i] = 0 #random.randrange(0, 9)
 print("####### plaintext ###########")
 x[0] = 1
+x[3] = 1
 print(x)
 
 [b, a, s] = lwe.key_gen()

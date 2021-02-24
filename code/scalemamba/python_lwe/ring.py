@@ -334,6 +334,23 @@ class Ring(object):
       res[i] = self.modBinom(N)
     return res
 
+  def recover(self, e):
+    for i in range(len(e)):
+      if e[i] > p/2:
+        e[i] = e[i] - p
+        e[i] = -(e[i])
+    return e
+
+  def ringBinom_new(self, N):
+    n = self.n
+    #res = sint.Array(n)
+    res = [0 for i in range(n)]
+    #@for_range(n)
+    #def range_body(i):
+    for i in range(n):
+      res[i] = self.modBinom(N)
+    return self.recover(res)
+
   def ringRevealPrettyPrint(self, a):
     print_ln("[ ")
     for i in range(0, len(a)):

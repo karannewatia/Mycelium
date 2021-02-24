@@ -112,8 +112,8 @@ class LWE(object):
     r = self.r
     N = self.N
     a = r.ringRandClear()
-    s = r.ringBinom(N)
-    e = r.ringBinom(N)
+    s = r.ringBinom_new(N)
+    e = r.ringBinom_new(N)
     a_neg = [self.get_mod(-i) for i in a]
     e = [self.get_mod(2*i) for i in e]
     print("######## e #######")
@@ -130,12 +130,14 @@ class LWE(object):
     r = self.r
     N = self.N
     m = self.m
-    e0 = r.ringBinom(N)
-    e1 = r.ringBinom(N)
-    e2 = r.ringBinom(N)
+    e0 = r.ringBinom_new(N)
+    e1 = r.ringBinom_new(N)
+    e2 = r.ringBinom_new(N)
 
-    e1 = [self.get_mod(2*i)for i in e1]
-    e2 = [self.get_mod(2*i) for i in e2]
+    # e1 = [self.get_mod(2*i)for i in e1]
+    # e2 = [self.get_mod(2*i) for i in e2]
+    e1 = [(2*i)for i in e1]
+    e2 = [(2*i) for i in e2]
 
     # u = a*e0 + 2*e1 (mod q)
     u = r.ringMul(a, e0)
