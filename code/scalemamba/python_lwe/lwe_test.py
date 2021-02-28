@@ -17,10 +17,11 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = 0 #random.randrange(0, 9)
+  x[i] = 1 #random.randrange(0, 9)
 print("####### plaintext ###########")
-x[0] = 1
+x[1] = 0
 x[3] = 1
+
 print(x)
 
 [b, a, s] = lwe.key_gen()
@@ -31,7 +32,7 @@ print("####### public key b ###########")
 print(b)
 print("####### secret key s ###########")
 print(s)
-[v, u] = lwe.enc(b, a, x)
+[u, v] = lwe.enc(b, a, s, x)
 print("############## original ciphertext u ################")
 print(u)
 print("############## original ciphertext v #################")
@@ -91,7 +92,7 @@ print(v)
 # #x2 = lwe.dec_mul(c0, c1, c2, s)
 
 
-x2 = lwe.dec(v, u, s)
+x2 = lwe.dec(u, v, s)
 
 print("################# decrypted text ###################")
 print(x2)

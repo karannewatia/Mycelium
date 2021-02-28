@@ -1,7 +1,7 @@
 import random
 import numpy as np
 
-random.seed(10)
+random.seed()
 p=17#3843321857
 
 
