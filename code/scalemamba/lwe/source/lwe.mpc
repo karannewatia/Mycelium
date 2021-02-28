@@ -206,7 +206,7 @@ class LWE(object):
       tmp_e = r.ringBinom(N)
       @for_range(self.n)
       def range_body_inner(j):
-        e[i][j] = tmp_e[j]
+        e[i][j] = tmp_e[j] * self.m
 
     s2 = r.ringMul(s,s)
 
@@ -217,7 +217,7 @@ class LWE(object):
     def range_body(i):
       @for_range(self.n)
       def range_body_inner(j):
-        gs[i][j] = g[i] * s[j]
+        gs[i][j] = g[i] * s2[j]
 
     b = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
