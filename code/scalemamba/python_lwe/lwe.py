@@ -2,7 +2,7 @@ from ring import Ring
 import numpy as np
 
 p=257#3843321857
-t=2
+t=4
 
 class LWE(object):
 
@@ -116,7 +116,7 @@ class LWE(object):
     s = r.ringBinom(N)
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
-    e = [self.get_mod(2*i) for i in e]
+    e = [self.get_mod(t*i) for i in e]
 
     b = r.ringAdd(r.ringMul(a_neg, s), e)
 
@@ -135,13 +135,15 @@ class LWE(object):
     print("######### e0 #######")
     print(e0)
 
-    e1 = [self.get_mod(2*i) for i in e1]
-    e2 = [self.get_mod(2*i) for i in e2]
+    e1 = [self.get_mod(t*i) for i in e1]
+    e2 = [self.get_mod(t*i) for i in e2]
+
+    #e0 = [self.get_mod(t*i) for i in e0]
 
     # u = as+2e+m
     #u = r.ringMul(a, s)
     #u = r.ringAdd(u, e0)
-    #u = r.ringAdd(u, e0)
+
     u = r.ringMul(a, e0)
     u = r.ringAdd(u, e1)
 

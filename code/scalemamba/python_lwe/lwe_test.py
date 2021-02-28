@@ -17,9 +17,9 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = 1 #random.randrange(0, 9)
+  x[i] = 2 #random.randrange(0, 9)
 print("####### plaintext ###########")
-x[1] = 0
+x[1] = 3
 x[3] = 1
 
 print(x)
