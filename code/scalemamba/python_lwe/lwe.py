@@ -1,7 +1,7 @@
 from ring import Ring
 import numpy as np
 
-p=17#3843321857
+p=257#3843321857
 t=2
 
 class LWE(object):
@@ -130,16 +130,20 @@ class LWE(object):
     N = self.N
     m = self.m
     e0 = r.ringBinom(N)
+    e1 = r.ringBinom(N)
+    e2 = r.ringBinom(N)
     print("######### e0 #######")
     print(e0)
 
-    #e1 = [self.get_mod(2*i) for i in e1]
-    #e2 = [self.get_mod(2*i) for i in e2]
+    e1 = [self.get_mod(2*i) for i in e1]
+    e2 = [self.get_mod(2*i) for i in e2]
 
     # u = as+2e+m
-    u = r.ringMul(a, s)
-    u = r.ringAdd(u, e0)
-    u = r.ringAdd(u, e0)
+    #u = r.ringMul(a, s)
+    #u = r.ringAdd(u, e0)
+    #u = r.ringAdd(u, e0)
+    u = r.ringMul(a, e0)
+    u = r.ringAdd(u, e1)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
@@ -151,22 +155,22 @@ class LWE(object):
     for i in range(0, len(z)):
       zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
 
-    #v = r.ringMul(b, e0)
-    #v = r.ringAdd(v, e2)
-    #v = r.ringAdd(v, zMthP)
+    v = r.ringMul(b, e0)
+    v = r.ringAdd(v, e2)
+    v = r.ringAdd(v, zMthP)
 
-    u = r.ringAdd(u, zMthP)
-    res = [u, a]
+    #u = r.ringAdd(u, zMthP)
+    res = [v, u]
     return res
 
 
-  def dec(self, u, v, s):
+  def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
     clearM = m
-    zNoisy = r.ringSub(u, r.ringMul(v, s))
-    #zNoisy = r.ringAdd(v, r.ringMul(u, s))
+    #zNoisy = r.ringSub(u, r.ringMul(v, s))
+    zNoisy = r.ringAdd(v, r.ringMul(u, s))
 
     halfMthP = p/(2*m)
 

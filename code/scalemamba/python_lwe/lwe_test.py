@@ -2,7 +2,7 @@ from ring import Ring
 from lwe import LWE
 import random
 
-p = 17#3843321857
+p = 257#3843321857
 w = 9#385597899
 
 lgN = 2#4
@@ -12,7 +12,7 @@ N = 1
 lgM = 1#10
 l = 4#16
 n = 4#16
-lgP = 4#32
+lgP = 8#32
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 x = [0 for i in range(l)]

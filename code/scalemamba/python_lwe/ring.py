@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 random.seed()
-p=17#3843321857
+p=257#3843321857
 
 
 class Ring(object):
@@ -333,13 +333,6 @@ class Ring(object):
     for i in range(n):
       res[i] = self.modBinom(N)
     return res
-
-  def recover(self, e):
-    for i in range(len(e)):
-      if e[i] > p/2:
-        e[i] = e[i] - p
-        e[i] = -(e[i])
-    return e
 
   def ringBinom_new(self, N):
     n = self.n
