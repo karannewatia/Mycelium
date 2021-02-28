@@ -1,7 +1,7 @@
 from ring import Ring
 import numpy as np
 
-p=3843321857
+p=15222828664137318401
 
 class LWE(object):
 
@@ -135,12 +135,6 @@ class LWE(object):
     e1 = [self.get_mod(self.m*i) for i in e1]
     e2 = [self.get_mod(self.m*i) for i in e2]
 
-    #e0 = [self.get_mod(t*i) for i in e0]
-
-    # u = as+2e+m
-    #u = r.ringMul(a, s)
-    #u = r.ringAdd(u, e0)
-
     u = r.ringMul(a, e0)
     u = r.ringAdd(u, e1)
 
@@ -158,7 +152,6 @@ class LWE(object):
     v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
-    #u = r.ringAdd(u, zMthP)
     res = [v, u]
     return res
 

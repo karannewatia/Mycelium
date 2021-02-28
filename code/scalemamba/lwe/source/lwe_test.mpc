@@ -1,27 +1,29 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 
-#p = 43584675284779009
+#p = 15222828664137318401
 
-w = cint(21553495391427324)
+w = cint(6573050754454748565)
 
-lgN = 11
+lgN = 4
 r = Ring(lgN, w)
 
 N = 1
-lgM = 32
-l = 2048
-n = 2048
-lgP = 56
+lgM = 15
+l = 16
+n = 16
+lgP = 64
 lwe = LWE(r, N, lgM, l, n, lgP)
 
-#x = sint.Array(l)
-#for i in range(l):
-  #x[i] = sint(5)
+x = sint.Array(l)
+for i in range(l):
+  x[i] = sint(0)
   #print_ln("Plaintext is %s ", x[i].reveal())
+
+x[3] = sint(1)
 
 ############ Key gen ########################
 
-#[b, a, s] = lwe.key_gen()
+[b, a, s] = lwe.key_gen()
 
 #print_ln("public key a")
 #for i in range(len(a)):
@@ -29,13 +31,21 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #print_ln("public key b")
 #for i in range(len(b)):
   #print_ln("%s ", b[i])
-
 #for i in range(n):
   #output_shares(0, s[i])
 
 ############################################
 
-#[v, u] = lwe.enc(b, a, x)
+[v, u] = lwe.enc(b, a, x)
+
+x[3] = sint(0)
+x[5] = sint(1)
+
+[v1, u1] = lwe.enc(b, a, x)
+c0 = lwe.mul(v, v1)
+c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+c2 = lwe.mul(u, u1)
+
 #print_ln("########### ciphertext v #############")
 #for i in range(len(v)):
   #print_ln("%s ", v[i])
@@ -45,27 +55,28 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 ############ Decrypt ########################
 
-v = cint.Array(n)
-u = cint.Array(n)
+#v = cint.Array(n)
+#u = cint.Array(n)
 
-@for_range(n)
-def set_V(i):
-  v[i] = cint.public_input(0)
-@for_range(n)
-def set_U(i):
-  u[i] = cint.public_input(0)
+#@for_range(n)
+#def set_V(i):
+  #v[i] = cint.public_input(0)
+#@for_range(n)
+#def set_U(i):
+  #u[i] = cint.public_input(0)
 
-s = sint.Array(n)
-@for_range(n)
-def copy(i):
-  tmp = [sint()]
-  input_shares(0, *tmp)
-  s[i] = tmp[0]
+#s = sint.Array(n)
+#@for_range(n)
+#def copy(i):
+  #tmp = [sint()]
+  #input_shares(0, *tmp)
+  #s[i] = tmp[0]
 
-x2 = lwe.dec(v, u, s)
+#x2 = lwe.dec(v, u, s)
+x2 = lwe.dec_mul(c0, c1, c2, s)
 
 for i in range(l):
-  z = x2[i] + sint.get_random_bit() #add noise
+  z = x2[i] #+ sint.get_random_bit() #add noise
   print_ln("Decrypt result is: %s ", z.reveal_to(0))
 
 ##########################################

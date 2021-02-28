@@ -14,7 +14,7 @@ class LWE(object):
     # m = Modulus of ciphertext additions
     # Require p = 1 (mod 2m), and m to be a power of 2
     self.lgM = lgM
-    self.m = 2 ** lgM    # Plaintext modulus (size per element)
+    self.m = 1 << lgM   # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     self.n = n
     self.lgP = lgP
@@ -63,7 +63,7 @@ class LWE(object):
     a_neg = cint.Array(self.n)
     @for_range(self.n)
     def range_body(i):
-      e[i] *= cint(2)
+      e[i] *= cint(self.m)
       a_neg[i] = -a[i]
     b = r.reveal(r.ringAdd(r.ringMulFast(a_neg, s), e))
 
@@ -98,9 +98,9 @@ class LWE(object):
   #calculate the decompose gadget g
   def decompose_gadget(self):
     g = cint.Array(self.lgP)
-    @for_range(self.lgP-1, -1, -1)
+    @for_range(self.lgP)
     def range_body(i):
-      g[(self.lgP-1) - i] = 2**i
+      g[i] = 2**i
     return g
 
   #Returns [v, u]
@@ -185,6 +185,52 @@ class LWE(object):
 
     return [c0_new, c1_new]
 
+  def rl_keys(self, s):
+    r = self.r
+    N = self.N
+
+    a = cint.Matrix(self.lgP, self.n)
+    a_neg = cint.Matrix(self.lgP, self.n)
+
+    @for_range(self.lgP)
+    def range_body(i):
+      tmp_a = r.ringRandClear()
+      @for_range(self.n)
+      def range_body_inner(j):
+        a[i][j] = tmp_a[j]
+        a_neg[i][j] = -tmp_a[j]
+
+    e = sint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      tmp_e = r.ringBinom(N)
+      @for_range(self.n)
+      def range_body_inner(j):
+        e[i][j] = tmp_e[j]
+
+    s2 = r.ringMul(s,s)
+
+    g = self.decompose_gadget()
+
+    gs = sint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      @for_range(self.n)
+      def range_body_inner(j):
+        gs[i][j] = g[i] * s[j]
+
+    b = cint.Matrix(self.lgP, self.n)
+    @for_range(self.lgP)
+    def range_body(i):
+      tmp_b = r.ringAdd(r.ringMulFast(a_neg[i], s), e[i])
+      tmp_b = r.ringAdd(tmp_b, gs[i])
+      @for_range(self.n)
+      def range_body_inner(j):
+        b[i][j] = tmp_b[j]
+
+    res = [b, a]
+    return res
+
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [u, v]
   def enc(self, b, a, z):
@@ -197,23 +243,23 @@ class LWE(object):
 
     @for_range(self.n)
     def range_body(i):
-      e1[i] *= cint(2)
+      e1[i] *= cint(self.m)
 
-    # u = a*e0 + 2*e1 (mod q)
+    # u = a*e0 + m*e1 (mod q)
     u = r.ringMulFast(a, e0)
     u = r.ringAdd(u, e1)
 
-    # v = b*e0 + 2*e2 + round(p/m)z (mod p)
+    # v = b*e0 + m*e2 + z (mod p)
     mthP = cint(-1)/cint(m)
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = z[i] * mthP
+      zMthP[i] = z[i]
 
     @for_range(self.n)
     def range_body(i):
-      e2[i] *= cint(2)
+      e2[i] *= cint(self.m)
 
     v = r.ringMulFast(b, e0)
     v = r.ringAdd(v, e2)
@@ -228,20 +274,42 @@ class LWE(object):
     lgM = self.lgM
     m = 1 << lgM
     clearM = cint(m)
-    #zNoisy = r.ringSub(v, r.ringMulFast(u, s))
     zNoisy = r.ringAdd(v, r.ringMulFast(u, s))
 
     halfMthP = cint(-1)/(2*m)
     z = sint.Array(self.l)
     @for_range(self.l)
     def round(i):
-      zRangeI = zNoisy[i] + halfMthP
-      zNotchesI = zRangeI * clearM
-      z[i] = m - 1 - ((zNotchesI - 1) % m)
+      zNoisy[i] = zNoisy[i] + halfMthP
+      zNoisy[i] = zNoisy[i] - halfMthP
+      z[i] = zNoisy[i] % self.m
+
+    return z
+
+  def dec_mul(self, c0, c1, c2, s):
+    r = self.r
+    lgM = self.lgM
+    m = 1 << lgM
+    clearM = cint(m)
+    s1 = r.ringMul(s,s)
+    zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+
+    halfMthP = cint(-1)/(2*m)
+    z = sint.Array(self.l)
+    @for_range(self.l)
+    def round(i):
+      zNoisy[i] = zNoisy[i] + halfMthP
+      zNoisy[i] = zNoisy[i] - halfMthP
+      z[i] = zNoisy[i] % self.m
 
     return z
 
   def add(self, u1, u2):
     r = self.r
     res = r.reveal(r.ringAdd(u1, u2))
+    return res
+
+  def mul(self, u1, u2):
+    r = self.r
+    res = r.reveal(r.ringMulFast(u1, u2))
     return res

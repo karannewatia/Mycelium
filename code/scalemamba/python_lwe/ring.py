@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 #random.seed()
-p= 3843321857
+p= 15222828664137318401
 
 
 class Ring(object):
