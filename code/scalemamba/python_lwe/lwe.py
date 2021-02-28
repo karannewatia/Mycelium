@@ -1,7 +1,8 @@
 from ring import Ring
 import numpy as np
 
-p=17 #3843321857
+p=17#3843321857
+t=2
 
 class LWE(object):
 
@@ -129,21 +130,16 @@ class LWE(object):
     N = self.N
     m = self.m
     e0 = r.ringBinom(N)
-    e1 = r.ringBinom(N)
-    e2 = r.ringBinom(N)
     print("######### e0 #######")
     print(e0)
 
-    e1 = [self.get_mod(2*i) for i in e1]
-    e2 = [self.get_mod(2*i) for i in e2]
+    #e1 = [self.get_mod(2*i) for i in e1]
+    #e2 = [self.get_mod(2*i) for i in e2]
 
     # u = as+2e+m
-    #u = r.ringMul(a, s)
-    #u = r.ringAdd(u, e0)
-    #u = r.ringAdd(u, e0)
-    u = r.ringMul(a, e0)
-    u = r.ringAdd(u, e1)
-
+    u = r.ringMul(a, s)
+    u = r.ringAdd(u, e0)
+    u = r.ringAdd(u, e0)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
@@ -155,22 +151,22 @@ class LWE(object):
     for i in range(0, len(z)):
       zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
 
-    v = r.ringMul(b, e0)
-    v = r.ringAdd(v, e2)
-    v = r.ringAdd(v, zMthP)
+    #v = r.ringMul(b, e0)
+    #v = r.ringAdd(v, e2)
+    #v = r.ringAdd(v, zMthP)
 
-    #u = r.ringAdd(u, zMthP)
-    res = [v, u]
+    u = r.ringAdd(u, zMthP)
+    res = [u, a]
     return res
 
 
-  def dec(self, v, u, s):
+  def dec(self, u, v, s):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
     clearM = m
-    #zNoisy = r.ringSub(u, r.ringMul(v, s))
-    zNoisy = r.ringAdd(v, r.ringMul(u, s))
+    zNoisy = r.ringSub(u, r.ringMul(v, s))
+    #zNoisy = r.ringAdd(v, r.ringMul(u, s))
 
     halfMthP = p/(2*m)
 
@@ -179,12 +175,14 @@ class LWE(object):
       # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
       # zNotchesI = self.get_mod(zRangeI * clearM)
       # z[i] = m - 1 - ((zNotchesI - 1) % m)  
-      if zNoisy[i] > 3*p/4:
-        zNoisy[i] = zNoisy[i] - p
-      if abs(zNoisy[i] > p/2):
+      zNoisy[i] = self.get_mod(zNoisy[i] + p/(2*t))
+      zNoisy[i] = zNoisy[i] - p/(2*t)
+      #if zNoisy[i] > p - p/(2*t):
+      #  zNoisy[i] = zNoisy[i] - p
+      if abs(zNoisy[i]) >= p/(2*t):
         print(" !!! dec fails !!! ")
         
-      z[i] = zNoisy[i] % 2
+      z[i] = zNoisy[i] % t
       # d = p/m
       # z[i] = round(zNoisy[i]/d)
 

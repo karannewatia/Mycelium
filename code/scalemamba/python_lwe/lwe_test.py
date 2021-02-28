@@ -20,7 +20,7 @@ for i in range(l):
   x[i] = 1 #random.randrange(0, 9)
 print("####### plaintext ###########")
 x[1] = 0
-x[3] = 0
+x[3] = 1
 
 print(x)
 
