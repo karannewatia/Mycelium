@@ -231,7 +231,6 @@ class LWE(object):
       c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
       c1_new = [0 for i in range(self.n)]
-      print(c2)
 
       for i in range(self.n):
         tmp_binary = self.to_binary(c2[i])[::-1]
