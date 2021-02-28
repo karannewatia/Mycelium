@@ -2,14 +2,14 @@ from ring import Ring
 from lwe import LWE
 import random
 
-p = 17 #3843321857
-w = 9 #385597899
+p = 17#3843321857
+w = 9#385597899
 
 lgN = 2#4
 r = Ring(lgN, w)
 
 N = 1
-lgM = 1 #10
+lgM = 1#10
 l = 4#16
 n = 4#16
 lgP = 4#32
@@ -20,7 +20,7 @@ for i in range(l):
   x[i] = 1 #random.randrange(0, 9)
 print("####### plaintext ###########")
 x[1] = 0
-x[3] = 1
+x[3] = 0
 
 print(x)
 

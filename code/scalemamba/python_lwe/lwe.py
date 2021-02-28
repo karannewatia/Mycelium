@@ -129,13 +129,20 @@ class LWE(object):
     N = self.N
     m = self.m
     e0 = r.ringBinom(N)
+    e1 = r.ringBinom(N)
+    e2 = r.ringBinom(N)
     print("######### e0 #######")
     print(e0)
 
+    e1 = [self.get_mod(2*i) for i in e1]
+    e2 = [self.get_mod(2*i) for i in e2]
+
     # u = as+2e+m
-    u = r.ringMul(a, s)
-    u = r.ringAdd(u, e0)
-    u = r.ringAdd(u, e0)
+    #u = r.ringMul(a, s)
+    #u = r.ringAdd(u, e0)
+    #u = r.ringAdd(u, e0)
+    u = r.ringMul(a, e0)
+    u = r.ringAdd(u, e1)
 
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
@@ -148,22 +155,22 @@ class LWE(object):
     for i in range(0, len(z)):
       zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
 
-    #v = r.ringMul(b, e0)
-    #v = r.ringAdd(v, e2)
-    #v = r.ringAdd(v, zMthP)
+    v = r.ringMul(b, e0)
+    v = r.ringAdd(v, e2)
+    v = r.ringAdd(v, zMthP)
 
-    u = r.ringAdd(u, zMthP)
-    res = [u, a]
+    #u = r.ringAdd(u, zMthP)
+    res = [v, u]
     return res
 
 
-  def dec(self, u, v, s):
+  def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
     clearM = m
-    zNoisy = r.ringSub(u, r.ringMul(v, s))
-    #zNoisy = r.ringAdd(v, r.ringMul(u, s))
+    #zNoisy = r.ringSub(u, r.ringMul(v, s))
+    zNoisy = r.ringAdd(v, r.ringMul(u, s))
 
     halfMthP = p/(2*m)
 
@@ -172,8 +179,10 @@ class LWE(object):
       # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
       # zNotchesI = self.get_mod(zRangeI * clearM)
       # z[i] = m - 1 - ((zNotchesI - 1) % m)  
-      if zNoisy[i] > p/2:
+      if zNoisy[i] > 3*p/4:
         zNoisy[i] = zNoisy[i] - p
+      if abs(zNoisy[i] > p/2):
+        print(" !!! dec fails !!! ")
         
       z[i] = zNoisy[i] % 2
       # d = p/m
