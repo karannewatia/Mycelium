@@ -1,8 +1,7 @@
 from ring import Ring
 import numpy as np
 
-p=17#3843321857
-t=2
+p=3843321857
 
 class LWE(object):
 
@@ -116,7 +115,7 @@ class LWE(object):
     s = r.ringBinom(N)
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
-    e = [self.get_mod(2*i) for i in e]
+    e = [self.get_mod(self.m*i) for i in e]
 
     b = r.ringAdd(r.ringMul(a_neg, s), e)
 
@@ -125,21 +124,25 @@ class LWE(object):
 
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [u, v]
-  def enc(self, b, a, s, z):
+  def enc(self, b, a, z):
     r = self.r
     N = self.N
     m = self.m
     e0 = r.ringBinom(N)
-    print("######### e0 #######")
-    print(e0)
+    e1 = r.ringBinom(N)
+    e2 = r.ringBinom(N)
 
-    #e1 = [self.get_mod(2*i) for i in e1]
-    #e2 = [self.get_mod(2*i) for i in e2]
+    e1 = [self.get_mod(self.m*i) for i in e1]
+    e2 = [self.get_mod(self.m*i) for i in e2]
+
+    #e0 = [self.get_mod(t*i) for i in e0]
 
     # u = as+2e+m
-    u = r.ringMul(a, s)
-    u = r.ringAdd(u, e0)
-    u = r.ringAdd(u, e0)
+    #u = r.ringMul(a, s)
+    #u = r.ringAdd(u, e0)
+
+    u = r.ringMul(a, e0)
+    u = r.ringAdd(u, e1)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
@@ -151,22 +154,22 @@ class LWE(object):
     for i in range(0, len(z)):
       zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
 
-    #v = r.ringMul(b, e0)
-    #v = r.ringAdd(v, e2)
-    #v = r.ringAdd(v, zMthP)
+    v = r.ringMul(b, e0)
+    v = r.ringAdd(v, e2)
+    v = r.ringAdd(v, zMthP)
 
-    u = r.ringAdd(u, zMthP)
-    res = [u, a]
+    #u = r.ringAdd(u, zMthP)
+    res = [v, u]
     return res
 
 
-  def dec(self, u, v, s):
+  def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
     m = 1 << lgM
     clearM = m
-    zNoisy = r.ringSub(u, r.ringMul(v, s))
-    #zNoisy = r.ringAdd(v, r.ringMul(u, s))
+    #zNoisy = r.ringSub(u, r.ringMul(v, s))
+    zNoisy = r.ringAdd(v, r.ringMul(u, s))
 
     halfMthP = p/(2*m)
 
@@ -174,17 +177,15 @@ class LWE(object):
     for i in range(self.l):
       # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
       # zNotchesI = self.get_mod(zRangeI * clearM)
-      # z[i] = m - 1 - ((zNotchesI - 1) % m)  
-      zNoisy[i] = self.get_mod(zNoisy[i] + p/(2*t))
-      zNoisy[i] = zNoisy[i] - p/(2*t)
+      # z[i] = m - 1 - ((zNotchesI - 1) % m)
+      zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
+      zNoisy[i] = zNoisy[i] - halfMthP
       #if zNoisy[i] > p - p/(2*t):
       #  zNoisy[i] = zNoisy[i] - p
-      if abs(zNoisy[i]) >= p/(2*t):
+      if abs(zNoisy[i]) >= halfMthP:
         print(" !!! dec fails !!! ")
-        
-      z[i] = zNoisy[i] % t
-      # d = p/m
-      # z[i] = round(zNoisy[i]/d)
+
+      z[i] = zNoisy[i] % self.m
 
     return [z, zNoisy]
 
@@ -201,30 +202,25 @@ class LWE(object):
 
     z = [0 for i in range(self.l)]
     for i in range(self.l):
-      zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-      zNotchesI = self.get_mod(zRangeI * clearM)
-      z[i] = m - 1 - ((zNotchesI - 1) % m)
-      z[i] = self.get_mod(z[i])
-      # d = p/m
-      # z[i] = round(zNoisy[i]/d)
+         zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
+         zNoisy[i] = zNoisy[i] - halfMthP
+         #if zNoisy[i] > p - p/(2*t):
+         #  zNoisy[i] = zNoisy[i] - p
+         if abs(zNoisy[i]) >= halfMthP:
+           print(" !!! dec fails !!! ")
+
+         z[i] = zNoisy[i] % self.m
 
     return [z, zNoisy]
 
   def rl_keys(self, s):
       r = self.r
       N = self.N
-      tmp_a = r.ringRandClear()
-      a = [tmp_a for i in range(self.lgP)]
-      # e = r.ringBinom(N)
-      # a_neg = [self.get_mod(-i) for i in tmp_a]
-      # e = [self.get_mod(2*i) for i in e]
-      # tmp_b = r.reveal(r.ringAdd(r.ringMul(a_neg, s), e))
-      # b = [tmp_b for i in range(self.lgP)]
-      tmp_b = r.ringRandClear()
-      b = [tmp_b for i in range(self.lgP)]
+      a = [r.ringRandClear() for i in range(self.lgP)]
+      b = [r.ringRandClear() for i in range(self.lgP)]
       s2 = r.ringMul(s,s)
 
-      for i in range(self.lgP - 1, -1, -1):
+      for i in range(self.lgP):
           s2_tmp = [self.get_mod((2**i) * j) for j in s2]
           b[i] = r.ringAdd(b[i], s2_tmp)
 
@@ -235,16 +231,17 @@ class LWE(object):
       c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
       c1_new = [0 for i in range(self.n)]
+      print(c2)
 
       for i in range(self.n):
-        tmp_binary = self.to_binary(c2[i])
+        tmp_binary = self.to_binary(c2[i])[::-1]
         for j in range(self.lgP):
           if (c2[i] < 0):
               tmp_binary[j] = -tmp_binary[j]
           c2_inverse[i][j] = tmp_binary[j]
 
       for i in range(self.lgP):
-        ct = [0 for k in range(self.n)]
+        ct = [0 for _ in range(self.n)]
         for j in range(self.n):
           ct[j] = c2_inverse[j][i]
 
