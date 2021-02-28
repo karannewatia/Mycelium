@@ -217,7 +217,13 @@ class LWE(object):
       r = self.r
       N = self.N
       a = [r.ringRandClear() for i in range(self.lgP)]
-      b = [r.ringRandClear() for i in range(self.lgP)]
+      b = [r.zero() for i in range(self.lgP)]
+      for j in range(self.lgP):
+          a_neg = [self.get_mod(-i) for i in a[j]]
+          e = r.ringBinom(N)
+          e = [self.get_mod(self.m*i) for i in e]
+          b[j] = r.ringAdd(r.ringMul(a_neg, s), e)
+
       s2 = r.ringMul(s,s)
 
       for i in range(self.lgP):
@@ -226,7 +232,7 @@ class LWE(object):
 
       return [b, a]
 
-  def relinearization(self, b, a, c0, c1, c2):
+  def relinearization(self, b, a, c0, c1, c2, s):
       r = self.r
       c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]

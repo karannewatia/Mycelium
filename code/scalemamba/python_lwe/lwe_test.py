@@ -9,7 +9,7 @@ lgN = 4
 r = Ring(lgN, w)
 
 N = 1
-lgM = 5 #10
+lgM = 7 #10
 l = 16
 n = 16
 lgP = 32
@@ -77,20 +77,10 @@ c0 = lwe.mul(v, v1)
 c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
 c2 = lwe.mul(u, u1)
 [rlk_b, rlk_a] = lwe.rl_keys(s)
-# print("################# rlk a ###################")
-# for i in range(lgP):
-#     print(rlk_a[i])
-# print("################# rlk b ###################")
-# for i in range(lgP):
-#     print(rlk_b[i])
-[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2)
-# print("################# c0 relin ###################")
-# print(c0_mul)
-# print("################# c1 relin ###################")
-# print(c1_mul)
+[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+x2 = lwe.dec(c0_mul, c1_mul, s)
 
-#x2 = lwe.dec(c0_mul, c1_mul, s)
-x2 = lwe.dec_mul(c0, c1, c2, s)
+#x2 = lwe.dec_mul(c0, c1, c2, s)
 
 
 
