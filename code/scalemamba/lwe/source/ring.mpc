@@ -284,6 +284,151 @@ class Ring(object):
 
     return res
 
+  def ringMulFastSecret(self, a, b):
+    n = self.n
+    nBitsN = self.nBitsN
+
+    Rs = sint.Matrix(nBitsN+1, n)
+    As = sint.Matrix(nBitsN+1, n)
+    Bs = sint.Matrix(nBitsN+1, n)
+
+    @for_range(n)
+    def topAB(i):
+      As[0][i] = a[i]
+      Bs[0][i] = b[i]
+
+    @for_range(1, nBitsN+1)
+    def splitRow(k):
+      d = nBitsN - k       # Number of recursions left until base layer
+      gapSize = 1 << d
+      @for_range(n)
+      def splitCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
+        isRight = cint((i >> d) % 2)
+
+	AsUp = As[k-1][i]
+	AsUpL = As[k-1][i-gapSize]
+	AsUpR = As[k-1][i+gapSize]
+
+        AsIfLeft = AsUp + AsUpR * c
+        AsIfRight = AsUpL - AsUp*c
+
+        As[k][i] = self.mux(isRight, AsIfLeft, AsIfRight)
+
+    @for_range(1, nBitsN+1)
+    def splitRow(k):
+      d = nBitsN - k       # Number of recursions left until base layer
+      gapSize = 1 << d
+      @for_range(n)
+      def splitCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
+        isRight = cint(((i >> d) % 2))
+
+	BsUp = Bs[k-1][i]
+	BsUpL = Bs[k-1][i-gapSize]
+	BsUpR = Bs[k-1][i+gapSize]
+
+        BsIfLeft = BsUp + BsUpR * c
+        BsIfRight = BsUpL - BsUp*c
+
+        Bs[k][i] = self.mux(isRight, BsIfLeft, BsIfRight)
+
+    @for_range(n)
+    def baseRs(i):
+      Rs[nBitsN][i] = As[nBitsN][i] * Bs[nBitsN][i]
+
+    @for_range(1, nBitsN+1)
+    def combRow(d):
+      k = nBitsN - d
+      gapSize = 1 << (d-1)
+      @for_range(n)
+      def combCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d-1), cint(i)), nBitsN)
+        isRight = cint((i >> (d-1)) % 2)
+	RsLeft = Rs[k+1][i] + Rs[k+1][i + gapSize]
+        RsRight = (Rs[k+1][i - gapSize] - Rs[k+1][i]) / c
+        Rs[k][i] = self.mux(isRight, RsLeft, RsRight)
+
+    res = sint.Array(n)
+    @for_range(n)
+    def setRes(i):
+      res[i] = Rs[0][i] / n
+
+    return res
+
+  # We require: p = 1 (mod 2n), w^n = -1 (mod p)
+  def ringMulFastClear(self, a, b):
+    n = self.n
+    nBitsN = self.nBitsN
+
+    Rs = cint.Matrix(nBitsN+1, n)
+    As = cint.Matrix(nBitsN+1, n)
+    Bs = cint.Matrix(nBitsN+1, n)
+
+    @for_range(n)
+    def topAB(i):
+      As[0][i] = a[i]
+      Bs[0][i] = b[i]
+
+    @for_range(1, nBitsN+1)
+    def splitRow(k):
+      d = nBitsN - k       # Number of recursions left until base layer
+      gapSize = 1 << d
+      @for_range(n)
+      def splitCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
+        isRight = cint((i >> d) % 2)
+
+	AsUp = As[k-1][i]
+	AsUpL = As[k-1][i-gapSize]
+	AsUpR = As[k-1][i+gapSize]
+
+        AsIfLeft = AsUp + AsUpR * c
+        AsIfRight = AsUpL - AsUp*c
+
+        As[k][i] = self.mux(isRight, AsIfLeft, AsIfRight)
+
+    @for_range(1, nBitsN+1)
+    def splitRow(k):
+      d = nBitsN - k       # Number of recursions left until base layer
+      gapSize = 1 << d
+      @for_range(n)
+      def splitCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d), cint(i)), nBitsN)
+        isRight = cint(((i >> d) % 2))
+
+	BsUp = Bs[k-1][i]
+	BsUpL = Bs[k-1][i-gapSize]
+	BsUpR = Bs[k-1][i+gapSize]
+
+        BsIfLeft = BsUp + BsUpR * c
+        BsIfRight = BsUpL - BsUp*c
+
+        Bs[k][i] = self.mux(isRight, BsIfLeft, BsIfRight)
+
+    @for_range(n)
+    def baseRs(i):
+      Rs[nBitsN][i] = As[nBitsN][i] * Bs[nBitsN][i]
+
+    @for_range(1, nBitsN+1)
+    def combRow(d):
+      k = nBitsN - d
+      gapSize = 1 << (d-1)
+      @for_range(n)
+      def combCell(i):
+        c = self.cPow(self.w, self.getWExp(cint(d-1), cint(i)), nBitsN)
+        isRight = cint((i >> (d-1)) % 2)
+	RsLeft = Rs[k+1][i] + Rs[k+1][i + gapSize]
+        RsRight = (Rs[k+1][i - gapSize] - Rs[k+1][i]) / c
+        Rs[k][i] = self.mux(isRight, RsLeft, RsRight)
+
+    res = cint.Array(n)
+    @for_range(n)
+    def setRes(i):
+      res[i] = Rs[0][i] / n
+
+    return res
+
   # Returns 0:
   def zero(self):
     n = self.n

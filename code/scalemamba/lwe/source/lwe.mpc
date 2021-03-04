@@ -185,32 +185,31 @@ class LWE(object):
 
     return [c0_new, c1_new]
 
-  def rl_keys(self, s):
+  def rl_keys(self, s, a, g, e):
     r = self.r
     N = self.N
 
-    a = cint.Matrix(self.lgP, self.n)
+    #a = cint.Matrix(self.lgP, self.n)
     a_neg = cint.Matrix(self.lgP, self.n)
 
     @for_range(self.lgP)
     def range_body(i):
-      tmp_a = r.ringRandClear()
+      #tmp_a = r.ringRandClear()
       @for_range(self.n)
       def range_body_inner(j):
-        a[i][j] = tmp_a[j]
-        a_neg[i][j] = -tmp_a[j]
+        #a[i][j] = tmp_a[j]
+        #a_neg[i][j] = -tmp_a[j]
+        a_neg[i][j] = a[i][j]
 
-    e = sint.Matrix(self.lgP, self.n)
-    @for_range(self.lgP)
-    def range_body(i):
-      tmp_e = r.ringBinom(N)
-      @for_range(self.n)
-      def range_body_inner(j):
-        e[i][j] = tmp_e[j] * self.m
+    #e = sint.Matrix(self.lgP, self.n)
+    #@for_range(self.lgP)
+    #def range_body(i):
+      #tmp_e = r.ringBinom(N)
+      #@for_range(self.n)
+      #def range_body_inner(j):
+        #e[i][j] = tmp_e[j] * self.m
 
-    s2 = r.ringMul(s,s)
-
-    g = self.decompose_gadget()
+    s2 = r.ringMulFastSecret(s,s)
 
     gs = sint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
@@ -222,8 +221,7 @@ class LWE(object):
     b = cint.Matrix(self.lgP, self.n)
     @for_range(self.lgP)
     def range_body(i):
-      tmp_b = r.ringAdd(r.ringMulFast(a_neg[i], s), e[i])
-      tmp_b = r.ringAdd(tmp_b, gs[i])
+      tmp_b = r.reveal(r.ringAdd(r.ringAdd(r.ringMulFast(a_neg[i], s), e[i]), gs[i]))
       @for_range(self.n)
       def range_body_inner(j):
         b[i][j] = tmp_b[j]
@@ -291,8 +289,8 @@ class LWE(object):
     lgM = self.lgM
     m = 1 << lgM
     clearM = cint(m)
-    s1 = r.ringMul(s,s)
-    zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+    s1 = r.ringMulFast(s,s)
+    zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMulFast(c1, s)), r.ringMulFast(c2, s1))
 
     halfMthP = cint(-1)/(2*m)
     z = sint.Array(self.l)

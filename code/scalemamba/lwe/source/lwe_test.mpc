@@ -1,50 +1,102 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 
-#p = 15222828664137318401
+#p = 16108016393323257857
 
-w = cint(6573050754454748565)
+w = cint(6907421464221826047)
 
-lgN = 4
+lgN = 11
 r = Ring(lgN, w)
 
 N = 1
-lgM = 15
-l = 16
-n = 16
+lgM = 12
+l = 2048
+n = 2048
 lgP = 64
 lwe = LWE(r, N, lgM, l, n, lgP)
 
-x = sint.Array(l)
-for i in range(l):
-  x[i] = sint(0)
+#x = sint.Array(l)
+#for i in range(l):
+  #x[i] = sint(0)
   #print_ln("Plaintext is %s ", x[i].reveal())
 
-x[3] = sint(1)
+#x[3] = sint(1)
 
 ############ Key gen ########################
 
 [b, a, s] = lwe.key_gen()
 
-#print_ln("public key a")
-#for i in range(len(a)):
-  #print_ln("%s ", a[i])
-#print_ln("public key b")
-#for i in range(len(b)):
-  #print_ln("%s ", b[i])
-#for i in range(n):
-  #output_shares(0, s[i])
+print_ln("public key a")
+for i in range(len(a)):
+  print_ln("%s ", a[i])
+print_ln("public key b")
+for i in range(len(b)):
+  print_ln("%s ", b[i])
+for i in range(n):
+  output_shares(0, s[i])
+
+g = cint.Array(lgP)
+e = sint.Matrix(lgP, n)
+e_in = cint.Matrix(lgP, n)
+rlk_a_in = cint.Matrix(lgP, n)
+
+@for_range(lgP)
+def set_G(i):
+  g[i] = cint.public_input(0)
+
+@for_range(lgP)
+def _(i):
+  @for_range(n)
+  def _(j):
+    rlk_a_in[i][j] = cint(1)
+
+@for_range(n)
+def _(j):
+  for play_num in range(5):
+    tmp1 = sint.get_private_input_from(play_num)
+    tmp2 = tmp1.reveal()
+    rlk_a_in[i][j] ^= cint(tmp2)
+
+@for_range(lgP)
+def _(i):
+  @for_range(n)
+  def _(j):
+    e_in[i][j] = cint(1)
+
+@for_range(lgP)
+def _(i):
+  @for_range(n)
+  def _(j):
+    for play_num in range(5):
+      tmp1 = sint.get_private_input_from(play_num)
+      tmp2 = tmp1.reveal()
+      e_in[i][j] ^= cint(tmp2)
+
+@for_range(lgP)
+def _(i):
+  @for_range(n)
+  def _(j):
+    e[i][j] = sint(e_in[i][j])
+
+[rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
+
+@for_range(lgP)
+def _(i):
+  @for_range(n)
+  def _(j):
+    print_ln("%s ", rlk_a[i][j])
+    print_ln("%s ",  rlk_b[i][j])
 
 ############################################
 
-[v, u] = lwe.enc(b, a, x)
+#[v, u] = lwe.enc(b, a, x)
 
-x[3] = sint(0)
-x[5] = sint(1)
+#x[3] = sint(0)
+#x[5] = sint(1)
 
-[v1, u1] = lwe.enc(b, a, x)
-c0 = lwe.mul(v, v1)
-c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-c2 = lwe.mul(u, u1)
+#[v1, u1] = lwe.enc(b, a, x)
+#c0 = lwe.mul(v, v1)
+#c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#c2 = lwe.mul(u, u1)
 
 #print_ln("########### ciphertext v #############")
 #for i in range(len(v)):
@@ -73,11 +125,11 @@ c2 = lwe.mul(u, u1)
   #s[i] = tmp[0]
 
 #x2 = lwe.dec(v, u, s)
-x2 = lwe.dec_mul(c0, c1, c2, s)
+#x2 = lwe.dec_mul(c0, c1, c2, s)
 
-for i in range(l):
-  z = x2[i] #+ sint.get_random_bit() #add noise
-  print_ln("Decrypt result is: %s ", z.reveal_to(0))
+#for i in range(l):
+  #z = x2[i] #+ sint.get_random_bit() #add noise
+  #print_ln("Decrypt result is: %s ", z.reveal_to(0))
 
 ##########################################
 
