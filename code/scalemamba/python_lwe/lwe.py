@@ -271,29 +271,33 @@ class LWE(object):
       res = r.ringMul(u1, u2)
       return res
 
+  def custom_round(self, x, base):
+      return int(base * round(x/base))
+
   def modulus_switching(self, q0, q1, c0, c1):
       q1q0 = q1/float(q0)
-      print("q1/q0", q1q0)
-      c0_new = [self.get_mod(int(round(i*q1q0))) for i in c0]
-      c1_new = [self.get_mod(int(round(i*q1q0))) for i in c1]
-      print(c0_new, c1_new)
+      c0_new = [self.get_mod(self.custom_round(i, q1q0)) for i in c0]
+      c1_new = [self.get_mod(self.custom_round(i, q1q0)) for i in c1]
+      # c0_new = [self.get_mod(int(round(i*q1q0))) for i in c0]
+      # c1_new = [self.get_mod(int(round(i*q1q0))) for i in c1]
       return [c0_new, c1_new]
 
-  def shift(self, c, k):
-      cn = [x for x in c]
-      res = [0 for i in range(self.n)]
-      res[0] = cn[0]
-      xn_1 = [0 for _ in range(self.n + 1)]
-      xn_1[0] = 1
-      xn_1[-1] = 1
-      for i in range(1, self.n):
-          pow_0 = i*k
-          pow = pow_0 % (self.n)
-          num = [0 for _ in range(pow_0 + 1)]
-          num[-1] = cn[i]
-          ans = self.poly_mod(num, xn_1)
-          res[pow] = self.get_mod(res[pow] + self.get_mod(ans))
-      return res
+
+  # def shift(self, c, k):
+  #     cn = [x for x in c]
+  #     res = [0 for i in range(self.n)]
+  #     res[0] = cn[0]
+  #     xn_1 = [0 for _ in range(self.n + 1)]
+  #     xn_1[0] = 1
+  #     xn_1[-1] = 1
+  #     for i in range(1, self.n):
+  #         pow_0 = i*k
+  #         pow = pow_0 % (self.n)
+  #         num = [0 for _ in range(pow_0 + 1)]
+  #         num[-1] = cn[i]
+  #         ans = self.poly_mod(num, xn_1)
+  #         res[pow] = self.get_mod(res[pow] + self.get_mod(ans))
+  #     return res
 
 
   # def switch_key(self, s, s0, v , u):

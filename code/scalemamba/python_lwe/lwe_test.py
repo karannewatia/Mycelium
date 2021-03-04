@@ -3,16 +3,16 @@ from lwe import LWE
 import random
 import numpy as np
 
-p = 197458134058155322064214455559731813377
+p = 285896339783634948757783167889218300929
 w = 1
 
-lgN = 2
+lgN = 1
 r = Ring(lgN, w, p)
 
 N = 1
 lgM = 7
-l = 4
-n = 4
+l = 2
+n = 2
 lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
@@ -25,9 +25,9 @@ print(x)
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
 
-# new_p = 1039235796953058251385820101727606273
-# lwe.set_p(new_p)
-# [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
+new_p = 14543227543197505793
+lwe.set_p(new_p)
+[v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
 
 #s2 = lwe.mul(s,s)
 
