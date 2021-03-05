@@ -1,90 +1,96 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
+from Compiler import mpc_math
 
-#p = 16108016393323257857
+#p = 227279464915964081784588273816791154689
 
-w = cint(6907421464221826047)
+w = cint(192022353834464625871979455242536387899)
 
-lgN = 11
+lgN = 12
 r = Ring(lgN, w)
 
 N = 1
-lgM = 12
-l = 2048
-n = 2048
-lgP = 64
+lgM = 20
+l = 4096
+n = 4096
+lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 #x = sint.Array(l)
 #for i in range(l):
   #x[i] = sint(0)
   #print_ln("Plaintext is %s ", x[i].reveal())
-
 #x[3] = sint(1)
+
+noise = lwe.laplace(sint(1))
+print_ln("Noise is %s ", noise.reveal())
+
+## use mpc_math.floor_fx(x)) to get the floor of sfix x
+
 
 ############ Key gen ########################
 
-[b, a, s] = lwe.key_gen()
+#[b, a, s] = lwe.key_gen()
 
-print_ln("public key a")
-for i in range(len(a)):
-  print_ln("%s ", a[i])
-print_ln("public key b")
-for i in range(len(b)):
-  print_ln("%s ", b[i])
-for i in range(n):
-  output_shares(0, s[i])
+#print_ln("public key a")
+#for i in range(len(a)):
+  #print_ln("%s ", a[i])
+#print_ln("public key b")
+#for i in range(len(b)):
+  #print_ln("%s ", b[i])
+#for i in range(n):
+  #output_shares(0, s[i])
 
-g = cint.Array(lgP)
-e = sint.Matrix(lgP, n)
-e_in = cint.Matrix(lgP, n)
-rlk_a_in = cint.Matrix(lgP, n)
+#g = cint.Array(lgP)
+#e = sint.Matrix(lgP, n)
+#e_in = cint.Matrix(lgP, n)
+#rlk_a_in = cint.Matrix(lgP, n)
 
-@for_range(lgP)
-def set_G(i):
-  g[i] = cint.public_input(0)
+#@for_range(lgP)
+#def set_G(i):
+  #g[i] = cint.public_input(0)
 
-@for_range(lgP)
-def _(i):
-  @for_range(n)
-  def _(j):
-    rlk_a_in[i][j] = cint(1)
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #rlk_a_in[i][j] = cint(1)
 
-@for_range(n)
-def _(j):
-  for play_num in range(5):
-    tmp1 = sint.get_private_input_from(play_num)
-    tmp2 = tmp1.reveal()
-    rlk_a_in[i][j] ^= cint(tmp2)
+#@for_range(n)
+#def _(j):
+  #for play_num in range(5):
+    #tmp1 = sint.get_private_input_from(play_num)
+    #tmp2 = tmp1.reveal()
+    #rlk_a_in[i][j] ^= cint(tmp2)
 
-@for_range(lgP)
-def _(i):
-  @for_range(n)
-  def _(j):
-    e_in[i][j] = cint(1)
+#for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #e_in[i][j] = cint(1)
 
-@for_range(lgP)
-def _(i):
-  @for_range(n)
-  def _(j):
-    for play_num in range(5):
-      tmp1 = sint.get_private_input_from(play_num)
-      tmp2 = tmp1.reveal()
-      e_in[i][j] ^= cint(tmp2)
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #for play_num in range(5):
+      #tmp1 = sint.get_private_input_from(play_num)
+      #tmp2 = tmp1.reveal()
+      #e_in[i][j] ^= cint(tmp2)
 
-@for_range(lgP)
-def _(i):
-  @for_range(n)
-  def _(j):
-    e[i][j] = sint(e_in[i][j])
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #e[i][j] = sint(e_in[i][j])
 
-[rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
+#[rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
 
-@for_range(lgP)
-def _(i):
-  @for_range(n)
-  def _(j):
-    print_ln("%s ", rlk_a[i][j])
-    print_ln("%s ",  rlk_b[i][j])
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #print_ln("%s ", rlk_a[i][j])
+    #print_ln("%s ",  rlk_b[i][j])
 
 ############################################
 
@@ -143,65 +149,6 @@ def _(i):
   #@for_range(n)
   #def _(j):
     #output_shares(0, tmp_s[j])
-
-################ Galois key gen ##################
-
-#a = sint.get_private_input_from(0)
-#print_ln("test private input: %s ", a.reveal_to(0))
-
-#g = cint.Array(lgP)
-#s = sint.Array(n)
-
-#@for_range(lgP)
-#def set_G(i):
-  #g[i] = cint.public_input(0)
-
-#@for_range(n)
-#def copy(i):
-  #tmp = [sint()]
-  #input_shares(0, *tmp)
-  #s[i] = tmp[0]
-
-#gs = lwe.calc_gs(g, s)
-
-#@for_range(1)
-#def galois_key_gen(i):
-  #tmp_s = sint.Array(n)
-  #@for_range(n)
-  #def read_sk(j):
-    #tmp = [sint()]
-    #input_shares(0, *tmp)
-    #tmp_s[j] = tmp[0]
-
-  #u_neg = cint.Matrix(lgP, n)
-  #e = sint.Matrix(lgP, n)
-
-  #@for_range(lgP)
-  #def _(c):
-    #@for_range(n)
-    #def _(d):
-      #u_neg[c][d] = cint(0)
-
-  #@for_range(lgP)
-  #def _(c):
-    #@for_range(n)
-    #def _(d):
-      #e[c][d] = sint(cint.public_input(0))
-      #for play_num in range(10):
-        #tmp1 = sint.get_private_input_from(play_num)
-        #tmp2 = tmp1.reveal()
-        #u_neg[c][d] ^= cint(tmp2)
-
-
-  #[v1, u1] = lwe.key_switching(gs, tmp_s, u_neg, e)
-
-  #@for_range(lgP)
-  #def _(a):
-    #@for_range(n)
-    #def _(b):
-      #print_ln("%s ", v1[a][b])
-      #print_ln("%s ", -u1[a][b])
-
 
 #############################################
 

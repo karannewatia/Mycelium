@@ -1,4 +1,5 @@
 execfile('/root/SCALE-MAMBA/Programs/ring/ring.mpc')
+from Compiler import mpc_math
 
 
 class LWE(object):
@@ -311,3 +312,14 @@ class LWE(object):
     r = self.r
     res = r.reveal(r.ringMulFast(u1, u2))
     return res
+
+  def exp_sample(self, mean):
+    rand = sint.get_random_int(15)
+    rand_fix = sfix.load_sint(rand)/32768
+    log_r = mpc_math.log2_fx(rand_fix)
+    return -mean*log_r
+
+  def laplace(self, scale):
+    e1 = self.exp_sample(scale)
+    e2 = self.exp_sample(scale)
+    return e1 - e2
