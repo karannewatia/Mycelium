@@ -6,28 +6,27 @@ import numpy as np
 p = 285896339783634948757783167889218300929
 w = 1
 
-lgN = 1
+lgN = 2
 r = Ring(lgN, w, p)
 
 N = 1
-lgM = 7
-l = 2
-n = 2
+lgM = 1
+l = 4
+n = 4
 lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
-# for i in range(l):
-#   x[i] = random.randrange(0, 100)
-x[1] = 1
+for i in range(l):
+  x[i] = random.randrange(0, 2)
 print(x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
 
-new_p = 14543227543197505793
-lwe.set_p(new_p)
-[v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
+# new_p = 14543227543197505793
+# lwe.set_p(new_p)
+# [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
 
 #s2 = lwe.mul(s,s)
 

@@ -1,16 +1,16 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 from Compiler import mpc_math
 
-#p = 227279464915964081784588273816791154689
+#p = 260140746809389434846275559370535206913
 
-w = cint(192022353834464625871979455242536387899)
+w = cint(3380833293761198715444695428724722071)
 
 lgN = 12
 r = Ring(lgN, w)
 
 N = 1
-lgM = 20
-l = 4096
+lgM = 30
+l = 1
 n = 4096
 lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP)
@@ -21,8 +21,8 @@ lwe = LWE(r, N, lgM, l, n, lgP)
   #print_ln("Plaintext is %s ", x[i].reveal())
 #x[3] = sint(1)
 
-noise = lwe.laplace(sint(1))
-print_ln("Noise is %s ", noise.reveal())
+#noise = lwe.laplace(sint(1))
+#print_ln("Noise is %s ", noise.reveal())
 
 ## use mpc_math.floor_fx(x)) to get the floor of sfix x
 
@@ -42,7 +42,6 @@ print_ln("Noise is %s ", noise.reveal())
 
 #g = cint.Array(lgP)
 #e = sint.Matrix(lgP, n)
-#e_in = cint.Matrix(lgP, n)
 #rlk_a_in = cint.Matrix(lgP, n)
 
 #@for_range(lgP)
@@ -53,35 +52,13 @@ print_ln("Noise is %s ", noise.reveal())
 #def _(i):
   #@for_range(n)
   #def _(j):
-    #rlk_a_in[i][j] = cint(1)
-
-#@for_range(n)
-#def _(j):
-  #for play_num in range(5):
-    #tmp1 = sint.get_private_input_from(play_num)
-    #tmp2 = tmp1.reveal()
-    #rlk_a_in[i][j] ^= cint(tmp2)
-
-#for_range(lgP)
-#def _(i):
-  #@for_range(n)
-  #def _(j):
-    #e_in[i][j] = cint(1)
+    #rlk_a_in[i][j] = cint.public_input(0)
 
 #@for_range(lgP)
 #def _(i):
   #@for_range(n)
   #def _(j):
-    #for play_num in range(5):
-      #tmp1 = sint.get_private_input_from(play_num)
-      #tmp2 = tmp1.reveal()
-      #e_in[i][j] ^= cint(tmp2)
-
-#@for_range(lgP)
-#def _(i):
-  #@for_range(n)
-  #def _(j):
-    #e[i][j] = sint(e_in[i][j])
+    #e[i][j] = sint(cint.public_input(0))
 
 #[rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
 
@@ -113,29 +90,30 @@ print_ln("Noise is %s ", noise.reveal())
 
 ############ Decrypt ########################
 
-#v = cint.Array(n)
-#u = cint.Array(n)
+v = cint.Array(n)
+u = cint.Array(n)
 
-#@for_range(n)
-#def set_V(i):
-  #v[i] = cint.public_input(0)
-#@for_range(n)
-#def set_U(i):
-  #u[i] = cint.public_input(0)
+@for_range(n)
+def set_V(i):
+  v[i] = cint.public_input(0)
+@for_range(n)
+def set_U(i):
+  u[i] = cint.public_input(0)
 
-#s = sint.Array(n)
-#@for_range(n)
-#def copy(i):
-  #tmp = [sint()]
-  #input_shares(0, *tmp)
-  #s[i] = tmp[0]
+s = sint.Array(n)
+@for_range(n)
+def copy(i):
+  tmp = [sint()]
+  input_shares(0, *tmp)
+  s[i] = tmp[0]
 
-#x2 = lwe.dec(v, u, s)
-#x2 = lwe.dec_mul(c0, c1, c2, s)
+@for_range(1000)
+def _(j):
+  x2 = lwe.dec(v, u, s)
 
-#for i in range(l):
-  #z = x2[i] #+ sint.get_random_bit() #add noise
-  #print_ln("Decrypt result is: %s ", z.reveal_to(0))
+  for i in range(l):
+    z = x2[i] #+ sint.get_random_bit() #add noise
+    print_ln("Decrypt result is: %s ", z.reveal_to(0))
 
 ##########################################
 

@@ -7,7 +7,7 @@ lgP = 128
 
 p = 4
 
-lgM = 20
+lgM = 30
 
 while (not sympy.isprime(p)):
   p = random.randrange(2**(lgP-lgM-2), 2**(lgP-lgM-1)-1) * 2**(lgM+1) +1

@@ -9,6 +9,7 @@ in another terminal inside MPC_lwe_elgamal-master:
 use docker ps to get the id of the docker container running, and then
 copy the following from host to docker:
 docker cp Cert-Store/ id:/root/SCALE-MAMBA/
+docker cp code/scalemamba/lwe/config/player_copy.sh id:/root/SCALE-MAMBA/Data/  
 
 in the docker:
 apt-get install vim    (for debugging)

@@ -271,7 +271,7 @@ class LWE(object):
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
-    m = 1 << lgM
+    m = self.m
     clearM = cint(m)
     zNoisy = r.ringAdd(v, r.ringMulFast(u, s))
 
