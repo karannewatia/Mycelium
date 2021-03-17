@@ -148,7 +148,9 @@ class LWE(object):
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
     #mthP = cint(-1)/cint(m)
-    mthP = self.p/m #int(math.ceil(self.p/float(self.m)))
+
+    #mthP = int(math.ceil(self.p/float(self.m)))
+    mthP = self.p/m
 
     zMthP = r.zero()
 
@@ -177,9 +179,8 @@ class LWE(object):
 
     z = [0 for i in range(self.l)]
     for i in range(self.l):
-         # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-         # zNotchesI = self.get_mod(zRangeI * self.m)
-         # z[i] = self.m - 1 - ((zNotchesI - 1) % self.m)
+         if (zNoisy[i] > self.p/2):
+             zNoisy[i] = zNoisy[i] - self.p
          z[i] = int(round(zNoisy[i]*self.m / float(self.p)))
          z[i] = z[i] % self.m
 
