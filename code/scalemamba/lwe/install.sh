@@ -1,7 +1,6 @@
 # download SCALE-MAMBA
 cd
 git clone https://github.com/KULeuven-COSIC/SCALE-MAMBA.git
-#git clone https://github.com/karannewatia/SCALE-MAMBA.git
 
 cd SCALE-MAMBA
 git checkout -b v1.7 46a5fa4be

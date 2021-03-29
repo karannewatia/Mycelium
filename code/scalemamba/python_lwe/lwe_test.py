@@ -3,35 +3,36 @@ from lwe import LWE
 import random
 import numpy as np
 
-p = 17 #285896339783634948757783167889218300929
-w = 1
+#generate p using code/scalemamba/lwe/params/genP.py
+p = 285896339783634948757783167889218300929
+w = 1 #unused in Python version
 
-lgN = 2
+lgN = 4
 r = Ring(lgN, w, p)
-
 N = 1
-lgM = 1
-l = 4
-n = 4
+lgM = 7
+l = 16
+n = 16
 lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
-for i in range(l):
-  x[i] = random.randrange(0, 2)
+# for i in range(l):
+#   x[i] = random.randrange(0, 100)
+x[1] = 1
+print("################# plaintext ###################")
 print(x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
 
+######### try modulus switching this does not work yet) ###########
 # new_p = 14543227543197505793
 # lwe.set_p(new_p)
 # [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
 
-#s2 = lwe.mul(s,s)
 
-
-####### expand #######
+############### expand ##################
 # zeros = [0 for i in range(n)]
 # expand_outer_loop_count = 4
 # c0 = [zeros for i in range(2**expand_outer_loop_count)]
@@ -57,6 +58,7 @@ print(x)
 # x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
+# s2 = lwe.mul(s,s)
 # [rlk_b, rlk_a] = lwe.rl_keys(s, s2)
 #
 # [v1, u1] = [v0, u0]
@@ -68,7 +70,7 @@ print(x)
 #
 # mult_count = 0
 #
-# for k in range(10):
+# for k in range(5):
 #     tmp = lwe.dec(c0_mul, c1_mul, s)
 #     if (tmp[0] == False):
 #         break
@@ -133,7 +135,7 @@ print(x)
 
 ######################################
 
-x2 = lwe.dec(v0, u0, s)
 
+x2 = lwe.dec(v0, u0, s)
 print("################# decrypted text ###################")
 print(x2[0])

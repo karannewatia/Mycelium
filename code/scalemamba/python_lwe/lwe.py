@@ -1,6 +1,5 @@
 from ring import Ring
 import numpy as np
-import math
 
 class LWE(object):
 
@@ -118,7 +117,7 @@ class LWE(object):
     s = r.ringBinom(N)
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
-    #e = [self.get_mod(self.m*i) for i in e]
+    e = [self.get_mod(self.m*i) for i in e]
 
     b = r.ringAdd(r.ringMul(a_neg, s), e)
 
@@ -131,39 +130,28 @@ class LWE(object):
     r = self.r
     N = self.N
     m = self.m
-    #e0 = r.ringBinom(N)
+    e0 = r.ringBinom(N)
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
-    # e1 = [self.get_mod(self.m*i) for i in e1]
-    # e2 = [self.get_mod(self.m*i) for i in e2]
+    e1 = [self.get_mod(self.m*i) for i in e1]
+    e2 = [self.get_mod(self.m*i) for i in e2]
 
-    #u = r.ringMul(a, e0)
-    #u = r.ringAdd(u, e1)
-
-    u = r.ringBinom(N)
-    u = r.ringMul(a, u)
-    u = r.ringAdd(u, e2)
+    u = r.ringMul(a, e0)
+    u = r.ringAdd(u, e1)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
     #mthP = cint(-1)/cint(m)
-
-    #mthP = int(math.ceil(self.p/float(self.m)))
     mthP = self.p/m
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      #zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
-      zMthP[i] = self.get_mod(z[i] * mthP)
+      zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
 
-    #v = r.ringMul(b, e0)
-    #v = r.ringAdd(v, e2)
-    #v = r.ringAdd(v, zMthP)
-
-    v = r.ringMul(b, u)
-    v = r.ringAdd(v, e1)
+    v = r.ringMul(b, e0)
+    v = r.ringAdd(v, e2)
     v = r.ringAdd(v, zMthP)
 
     res = [v, u]
@@ -173,32 +161,26 @@ class LWE(object):
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
+    m = 1 << lgM
+    clearM = m
     zNoisy = r.ringAdd(v, r.ringMul(u, s))
 
-    halfMthP = self.p/(2*self.m)
+    halfMthP = self.p/(2*m)
 
     z = [0 for i in range(self.l)]
     for i in range(self.l):
-         if (zNoisy[i] > self.p/2):
-             zNoisy[i] = zNoisy[i] - self.p
-         z[i] = int(round(zNoisy[i]*self.m / float(self.p)))
-         z[i] = z[i] % self.m
+      # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
+      # zNotchesI = self.get_mod(zRangeI * clearM)
+      # z[i] = m - 1 - ((zNotchesI - 1) % m)
+      zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
+      zNoisy[i] = zNoisy[i] - halfMthP
+      if abs(zNoisy[i]) >= halfMthP:
+        print(" !!! dec fails !!! ")
+        return [False, False]
 
-    # z = [0 for i in range(self.l)]
-    # for i in range(self.l):
-    #   # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-    #   # zNotchesI = self.get_mod(zRangeI * clearM)
-    #   # z[i] = m - 1 - ((zNotchesI - 1) % m)
-    #   zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
-    #   zNoisy[i] = zNoisy[i] - halfMthP
-    #   if abs(zNoisy[i]) >= halfMthP:
-    #     print(" !!! dec fails !!! ")
-    #     return [False, False]
-    #
-    #   z[i] = zNoisy[i] % self.m
+      z[i] = zNoisy[i] % self.m
 
     return [z, zNoisy]
-
 
   # def dec_mul(self, c0, c1, c2, s):
   #   r = self.r
@@ -233,20 +215,10 @@ class LWE(object):
       tmp_e = r.ringBinom(N)
       tmp_e = [self.get_mod(self.m*i) for i in tmp_e]
       tmp_b = r.ringAdd(r.ringMul(tmp_a_neg, s), tmp_e)
-      # s2_tmp = [self.get_mod((2**i) * j) for j in s2]
-      # tmp_b = r.ringAdd(tmp_b, s2_tmp)
+
       a = [tmp_a for i in range(self.lgP)]
       b = [tmp_b for i in range(self.lgP)]
 
-      # a = [r.ringRandClear() for i in range(self.lgP)]
-      # b = [r.zero() for i in range(self.lgP)]
-      # for j in range(self.lgP):
-      #     a_neg = [self.get_mod(-i) for i in a[j]]
-      #     e = r.ringBinom(N)
-      #     e = [self.get_mod(self.m*i) for i in e]
-      #     b[j] = r.ringAdd(r.ringMul(a_neg, s), e)
-
-      # s2 = r.ringMul(s,s)
       for i in range(self.lgP):
           s2_tmp = [self.get_mod((2**i) * j) for j in s2]
           b[i] = r.ringAdd(b[i], s2_tmp)

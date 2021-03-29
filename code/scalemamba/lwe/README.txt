@@ -1,15 +1,18 @@
 Docker set up instructions:
 
+Allocate at least 8 GB of memory for Docker
+
+After starting the docker application:
 inside MPC_lwe_elgamal-master:
 cd/code/scalemamba/lwe
 docker build -t lwe .    (this will take a while)
 docker run -it --rm lwe
 
-in another terminal inside MPC_lwe_elgamal-master:
+In another terminal inside MPC_lwe_elgamal-master:
 use docker ps to get the id of the docker container running, and then
 copy the following from host to docker:
 docker cp Cert-Store/ id:/root/SCALE-MAMBA/
-docker cp code/scalemamba/lwe/config/player_copy.sh id:/root/SCALE-MAMBA/Data/  
+docker cp code/scalemamba/lwe/config/player_copy.sh id:/root/SCALE-MAMBA/Data/
 
 in the docker:
 apt-get install vim    (for debugging)

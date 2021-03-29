@@ -1,33 +1,22 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
-from Compiler import mpc_math
+#from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
-#p = 260140746809389434846275559370535206913
+#p = 299560530892100486129993155639295082497
 
-w = cint(3380833293761198715444695428724722071)
+w = cint(293613720937132900083734693760470832414)
 
 lgN = 12
 r = Ring(lgN, w)
 
 N = 1
 lgM = 30
-l = 1
+l = 4
 n = 4096
 lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP)
 
-#x = sint.Array(l)
-#for i in range(l):
-  #x[i] = sint(0)
-  #print_ln("Plaintext is %s ", x[i].reveal())
-#x[3] = sint(1)
 
-#noise = lwe.laplace(sint(1))
-#print_ln("Noise is %s ", noise.reveal())
-
-## use mpc_math.floor_fx(x)) to get the floor of sfix x
-
-
-############ Key gen ########################
+############ Benchmark Key gen separately ########################
 
 #[b, a, s] = lwe.key_gen()
 
@@ -69,80 +58,66 @@ lwe = LWE(r, N, lgM, l, n, lgP)
     #print_ln("%s ", rlk_a[i][j])
     #print_ln("%s ",  rlk_b[i][j])
 
-############################################
+############ Benchmark Decrypt separately ########################
 
-#[v, u] = lwe.enc(b, a, x)
+#v = cint.Array(n)
+#u = cint.Array(n)
 
-#x[3] = sint(0)
-#x[5] = sint(1)
+#@for_range(n)
+#def set_V(i):
+  #v[i] = cint.public_input(0)
+#@for_range(n)
+#def set_U(i):
+  #u[i] = cint.public_input(0)
 
-#[v1, u1] = lwe.enc(b, a, x)
-#c0 = lwe.mul(v, v1)
-#c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#c2 = lwe.mul(u, u1)
+#s = sint.Array(n)
+#@for_range(n)
+#def copy(i):
+  #tmp = [sint()]
+  #input_shares(0, *tmp)
+  #s[i] = tmp[0]
 
-#print_ln("########### ciphertext v #############")
-#for i in range(len(v)):
-  #print_ln("%s ", v[i])
-#print_ln("############ ciphertext u ############")
-#for i in range(len(u)):
-  #print_ln("%s ", u[i])
-
-############ Decrypt ########################
-
-v = cint.Array(n)
-u = cint.Array(n)
-
-@for_range(n)
-def set_V(i):
-  v[i] = cint.public_input(0)
-@for_range(n)
-def set_U(i):
-  u[i] = cint.public_input(0)
-
-s = sint.Array(n)
-@for_range(n)
-def copy(i):
-  tmp = [sint()]
-  input_shares(0, *tmp)
-  s[i] = tmp[0]
-
-@for_range(1000)
-def _(j):
-  x2 = lwe.dec(v, u, s)
-
-  for i in range(l):
-    z = x2[i] #+ sint.get_random_bit() #add noise
-    print_ln("Decrypt result is: %s ", z.reveal_to(0))
-
-##########################################
-
-#s = lwe.secret_key_gen()
-#for i in range(n):
-  #output_shares(0, s[i])
-
-#@for_range(lgN)
-#def _(i):
-  #tmp_s = lwe.secret_key_gen()
-  #@for_range(n)
-  #def _(j):
-    #output_shares(0, tmp_s[j])
-
-#############################################
-
-#print_ln("decompose gadget done")
-#[s1, v1, u1] = lwe.key_switching(g, s)
-#print_ln("key switching done")
-#[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
-#print_ln("new ciphertext done")
-#x2 = lwe.dec(v2, u2, s1)
-
-#[u1, v1] = lwe.enc(a, b, x)
-#u2 = lwe.add(u, u1)
-#v2 = lwe.add(v, v1)
-#x2 = lwe.dec(u2, v2, s)
-
+#x2 = lwe.dec(v, u, s)
 
 #for i in range(l):
-  #x2[i].reveal_to(0)
-  #print_ln("%s ", x2[i].reveal())
+  #z = x2[i] #+ sint.get_random_bit() #add noise
+  #print_ln("Decrypt result is: %s ", z.reveal_to(0))
+
+
+################# Generate Laplace noise ####################
+
+#noise = lwe.laplace(sint(1))
+#print_ln("Noise is %s ", noise.reveal())
+
+
+################# test if rounding works (for BFV scheme) ###############
+
+#mthP = sfix(3.93633066929844e-3)
+#test = sfix(sint(2) * mthP)
+#print_ln("Testing %s ", test.reveal())
+
+#test = sfix(1.2)
+#y = mpc_math.floor_fx(test) + cfix(0.5)
+#compare = y < test
+#result = mpc_math.floor_fx(test) + compare
+x = sfix(5.5)
+result = x.v >> x.f #AdvInteger.Trunc(x.v >> x.f, x.v, x.k, x.f, x.kappa, True)
+#result = x % 1024
+
+print_ln("Testing %s ", result.reveal())
+
+
+##################### Test key gen + decrypt in MPC ########################
+
+x = sint.Array(l)
+for i in range(l):
+  x[i] = sint(1)
+  print_ln("Plaintext is %s ", x[i].reveal())
+
+[b, a, s] = lwe.key_gen()
+[v,u] = lwe.enc(b, a, x)
+
+x2 = lwe.dec(v, u, s)
+for i in range(l):
+  x2[i].reveal_to(0)
+  print_ln("%s ", x2[i].reveal())
