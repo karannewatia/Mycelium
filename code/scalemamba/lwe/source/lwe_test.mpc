@@ -1,18 +1,18 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 #from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
-#p = 299560530892100486129993155639295082497
+#p = 11559165781780725761
 
-w = cint(293613720937132900083734693760470832414)
+w = cint(11261140336194227983)
 
-lgN = 12
+lgN = 11
 r = Ring(lgN, w)
 
 N = 1
-lgM = 30
-l = 4
-n = 4096
-lgP = 128
+lgM = 15
+l = 100
+n = 2048
+lgP = 64
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 
@@ -49,7 +49,7 @@ lwe = LWE(r, N, lgM, l, n, lgP)
   #def _(j):
     #e[i][j] = sint(cint.public_input(0))
 
-#[rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
+#rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
 
 #@for_range(lgP)
 #def _(i):
@@ -100,11 +100,11 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #y = mpc_math.floor_fx(test) + cfix(0.5)
 #compare = y < test
 #result = mpc_math.floor_fx(test) + compare
-x = sfix(5.5)
-result = x.v >> x.f #AdvInteger.Trunc(x.v >> x.f, x.v, x.k, x.f, x.kappa, True)
+#x = sfix(5.5)
+#result = x.v >> x.f #AdvInteger.Trunc(x.v >> x.f, x.v, x.k, x.f, x.kappa, True)
 #result = x % 1024
 
-print_ln("Testing %s ", result.reveal())
+#print_ln("Testing %s ", result.reveal())
 
 
 ##################### Test key gen + decrypt in MPC ########################
@@ -120,4 +120,4 @@ for i in range(l):
 x2 = lwe.dec(v, u, s)
 for i in range(l):
   x2[i].reveal_to(0)
-  print_ln("%s ", x2[i].reveal())
+  print_ln("Decrypted text is %s ", x2[i].reveal())

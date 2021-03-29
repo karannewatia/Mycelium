@@ -11,7 +11,8 @@ def laplace(scale):
     return e1 - e2
 
 def ones():
-    for i in range(2*2048*64):
+    #for i in range(2*2048*64):
+    for i in range(2*2048):
         print(1)
 
 def g():
@@ -43,15 +44,15 @@ def graph_b(f, g, C):
 def main():
     #print(laplace(10))
 
-    # g()
-    # ones()
+    #g()
+    ones()
 
     # result = graph_a(0.02, 10)
     # print(result)
     # result = graph_b(0.00, 0.04, 10)
     # print(result)
 
-    print(mult_noise(10014161924125818881, 2**9, 2**12, 3))
+    #print(mult_noise(10014161924125818881, 2**9, 2**12, 3))
 
 
 if __name__ == '__main__':
