@@ -1,5 +1,6 @@
 import random
 import numpy as np
+random.seed(100)
 
 class Ring(object):
 
