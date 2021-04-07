@@ -1,50 +1,42 @@
 from ring import Ring
 from lwe import LWE
 import random
+import numpy as np
 
-p = 257#3843321857
-w = 9#385597899
 
-lgN = 2#4
-r = Ring(lgN, w)
+#generate p using code/scalemamba/lwe/params/genP.py
+p = 285896339783634948757783167889218300929
+w = 1 #unused in Python version
 
+
+lgN = 4
+r = Ring(lgN, w, p)
 N = 1
-lgM = 1#10
-l = 4#16
-n = 4#16
-lgP = 8#32
-lwe = LWE(r, N, lgM, l, n, lgP)
+
+lgM = 7
+l = 16
+n = 16
+lgP = 128
+lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
-for i in range(l):
-  x[i] = 2 #random.randrange(0, 9)
-print("####### plaintext ###########")
-x[1] = 3
-x[3] = 1
+# for i in range(l):
+#   x[i] = random.randrange(0, 100)
+x[1] = 1
+print("################# plaintext ###################")
 
 print(x)
 
 [b, a, s] = lwe.key_gen()
+[v0, u0] = lwe.enc(b, a, x)
 
-print("####### public key a ###########")
-print(a)
-print("####### public key b ###########")
-print(b)
-print("####### secret key s ###########")
-print(s)
-[u, v] = lwe.enc(b, a, s, x)
-print("############## original ciphertext u ################")
-print(u)
-print("############## original ciphertext v #################")
-print(v)
-
-# u = lwe.shift(u, 7)
-# v = lwe.shift(v, 7)
-# s_new = lwe.shift(s, 7)
-# x2 = lwe.dec(v, u, s_new)
+######### try modulus switching this does not work yet) ###########
+# new_p = 14543227543197505793
+# lwe.set_p(new_p)
+# [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
 
 
-####### expand #######
+############### expand ##################
 # zeros = [0 for i in range(n)]
 # expand_outer_loop_count = 4
 # c0 = [zeros for i in range(2**expand_outer_loop_count)]
@@ -70,29 +62,84 @@ print(v)
 # x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
-# [v1, u1] = lwe.enc(b, a, x)
+# s2 = lwe.mul(s,s)
+# [rlk_b, rlk_a] = lwe.rl_keys(s, s2)
+#
+# [v1, u1] = [v0, u0]
+# v, u = v0, u0
 # c0 = lwe.mul(v, v1)
 # c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
 # c2 = lwe.mul(u, u1)
-# print("################# c2 ###################")
-# print(c2)
-# [rlk_b, rlk_a] = lwe.rl_keys(s)
-# # print("################# rlk a ###################")
-# # for i in range(lgP):
-# #     print(rlk_a[i])
-# # print("################# rlk b ###################")
-# # for i in range(lgP):
-# #     print(rlk_b[i])
-# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2)
-# print("################# c0 relin ###################")
-# print(c0_mul)
-# print("################# c1 relin ###################")
-# print(c1_mul)
+# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#
+# mult_count = 0
+#
+# for k in range(5):
+#     tmp = lwe.dec(c0_mul, c1_mul, s)
+#     if (tmp[0] == False):
+#         break
+#     else:
+#         x2 = tmp
+#     v,u = c0_mul, c1_mul
+#     c0 = lwe.mul(v, v1)
+#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#     c2 = lwe.mul(u, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#     mult_count += 1
+#
+# print(mult_count)
+# print(x2[0])
+
+##################  check multiplicative depth ##############
+# plaintexts = []
+# for i in range(32):
+#     x = [0 for _ in range(l)]
+#     x[1] = 1
+#     plaintexts.append(x)
+
+# mult_lvl_1 = []
+# for i in range(0, 16, 2):
+#     [v, u] = [v0, u0] #lwe.enc(b, a, plaintexts[i])
+#     [v1, u1] = [v0, u0] #lwe.enc(b, a, plaintexts[i+1])
+#     c0 = lwe.mul(v, v1)
+#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#     c2 = lwe.mul(u, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#     mult_lvl_1.append([c0_mul, c1_mul])
+#
+# mult_lvl_2 = []
+# for i in range(0, 8, 2):
+#     [v, u] = mult_lvl_1[i]
+#     [v1, u1] = mult_lvl_1[i+1]
+#     c0 = lwe.mul(v, v1)
+#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#     c2 = lwe.mul(u, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#     mult_lvl_2.append([c0_mul, c1_mul])
+#
+# mult_lvl_3 = []
+# for i in range(0, 4, 2):
+#     [v, u] = mult_lvl_2[i]
+#     [v1, u1] = mult_lvl_2[i+1]
+#     c0 = lwe.mul(v, v1)
+#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#     c2 = lwe.mul(u, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#     mult_lvl_3.append([c0_mul, c1_mul])
+#
+# [v, u] = mult_lvl_3[0]
+# [v1, u1] = mult_lvl_3[1]
+# c0 = lwe.mul(v, v1)
+# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+# c2 = lwe.mul(u, u1)
+# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#
 # x2 = lwe.dec(c0_mul, c1_mul, s)
-# #x2 = lwe.dec_mul(c0, c1, c2, s)
+# print(x2[0])
+
+######################################
 
 
-x2 = lwe.dec(u, v, s)
-
+x2 = lwe.dec(v0, u0, s)
 print("################# decrypted text ###################")
-print(x2)
+print(x2[0])

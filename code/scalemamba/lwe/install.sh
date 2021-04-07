@@ -1,7 +1,8 @@
 # download SCALE-MAMBA
-cd 
+cd
 git clone https://github.com/KULeuven-COSIC/SCALE-MAMBA.git
-cd SCALE-MAMBA 
+
+cd SCALE-MAMBA
 git checkout -b v1.7 46a5fa4be
 
 mv /root/config/CONFIG.mine .
@@ -45,7 +46,7 @@ do
   openssl req -new -key Player$ID.key -subj $SUBJ -out csr/Player$ID.csr
   openssl x509 -req -days 1000 -set_serial 101$ID \
     -CA RootCA.crt -CAkey RootCA.key \
-    -in csr/Player$ID.csr -out Player$ID.crt 
+    -in csr/Player$ID.csr -out Player$ID.crt
 done
 
 
@@ -59,7 +60,7 @@ do
   # If $EX does local computation, copy script for this. If not don't complain.
   cp /root/source/${EX}_local.py Programs/${EX}/local.py  2> /dev/null
   cp /root/source/${EX}_lib.py Programs/${EX}/${EX}_lib.py 2> /dev/null
-done 
+done
 
 # add simple syntax highlighting
 cd
@@ -68,5 +69,3 @@ mv config/mamba.vim .vim/syntax
 mkdir .vim/ftdetect
 cd .vim/ftdetect
 echo "au BufNewFile,BufRead *.wir set filetype=mamba" > mamba.vim
-
-

@@ -1,25 +1,22 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
+#from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
-#p = 16894334278186303489 #237618008720528086661678096280471994369
+#p = 11559165781780725761
 
-w = cint(1565937618634636312) #cint(9694205632073507076) #cint(16886317379479819630385336263266985780)
+w = cint(11261140336194227983)
 
-lgN = 9 #10 #12
+lgN = 11
 r = Ring(lgN, w)
 
 N = 1
-lgM = 25 #50
-l = 512
-n = 512 #1024 #4096
-lgP = 64 #128
+lgM = 15
+l = 100
+n = 2048
+lgP = 64
 lwe = LWE(r, N, lgM, l, n, lgP)
 
-#x = sint.Array(l)
-#for i in range(l):
-  #x[i] = sint(5)
-  #print_ln("Plaintext is %s ", x[i].reveal())
 
-############ Key gen ########################
+############ Benchmark Key gen separately ########################
 
 #[b, a, s] = lwe.key_gen()
 
@@ -29,21 +26,39 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #print_ln("public key b")
 #for i in range(len(b)):
   #print_ln("%s ", b[i])
-
 #for i in range(n):
   #output_shares(0, s[i])
 
-############################################
+#g = cint.Array(lgP)
+#e = sint.Matrix(lgP, n)
+#rlk_a_in = cint.Matrix(lgP, n)
 
-#[v, u] = lwe.enc(b, a, x)
-#print_ln("########### ciphertext v #############")
-#for i in range(len(v)):
-  #print_ln("%s ", v[i])
-#print_ln("############ ciphertext u ############")
-#for i in range(len(u)):
-  #print_ln("%s ", u[i])
+#@for_range(lgP)
+#def set_G(i):
+  #g[i] = cint.public_input(0)
 
-############ Decrypt ########################
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #rlk_a_in[i][j] = cint.public_input(0)
+
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #e[i][j] = sint(cint.public_input(0))
+
+#rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
+
+#@for_range(lgP)
+#def _(i):
+  #@for_range(n)
+  #def _(j):
+    #print_ln("%s ", rlk_a[i][j])
+    #print_ln("%s ",  rlk_b[i][j])
+
+############ Benchmark Decrypt separately ########################
 
 #v = cint.Array(n)
 #u = cint.Array(n)
@@ -65,100 +80,44 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #x2 = lwe.dec(v, u, s)
 
 #for i in range(l):
-  #z = x2[i] + sint.get_random_bit() #add noise
+  #z = x2[i] #+ sint.get_random_bit() #add noise
   #print_ln("Decrypt result is: %s ", z.reveal_to(0))
 
-##########################################
 
-#s = lwe.secret_key_gen()
-#for i in range(n):
-  #output_shares(0, s[i])
+################# Generate Laplace noise ####################
 
-#@for_range(lgN)
-#def _(i):
-  #tmp_s = lwe.secret_key_gen()
-  #@for_range(n)
-  #def _(j):
-    #output_shares(0, tmp_s[j])
-
-################ Galois key gen ##################
-
-#a = sint.get_private_input_from(0)
-#print_ln("test private input: %s ", a.reveal_to(0))
-
-#a = cint(1)
-#a ^= cint(1)
+#noise = lwe.laplace(sint(1))
+#print_ln("Noise is %s ", noise.reveal())
 
 
-g = cint.Array(lgP)
-s = sint.Array(n)
+################# test if rounding works (for BFV scheme) ###############
 
-@for_range(lgP)
-def set_G(i):
-  g[i] = cint.public_input(0)
+#mthP = sfix(3.93633066929844e-3)
+#test = sfix(sint(2) * mthP)
+#print_ln("Testing %s ", test.reveal())
 
-@for_range(n)
-def copy(i):
-  tmp = [sint()]
-  input_shares(0, *tmp)
-  s[i] = tmp[0]
+#test = sfix(1.2)
+#y = mpc_math.floor_fx(test) + cfix(0.5)
+#compare = y < test
+#result = mpc_math.floor_fx(test) + compare
+#x = sfix(5.5)
+#result = x.v >> x.f #AdvInteger.Trunc(x.v >> x.f, x.v, x.k, x.f, x.kappa, True)
+#result = x % 1024
 
-gs = lwe.calc_gs(g, s)
-
-@for_range(1)
-def galois_key_gen(i):
-  tmp_s = sint.Array(n)
-  @for_range(n)
-  def read_sk(j):
-    tmp = [sint()]
-    input_shares(0, *tmp)
-    tmp_s[j] = tmp[0]
-
-  u_neg = cint.Matrix(lgP, n)
-  e = sint.Matrix(lgP, n)
-
-  @for_range(lgP)
-  def _(c):
-    @for_range(n)
-    def _(d):
-      u_neg[c][d] = cint(0)
-
-  @for_range(lgP)
-  def _(c):
-    @for_range(n)
-    def _(d):
-      e[c][d] = sint(cint.public_input(0))
-      for play_num in range(10):
-        tmp1 = sint.get_private_input_from(play_num)
-        tmp2 = tmp1.reveal()
-        u_neg[c][d] ^= cint(tmp2)
+#print_ln("Testing %s ", result.reveal())
 
 
-  [v1, u1] = lwe.key_switching(gs, tmp_s, u_neg, e)
+##################### Test key gen + decrypt in MPC ########################
 
-  #@for_range(lgP)
-  #def _(a):
-    #@for_range(n)
-    #def _(b):
-      #print_ln("%s ", v1[a][b])
-      #print_ln("%s ", -u1[a][b])
+x = sint.Array(l)
+for i in range(l):
+  x[i] = sint(1)
+  print_ln("Plaintext is %s ", x[i].reveal())
 
+[b, a, s] = lwe.key_gen()
+[v,u] = lwe.enc(b, a, x)
 
-#############################################
-
-#print_ln("decompose gadget done")
-#[s1, v1, u1] = lwe.key_switching(g, s)
-#print_ln("key switching done")
-#[v2, u2] = lwe.new_ciphertext(v, u, v1, u1)
-#print_ln("new ciphertext done")
-#x2 = lwe.dec(v2, u2, s1)
-
-#[u1, v1] = lwe.enc(a, b, x)
-#u2 = lwe.add(u, u1)
-#v2 = lwe.add(v, v1)
-#x2 = lwe.dec(u2, v2, s)
-
-
-#for i in range(l):
-  #x2[i].reveal_to(0)
-  #print_ln("%s ", x2[i].reveal())
+x2 = lwe.dec(v, u, s)
+for i in range(l):
+  x2[i].reveal_to(0)
+  print_ln("Decrypted text is %s ", x2[i].reveal())

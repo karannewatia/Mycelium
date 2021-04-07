@@ -1,10 +1,6 @@
 import random
 import numpy as np
 
-random.seed()
-p=257#3843321857
-
-
 class Ring(object):
 
   # Defines parameters for the ring Z/pZ/<X^n + 1>
@@ -16,17 +12,18 @@ class Ring(object):
   # n = 2^nBitsN
   # w is a 2nth primitive root of unity
   # All are public (non-secret) values
-  def __init__(self, nBitsN, w):
+  def __init__(self, nBitsN, w, p):
     self.n = 1 << nBitsN
     self.nBitsN = nBitsN
     self.w = w
+    self.p = p
     return
 
   def get_mod(self, a):
     if a >= 0:
-        return a % p
+        return a % self.p
     else:
-        return a % p
+        return a % self.p
 
   # Return a random element in [0, p)
   def randElem(self):
@@ -110,10 +107,26 @@ class Ring(object):
 
     #res = sint.Array(n)
     res = [0 for i in range(n)]
-    #@for_range(n-1)
-    #def range_body_wrap(i):
     for i in range(n-1):
       res[i] = self.get_mod(conv[i] - conv[i + n])
+
+    res[n-1] = conv[n-1]
+    return res
+
+  def ringMulNumpy(self, a, b):
+    mul_res = np.polymul(a[::-1], b[::-1])
+    conv_tmp = mul_res[::-1]
+    if (len(conv_tmp) < 2*self.n):
+        conv_tmp = np.concatenate([conv_tmp, np.zeros(2*self.n - len(conv_tmp))])
+
+    n = self.n
+    conv = [0 for i in range(2*n)]
+    for i in range(2*n):
+        conv[i] = self.get_mod(int(conv_tmp[i]))
+
+    res = [0 for i in range(n)]
+    for i in range(n-1):
+      res[i] = self.get_mod(self.get_mod(conv[i]) - self.get_mod(conv[i + n]))
 
     res[n-1] = conv[n-1]
     return res
@@ -312,7 +325,7 @@ class Ring(object):
     #   res[2*i] = r[0]
     #   res[2*i+1] = r[1]   # r[0] and r[1] are random and independent
     for i in range(n):
-        res[i] = random.randint(0, p-1)
+        res[i] = random.randint(0, self.p - 1)
 
     return res
 
@@ -334,15 +347,6 @@ class Ring(object):
       res[i] = self.modBinom(N)
     return res
 
-  def ringBinom_new(self, N):
-    n = self.n
-    #res = sint.Array(n)
-    res = [0 for i in range(n)]
-    #@for_range(n)
-    #def range_body(i):
-    for i in range(n):
-      res[i] = self.modBinom(N)
-    return self.recover(res)
 
   def ringRevealPrettyPrint(self, a):
     print_ln("[ ")
