@@ -150,9 +150,9 @@ class LWE(object):
     #u = r.ringMul(a, e0)
     #u = r.ringAdd(u, e1)
 
-    u = r.ringBinom(N)
-    u = [-1, 0]
-    u = r.ringMul(a, u)
+    u0 = r.ringBinom(N)
+    u0 = [-1, 0]
+    u = r.ringMul(a, u0)
     u = r.ringAdd(u, e2)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
@@ -173,7 +173,7 @@ class LWE(object):
     #v = r.ringAdd(v, e2)
     #v = r.ringAdd(v, zMthP)
 
-    v = r.ringMul(b, u)
+    v = r.ringMul(b, u0)
     print("############ p0.u #############")
     print(v)
     v = r.ringAdd(v, e1)
