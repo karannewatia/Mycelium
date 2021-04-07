@@ -114,9 +114,9 @@ class LWE(object):
   def key_gen(self):
     r = self.r
     N = self.N
-    a = [11, 6] #r.ringRandClear()
-    s = [-1, 0] #r.ringBinom(N)
-    e = [1, 0] #r.ringBinom(N)
+    a = r.ringRandClear()
+    s = r.ringBinom(N)
+    e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     #e = [self.get_mod(self.m*i) for i in e]
 
@@ -141,8 +141,8 @@ class LWE(object):
     N = self.N
     m = self.m
     #e0 = r.ringBinom(N)
-    e1 = [-1, 1] #r.ringBinom(N)
-    e2 = [0, 1] #r.ringBinom(N)
+    e1 = r.ringBinom(N)
+    e2 = r.ringBinom(N)
 
     # e1 = [self.get_mod(self.m*i) for i in e1]
     # e2 = [self.get_mod(self.m*i) for i in e2]
@@ -151,7 +151,6 @@ class LWE(object):
     #u = r.ringAdd(u, e1)
 
     u0 = r.ringBinom(N)
-    u0 = [-1, 0]
     u = r.ringMul(a, u0)
     u = r.ringAdd(u, e2)
 
