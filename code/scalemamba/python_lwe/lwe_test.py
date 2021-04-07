@@ -18,7 +18,8 @@ lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = random.randrange(0, 4)
+  x[i] = random.randrange(-2, 2)
+x = [-1, -2]
 print("################# Plaintext ###################")
 print(x)
 

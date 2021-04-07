@@ -15,7 +15,7 @@ class LWE(object):
     # m = Modulus of ciphertext additions
     # Require p = 1 (mod 2m), and m to be a power of 2
     self.lgM = lgM
-    self.m = (2 ** lgM)  # Plaintext modulus (size per element)
+    self.m = 5 #(2 ** lgM)  # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     self.n = n
     self.lgP = lgP
@@ -114,9 +114,9 @@ class LWE(object):
   def key_gen(self):
     r = self.r
     N = self.N
-    a = r.ringRandClear()
-    s = r.ringBinom(N)
-    e = r.ringBinom(N)
+    a = [11, 6] #r.ringRandClear()
+    s = [-1, 0] #r.ringBinom(N)
+    e = [1, 0] #r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     #e = [self.get_mod(self.m*i) for i in e]
 
@@ -140,8 +140,8 @@ class LWE(object):
     N = self.N
     m = self.m
     #e0 = r.ringBinom(N)
-    e1 = r.ringBinom(N)
-    e2 = r.ringBinom(N)
+    e1 = [-1, 1] #r.ringBinom(N)
+    e2 = [0, 1] #r.ringBinom(N)
 
     # e1 = [self.get_mod(self.m*i) for i in e1]
     # e2 = [self.get_mod(self.m*i) for i in e2]
@@ -152,6 +152,7 @@ class LWE(object):
     u = r.ringBinom(N)
     u = r.ringMul(a, u)
     u = r.ringAdd(u, e2)
+    u = [-1, 0]
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
@@ -199,7 +200,7 @@ class LWE(object):
     z_tmp = [0 for i in range(self.l)]
     for i in range(self.l):
          if (zNoisy[i] > self.p/2):
-             zNoisy[i] = zNoisy[i] - self.p
+             zNoisy[i] = self.get_mod(zNoisy[i] - self.p)
          z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
          z[i] = z_tmp[i] % self.m
 
