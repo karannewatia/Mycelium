@@ -151,9 +151,9 @@ class LWE(object):
     #u = r.ringAdd(u, e1)
 
     u = r.ringBinom(N)
+    u = [-1, 0]
     u = r.ringMul(a, u)
     u = r.ringAdd(u, e2)
-    u = [-1, 0]
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
