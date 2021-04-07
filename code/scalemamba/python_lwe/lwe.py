@@ -167,12 +167,15 @@ class LWE(object):
     for i in range(0, len(z)):
       #zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
       zMthP[i] = self.get_mod(z[i] * mthP)
-
+    print("############ delta * m #############")
+    print(zMthP)
     #v = r.ringMul(b, e0)
     #v = r.ringAdd(v, e2)
     #v = r.ringAdd(v, zMthP)
 
     v = r.ringMul(b, u)
+    print("############ p0.u #############")
+    print(v)
     v = r.ringAdd(v, e1)
     v = r.ringAdd(v, zMthP)
 
