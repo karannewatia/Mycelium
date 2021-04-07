@@ -120,7 +120,8 @@ class LWE(object):
     a_neg = [self.get_mod(-i) for i in a]
     #e = [self.get_mod(self.m*i) for i in e]
 
-    b = r.ringAdd(r.ringMul(a_neg, s), e)
+    b = r.ringAdd(r.ringMul(a, s), e)
+    b = [self.get_mod(-i) for i in b]
 
     res = [b,a,s]
     print("################# public key b ###################")
