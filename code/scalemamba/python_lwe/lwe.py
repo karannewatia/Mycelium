@@ -151,6 +151,9 @@ class LWE(object):
     #u = r.ringAdd(u, e1)
 
     u0 = r.ringBinom(N)
+    print("############ u (as in the paper) #############")
+    print(u0)
+
     u = r.ringMul(a, u0)
     u = r.ringAdd(u, e2)
 
