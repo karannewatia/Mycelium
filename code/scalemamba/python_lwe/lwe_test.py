@@ -63,8 +63,9 @@ print(x)
 [v1, u1] = [v0, u0]
 [v, u] = [v0, u0]
 [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
-[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
-x2 = lwe.dec(c0_mul, c1_mul, s)
+#[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
+#x2 = lwe.dec(c0_mul, c1_mul, s)
+x2 = lwe.dec_mul(c0, c1, c2, s)
 
 # mult_count = 0
 

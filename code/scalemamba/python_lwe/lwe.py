@@ -220,29 +220,29 @@ class LWE(object):
     return [z, zNoisy]
 
 
-  # def dec_mul(self, c0, c1, c2, s):
-  #   r = self.r
-  #   lgM = self.lgM
-  #   m = 1 << lgM
-  #   clearM = m
-  #   s1 = r.ringMul(s,s)
-  #   zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
-  #
-  #   halfMthP = self.p/(2*m)
-  #
-  #   z = [0 for i in range(self.l)]
-  #   for i in range(self.l):
-  #        zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
-  #        zNoisy[i] = zNoisy[i] - halfMthP
-  #        #if zNoisy[i] > p - p/(2*t):
-  #        #  zNoisy[i] = zNoisy[i] - p
-  #        if abs(zNoisy[i]) >= halfMthP:
-  #          #print(" !!! dec fails !!! ")
-  #          return ["Failed"]
-  #
-  #        z[i] = zNoisy[i] % self.m
-  #
-  #   return [z, zNoisy]
+  def dec_mul(self, c0, c1, c2, s):
+      r = self.r
+      lgM = self.lgM
+      s1 = r.ringMul(s,s)
+      zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+      print("################# zNoisy ###################")
+      print(zNoisy)
+
+      halfMthP = self.p/(2*self.m)
+
+      z = [0 for i in range(self.l)]
+      z_tmp = [0 for i in range(self.l)]
+      for i in range(self.l):
+           if (zNoisy[i] > self.p/2):
+               zNoisy[i] = self.get_mod(zNoisy[i] - self.p)
+           z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
+           z[i] = z_tmp[i] % self.m
+
+      print("################# z (before doing mod m) ###################")
+      print(z_tmp)
+
+      return [z, zNoisy]
+
 
   def rl_keys(self, s, s2):
       r = self.r
@@ -309,7 +309,7 @@ class LWE(object):
       c0_new = r.ringMul(c2, b)
       c1_new = r.ringMul(c2, a)
 
-      for i in range(len(c0_new)):
+      for i in range(self.n):
            c0_new[i] = self.get_mod(int(round(c0_new[i]/ float(self.p1))))
            c1_new[i] = self.get_mod(int(round(c1_new[i]/ float(self.p1))))
 
@@ -333,7 +333,7 @@ class LWE(object):
       c0 = self.mul(v, v1)
       c1 = self.add(self.mul(u,v1), self.mul(v,u1))
       c2 = self.mul(u, u1)
-      for i in range(len(c0)):
+      for i in range(self.n):
            c0[i] = self.get_mod(int(round(c0[i]*self.m / float(self.p))))
            c1[i] = self.get_mod(int(round(c1[i]*self.m / float(self.p))))
            c2[i] = self.get_mod(int(round(c2[i]*self.m / float(self.p))))
