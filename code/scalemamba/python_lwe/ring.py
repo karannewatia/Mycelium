@@ -1,6 +1,6 @@
 import random
 import numpy as np
-random.seed(100)
+# random.seed(100)
 
 class Ring(object):
 
@@ -18,6 +18,7 @@ class Ring(object):
     self.nBitsN = nBitsN
     self.w = w
     self.p = p
+    self.p1 = p ** 3
     return
 
   def get_mod(self, a):
@@ -25,6 +26,9 @@ class Ring(object):
         return a % self.p
     else:
         return a % self.p
+
+  def get_mod_pq(self, a):
+    return a % (self.p * self.p1)
 
   # Return a random element in [0, p)
   def randElem(self):
@@ -43,12 +47,18 @@ class Ring(object):
 
   # Selects r from (X~B(2n, 0.5) - n) mod p
   # i.e. should be centered at 0
-  def modBinom(self, n):
+  def modBinom(self, n, pq=False):
     #r = sint(0)
     r = 0
     for i in range(0, 2*n):
-      r = self.get_mod(r + self.randBit())
-    return self.get_mod(r - n)
+      if pq:
+          r = self.get_mod_pq(r + self.randBit())
+      else:
+          r = self.get_mod(r + self.randBit())
+    if pq:
+        return self.get_mod_pq(r - n)
+    else:
+        return self.get_mod(r - n)
 
 
   # RING OPERATIONS
@@ -57,13 +67,16 @@ class Ring(object):
   # It is assumed that n = len(a) = len(b).
 
   # Ring addition (i.e. pointwise vector addition mod p)
-  def ringAdd(self, a, b):
+  def ringAdd(self, a, b, pq=False):
     #res = sint.Array(self.n)
     res = [0 for i in range(self.n)]
     #@for_range(self.n)
     #def range_body(i):
     for i in range(self.n):
-      res[i] = self.get_mod(a[i] + b[i])
+      if pq:
+          res[i] = self.get_mod_pq(a[i] + b[i])
+      else:
+          res[i] = self.get_mod(a[i] + b[i])
     return res
 
   # Ring subtraction (i.e. pointwise vector subtraction mod p)
@@ -89,7 +102,7 @@ class Ring(object):
   # Polynomials are represented with lowest powers first
   #   e.g. (1 + 2x + 3x^2) is represented as [1, 2, 3]
   # Reduce polynomial modulo x^(len(a)) + 1
-  def ringMul(self, a, b):
+  def ringMul(self, a, b, pq=False):
     n = self.n
     #conv = sint.Array(2*n)
     conv = [0 for i in range(2*n)]
@@ -104,12 +117,18 @@ class Ring(object):
     for i in range(n**2):
       j = i % n
       k = i / n
-      conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
+      if pq:
+          conv[j+k] = self.get_mod_pq(self.get_mod_pq(conv[j+k]) + self.get_mod_pq(a[j] * b[k]))
+      else:
+          conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
 
     #res = sint.Array(n)
     res = [0 for i in range(n)]
     for i in range(n-1):
-      res[i] = self.get_mod(conv[i] - conv[i + n])
+      if pq:
+          res[i] = self.get_mod_pq(conv[i] - conv[i + n])
+      else:
+          res[i] = self.get_mod(conv[i] - conv[i + n])
 
     res[n-1] = conv[n-1]
     return res
@@ -314,38 +333,35 @@ class Ring(object):
   # Returns a vector of length n
   # Each item is chosen uniformally at random from [0, p)
   # Assumes n is even
-  def ringRand(self):
+  def ringRand(self, pq=False):
     n = self.n
     #res = sint.Array(n)
     res = [0 for i in range(n)]
 
-    # @for_range(n/2)
-    # def range_body(i):
-    # for i in range(n/2):
-    #   r = sint.get_random_triple()
-    #   res[2*i] = r[0]
-    #   res[2*i+1] = r[1]   # r[0] and r[1] are random and independent
     for i in range(n):
-        res[i] = random.randint(0, self.p - 1)
+        if (pq):
+            res[i] = random.randint(0, (self.p * self.p1) - 1)
+        else:
+            res[i] = random.randint(0, self.p - 1)
 
     return res
 
   # Assumes n is even
-  def ringRandClear(self):
-    rand = self.ringRand()
+  def ringRandClear(self, pq=False):
+    rand = self.ringRand(pq)
     res = rand
     return res
 
   # Returns a vector of length n
   # Each item is chosen independently at random from (B(2N, 0.5) - N) mod p
-  def ringBinom(self, N):
+  def ringBinom(self, N, pq=False):
     n = self.n
     #res = sint.Array(n)
     res = [0 for i in range(n)]
     #@for_range(n)
     #def range_body(i):
     for i in range(n):
-      res[i] = self.modBinom(N)
+      res[i] = self.modBinom(N, pq)
     return res
 
   def ringRevealPrettyPrint(self, a):

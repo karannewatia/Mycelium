@@ -3,34 +3,34 @@ from lwe import LWE
 import random
 import numpy as np
 
-p = 17
+p = 186490730596755183941466682335143648393
 w = 1
 
-lgN = 1
+lgN = 2
 r = Ring(lgN, w, p)
 
 N = 1
-lgM = 2
-l = 2
-n = 2
-lgP = 5
+lgM = 1
+l = 4
+n = 4
+lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = random.randrange(0, 5)
-#x = [4, 3]
+  x[i] = 0 #random.randrange(0, 100)
+x[1] = 1
 print("################# Plaintext ###################")
 print(x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
 
+#s2 = lwe.mul(s,s)
+
 # new_p = 14543227543197505793
 # lwe.set_p(new_p)
 # [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
-
-#s2 = lwe.mul(s,s)
 
 
 ####### expand #######
@@ -54,23 +54,21 @@ print(x)
 
 ###### check addition on ciphertext #######
 # [v1, u1] = lwe.enc(b, a, x)
-# u2 = lwe.add(u, u1)
-# v2 = lwe.add(v, v1)
+# u2 = lwe.add(u0, u1)
+# v2 = lwe.add(v0, v1)
 # x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
-# [rlk_b, rlk_a] = lwe.rl_keys(s, s2)
-#
-# [v1, u1] = [v0, u0]
-# v, u = v0, u0
-# c0 = lwe.mul(v, v1)
-# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-# c2 = lwe.mul(u, u1)
-# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-#
+[rlk_b, rlk_a] = lwe.rl_keys_alt(s)
+[v1, u1] = [v0, u0]
+[v, u] = [v0, u0]
+[c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
+x2 = lwe.dec(c0_mul, c1_mul, s)
+
 # mult_count = 0
-#
-# for k in range(10):
+
+# for k in range(1):
 #     tmp = lwe.dec(c0_mul, c1_mul, s)
 #     if (tmp[0] == False):
 #         break
@@ -82,7 +80,7 @@ print(x)
 #     c2 = lwe.mul(u, u1)
 #     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
 #     mult_count += 1
-#
+
 # print(mult_count)
 # print(x2[0])
 
@@ -135,7 +133,7 @@ print(x)
 
 ######################################
 
-x2 = lwe.dec(v0, u0, s)
+#x2 = lwe.dec(v0, u0, s)
 
 print("################# decrypted text ###################")
 print(x2[0])

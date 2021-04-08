@@ -15,11 +15,12 @@ class LWE(object):
     # m = Modulus of ciphertext additions
     # Require p = 1 (mod 2m), and m to be a power of 2
     self.lgM = lgM
-    self.m = 5 #(2 ** lgM)  # Plaintext modulus (size per element)
+    self.m = (2 ** lgM)  # Plaintext modulus (size per element)
     self.l = l           # Plaintext length (number of elements)
     self.n = n
     self.lgP = lgP
     self.p = p
+    self.p1 = p ** 3
     return
 
   def set_p(self, new_p):
@@ -30,6 +31,9 @@ class LWE(object):
         return a % self.p
     else:
         return a % self.p
+
+  def get_mod_pq(self, a):
+    return a % (self.p * self.p1)
 
   def decompose_gadget(self):
     g = [0 for i in range(self.lgP)]
@@ -213,19 +217,6 @@ class LWE(object):
     print("################# z (before doing mod m) ###################")
     print(z_tmp)
 
-    # z = [0 for i in range(self.l)]
-    # for i in range(self.l):
-    #   # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-    #   # zNotchesI = self.get_mod(zRangeI * clearM)
-    #   # z[i] = m - 1 - ((zNotchesI - 1) % m)
-    #   zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
-    #   zNoisy[i] = zNoisy[i] - halfMthP
-    #   if abs(zNoisy[i]) >= halfMthP:
-    #     print(" !!! dec fails !!! ")
-    #     return [False, False]
-    #
-    #   z[i] = zNoisy[i] % self.m
-
     return [z, zNoisy]
 
 
@@ -258,31 +249,36 @@ class LWE(object):
       N = self.N
 
       tmp_a = r.ringRandClear()
-      tmp_a_neg = [self.get_mod(-i) for i in tmp_a]
       tmp_e = r.ringBinom(N)
-      tmp_e = [self.get_mod(self.m*i) for i in tmp_e]
-      tmp_b = r.ringAdd(r.ringMul(tmp_a_neg, s), tmp_e)
-      # s2_tmp = [self.get_mod((2**i) * j) for j in s2]
-      # tmp_b = r.ringAdd(tmp_b, s2_tmp)
+      tmp_b = r.ringAdd(r.ringMul(tmp_a, s), tmp_e)
+      tmp_b = [self.get_mod(-i) for i in tmp_b]
+
       a = [tmp_a for i in range(self.lgP)]
       b = [tmp_b for i in range(self.lgP)]
 
-      # a = [r.ringRandClear() for i in range(self.lgP)]
-      # b = [r.zero() for i in range(self.lgP)]
-      # for j in range(self.lgP):
-      #     a_neg = [self.get_mod(-i) for i in a[j]]
-      #     e = r.ringBinom(N)
-      #     e = [self.get_mod(self.m*i) for i in e]
-      #     b[j] = r.ringAdd(r.ringMul(a_neg, s), e)
-
-      # s2 = r.ringMul(s,s)
       for i in range(self.lgP):
           s2_tmp = [self.get_mod((2**i) * j) for j in s2]
           b[i] = r.ringAdd(b[i], s2_tmp)
 
       return [b, a]
 
-  def relinearization(self, b, a, c0, c1, c2, s):
+  def rl_keys_alt(self, s):
+      r = self.r
+      N = self.N
+
+      s2 = r.ringMul(s, s, pq=True)
+
+      a = r.ringRandClear(pq=True)
+      e = r.ringBinom(self.N, pq=True)
+      b = r.ringAdd(r.ringMul(a, s, pq=True), e, pq=True)
+      b = [self.get_mod_pq(-i) for i in b]
+
+      s2_tmp = [self.get_mod_pq(j*self.p1) for j in s2]
+      b = r.ringAdd(b, s2_tmp, pq=True)
+
+      return [b, a]
+
+  def relinearization(self, b, a, c0, c1, c2):
       r = self.r
       c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
@@ -308,6 +304,21 @@ class LWE(object):
 
       return [c0_new, c1_new]
 
+  def relinearization_alt(self, b, a, c0, c1, c2):
+      r = self.r
+      c0_new = r.ringMul(c2, b)
+      c1_new = r.ringMul(c2, a)
+
+      for i in range(len(c0_new)):
+           c0_new[i] = self.get_mod(int(round(c0_new[i]/ float(self.p1))))
+           c1_new[i] = self.get_mod(int(round(c1_new[i]/ float(self.p1))))
+
+      c0_new = r.ringAdd(c0_new, c0)
+      c1_new = r.ringAdd(c1_new, c1)
+
+      return [c0_new, c1_new]
+
+
   def add(self, u1, u2):
     r = self.r
     res = r.ringAdd(u1, u2)
@@ -317,6 +328,17 @@ class LWE(object):
       r = self.r
       res = r.ringMul(u1, u2)
       return res
+
+  def ciphertext_mult(self, v, u, v1, u1):
+      c0 = self.mul(v, v1)
+      c1 = self.add(self.mul(u,v1), self.mul(v,u1))
+      c2 = self.mul(u, u1)
+      for i in range(len(c0)):
+           c0[i] = self.get_mod(int(round(c0[i]*self.m / float(self.p))))
+           c1[i] = self.get_mod(int(round(c1[i]*self.m / float(self.p))))
+           c2[i] = self.get_mod(int(round(c2[i]*self.m / float(self.p))))
+      return [c0, c1, c2]
+
 
   def custom_round(self, x, base):
       return int(base * round(x/base))
