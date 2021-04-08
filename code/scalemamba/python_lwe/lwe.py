@@ -27,10 +27,11 @@ class LWE(object):
       self.p = new_p
 
   def get_mod(self, a):
-    if a >= 0:
-        return a % self.p
-    else:
-        return a % self.p
+      return a % self.p
+      # tmp = a % self.p
+      # if (tmp >= self.p/2):
+      #   tmp = tmp - self.p
+      # return tmp
 
   def get_mod_pq(self, a):
     return a % (self.p * self.p1)
@@ -132,7 +133,7 @@ class LWE(object):
     print(b)
     print("################# public key a ###################")
     print(a)
-    print("################# public key s ###################")
+    print("################# secret key s ###################")
     print(s)
     print("################# error e (in key gen) ###################")
     print(e)
@@ -204,13 +205,11 @@ class LWE(object):
     print("################# zNoisy ###################")
     print(zNoisy)
 
-    halfMthP = self.p/(2*self.m)
-
     z = [0 for i in range(self.l)]
     z_tmp = [0 for i in range(self.l)]
     for i in range(self.l):
-         if (zNoisy[i] > self.p/2):
-             zNoisy[i] = self.get_mod(zNoisy[i] - self.p)
+         if (zNoisy[i] >= self.p/2):
+             zNoisy[i] -= self.p
          z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
          z[i] = z_tmp[i] % self.m
 
@@ -228,13 +227,11 @@ class LWE(object):
       print("################# zNoisy ###################")
       print(zNoisy)
 
-      halfMthP = self.p/(2*self.m)
-
       z = [0 for i in range(self.l)]
       z_tmp = [0 for i in range(self.l)]
       for i in range(self.l):
-           if (zNoisy[i] > self.p/2):
-               zNoisy[i] = self.get_mod(zNoisy[i] - self.p)
+           if (zNoisy[i] >= self.p/2):
+               zNoisy[i] -= self.p
            z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
            z[i] = z_tmp[i] % self.m
 
@@ -334,9 +331,28 @@ class LWE(object):
       c1 = self.add(self.mul(u,v1), self.mul(v,u1))
       c2 = self.mul(u, u1)
       for i in range(self.n):
-           c0[i] = self.get_mod(int(round(c0[i]*self.m / float(self.p))))
-           c1[i] = self.get_mod(int(round(c1[i]*self.m / float(self.p))))
-           c2[i] = self.get_mod(int(round(c2[i]*self.m / float(self.p))))
+          if (c0[i] >= self.p/2):
+              c0[i] -= self.p
+          if (c1[i] >= self.p/2):
+              c1[i] -= self.p
+          if (c2[i] >= self.p/2):
+              c2[i] -= self.p
+      print("################# c0 before round ###################")
+      print(c0)
+      print("################# c1 before round ###################")
+      print(c1)
+      print("################# c2 before round ###################")
+      print(c2)
+      for i in range(self.n):
+          c0[i] = int(round(c0[i]*self.m / float(self.p)))
+          c1[i] = int(round(c1[i]*self.m / float(self.p)))
+          c2[i] = int(round(c2[i]*self.m / float(self.p)))
+      print("################# c0 after round ###################")
+      print(c0)
+      print("################# c1 after round  ###################")
+      print(c1)
+      print("################# c2 after round ###################")
+      print(c2)
       return [c0, c1, c2]
 
 

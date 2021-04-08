@@ -3,23 +3,23 @@ from lwe import LWE
 import random
 import numpy as np
 
-p = 186490730596755183941466682335143648393
+p = 37 #186490730596755183941466682335143648393
 w = 1
 
-lgN = 2
+lgN = 1
 r = Ring(lgN, w, p)
 
 N = 1
-lgM = 1
-l = 4
-n = 4
+lgM = 2
+l = 2
+n = 2
 lgP = 128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
 for i in range(l):
-  x[i] = 0 #random.randrange(0, 100)
-x[1] = 1
+  x[i] = 0 #random.randrange(0, 10)
+x[0] = 1
 print("################# Plaintext ###################")
 print(x)
 
@@ -59,10 +59,11 @@ print(x)
 # x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
-[rlk_b, rlk_a] = lwe.rl_keys_alt(s)
-[v1, u1] = [v0, u0]
-[v, u] = [v0, u0]
-[c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+#[rlk_b, rlk_a] = lwe.rl_keys_alt(s)
+# [v1, u1] = [v0, u0]
+# [v, u] = [v0, u0]
+#[v1, u1] = lwe.enc(b, a, x)
+[c0, c1, c2] = lwe.ciphertext_mult(v0, u0, v0, u0)
 #[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
 #x2 = lwe.dec(c0_mul, c1_mul, s)
 x2 = lwe.dec_mul(c0, c1, c2, s)

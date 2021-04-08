@@ -1,6 +1,6 @@
 import random
 import numpy as np
-# random.seed(100)
+random.seed(100)
 
 class Ring(object):
 
@@ -22,10 +22,11 @@ class Ring(object):
     return
 
   def get_mod(self, a):
-    if a >= 0:
-        return a % self.p
-    else:
-        return a % self.p
+      return a % self.p
+      # tmp = a % self.p
+      # if (tmp >= self.p/2):
+      #   tmp = tmp - self.p
+      # return tmp
 
   def get_mod_pq(self, a):
     return a % (self.p * self.p1)
@@ -122,6 +123,7 @@ class Ring(object):
       else:
           conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
 
+    #print(a, b, conv)
     #res = sint.Array(n)
     res = [0 for i in range(n)]
     for i in range(n-1):
