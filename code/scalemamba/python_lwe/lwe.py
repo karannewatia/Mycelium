@@ -123,20 +123,19 @@ class LWE(object):
     s = r.ringBinom(N)
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
-    #e = [self.get_mod(self.m*i) for i in e]
 
     b = r.ringAdd(r.ringMul(a, s), e)
     b = [self.get_mod(-i) for i in b]
 
     res = [b,a,s]
-    print("################# public key b ###################")
-    print(b)
-    print("################# public key a ###################")
-    print(a)
-    print("################# secret key s ###################")
-    print(s)
-    print("################# error e (in key gen) ###################")
-    print(e)
+    # print("################# public key b ###################")
+    # print(b)
+    # print("################# public key a ###################")
+    # print(a)
+    # print("################# secret key s ###################")
+    # print(s)
+    # print("################# error e (in key gen) ###################")
+    # print(e)
     return res
 
   # z is plaintext (array) of l elems each modulo m
@@ -149,64 +148,48 @@ class LWE(object):
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
-    # e1 = [self.get_mod(self.m*i) for i in e1]
-    # e2 = [self.get_mod(self.m*i) for i in e2]
-
-    #u = r.ringMul(a, e0)
-    #u = r.ringAdd(u, e1)
-
     u0 = r.ringBinom(N)
-    print("############ u (as in the paper) #############")
-    print(u0)
+    # print("############ u (as in the paper) #############")
+    # print(u0)
 
     u = r.ringMul(a, u0)
     u = r.ringAdd(u, e2)
 
-    # v = b*e0 + 2*e2 + round(p/m)z (mod p)
-
-    #mthP = cint(-1)/cint(m)
-
-    #mthP = int(math.ceil(self.p/float(self.m)))
     mthP = self.p/m
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      #zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
       zMthP[i] = self.get_mod(z[i] * mthP)
-    print("############ delta * m #############")
-    print(zMthP)
-    #v = r.ringMul(b, e0)
-    #v = r.ringAdd(v, e2)
-    #v = r.ringAdd(v, zMthP)
+    # print("############ delta * m #############")
+    # print(zMthP)
 
     v = r.ringMul(b, u0)
-    print("############ p0.u #############")
-    print(v)
+    # print("############ p0.u #############")
+    # print(v)
     v = r.ringAdd(v, e1)
     v = r.ringAdd(v, zMthP)
 
     res = [v, u]
-    print("################# error e1 (in encrypt) ###################")
-    print(e1)
-    print("################# error e2 (in encrypt)###################")
-    print(e2)
-    print("################# ciphertext v ###################")
-    print(v)
-    print("################# ciphertext u ###################")
-    print(u)
+    # print("################# error e1 (in encrypt) ###################")
+    # print(e1)
+    # print("################# error e2 (in encrypt)###################")
+    # print(e2)
+    # print("################# ciphertext v ###################")
+    # print(v)
+    # print("################# ciphertext u ###################")
+    # print(u)
     return res
 
 
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
-    #zNoisy = r.ringAdd(v, r.ringMul(u, s))
     zNoisy = r.ringAdd(v, r.ringMul(u, s, take_mod=False), take_mod=False)
     for i in range(self.n):
         zNoisy[i] = self.get_mod(zNoisy[i])
-    print("################# zNoisy ###################")
-    print(zNoisy)
+    # print("################# zNoisy ###################")
+    # print(zNoisy)
 
     z = [0 for i in range(self.l)]
     z_tmp = [0 for i in range(self.l)]
@@ -216,8 +199,8 @@ class LWE(object):
          z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
          z[i] = z_tmp[i] % self.m
 
-    print("################# z (before doing mod m) ###################")
-    print(z_tmp)
+    # print("################# z (before doing mod m) ###################")
+    # print(z_tmp)
 
     return [z, zNoisy]
 
@@ -351,12 +334,12 @@ class LWE(object):
           c1[i] = self.get_mod(c1[i])
           c2[i] = self.get_mod(c2[i])
 
-      print("################# c0 after round ###################")
-      print(c0)
-      print("################# c1 after round  ###################")
-      print(c1)
-      print("################# c2 after round ###################")
-      print(c2)
+      # print("################# c0 after round ###################")
+      # print(c0)
+      # print("################# c1 after round  ###################")
+      # print(c1)
+      # print("################# c2 after round ###################")
+      # print(c2)
 
       return [c0, c1, c2]
 
