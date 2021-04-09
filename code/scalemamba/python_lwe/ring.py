@@ -1,6 +1,6 @@
 import random
 import numpy as np
-random.seed(100)
+#random.seed(100)
 
 class Ring(object):
 
@@ -68,7 +68,7 @@ class Ring(object):
   # It is assumed that n = len(a) = len(b).
 
   # Ring addition (i.e. pointwise vector addition mod p)
-  def ringAdd(self, a, b, pq=False):
+  def ringAdd(self, a, b, pq=False, take_mod=True):
     #res = sint.Array(self.n)
     res = [0 for i in range(self.n)]
     #@for_range(self.n)
@@ -77,7 +77,10 @@ class Ring(object):
       if pq:
           res[i] = self.get_mod_pq(a[i] + b[i])
       else:
-          res[i] = self.get_mod(a[i] + b[i])
+          if take_mod:
+              res[i] = self.get_mod(a[i] + b[i])
+          else:
+              res[i] = a[i] + b[i]
     return res
 
   # Ring subtraction (i.e. pointwise vector subtraction mod p)
@@ -103,7 +106,7 @@ class Ring(object):
   # Polynomials are represented with lowest powers first
   #   e.g. (1 + 2x + 3x^2) is represented as [1, 2, 3]
   # Reduce polynomial modulo x^(len(a)) + 1
-  def ringMul(self, a, b, pq=False):
+  def ringMul(self, a, b, pq=False, take_mod=True):
     n = self.n
     #conv = sint.Array(2*n)
     conv = [0 for i in range(2*n)]
@@ -121,7 +124,10 @@ class Ring(object):
       if pq:
           conv[j+k] = self.get_mod_pq(self.get_mod_pq(conv[j+k]) + self.get_mod_pq(a[j] * b[k]))
       else:
-          conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
+          if take_mod:
+              conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
+          else:
+              conv[j+k] = conv[j+k] + a[j] * b[k]
 
     #print(a, b, conv)
     #res = sint.Array(n)
@@ -130,7 +136,10 @@ class Ring(object):
       if pq:
           res[i] = self.get_mod_pq(conv[i] - conv[i + n])
       else:
-          res[i] = self.get_mod(conv[i] - conv[i + n])
+          if take_mod:
+              res[i] = self.get_mod(conv[i] - conv[i + n])
+          else:
+               res[i] = conv[i] - conv[i + n]
 
     res[n-1] = conv[n-1]
     return res

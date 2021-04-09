@@ -201,7 +201,10 @@ class LWE(object):
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
-    zNoisy = r.ringAdd(v, r.ringMul(u, s))
+    #zNoisy = r.ringAdd(v, r.ringMul(u, s))
+    zNoisy = r.ringAdd(v, r.ringMul(u, s, take_mod=False), take_mod=False)
+    for i in range(self.n):
+        zNoisy[i] = self.get_mod(zNoisy[i])
     print("################# zNoisy ###################")
     print(zNoisy)
 
@@ -223,7 +226,10 @@ class LWE(object):
       r = self.r
       lgM = self.lgM
       s1 = r.ringMul(s,s)
-      zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+      zNoisy = r.ringAdd(c0, r.ringMul(c1, s, take_mod=False), take_mod=False)
+      zNoisy = r.ringAdd(zNoisy, r.ringMul(c2, s1, take_mod=False), take_mod=False)
+      for i in range(self.n):
+          zNoisy[i] = self.get_mod(zNoisy[i])
       print("################# zNoisy ###################")
       print(zNoisy)
 
@@ -241,9 +247,11 @@ class LWE(object):
       return [z, zNoisy]
 
 
-  def rl_keys(self, s, s2):
+  def rl_keys(self, s):
       r = self.r
       N = self.N
+
+      s2 = r.ringMul(s, s)
 
       tmp_a = r.ringRandClear()
       tmp_e = r.ringBinom(N)
@@ -263,14 +271,14 @@ class LWE(object):
       r = self.r
       N = self.N
 
-      s2 = r.ringMul(s, s, pq=True)
+      s2 = r.ringMul(s, s, take_mod=False)
 
-      a = r.ringRandClear(pq=True)
-      e = r.ringBinom(self.N, pq=True)
-      b = r.ringAdd(r.ringMul(a, s, pq=True), e, pq=True)
-      b = [self.get_mod_pq(-i) for i in b]
+      a = r.ringRandClear()
+      e = r.ringBinom(N)
+      b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
+      b = [-i for i in b]
 
-      s2_tmp = [self.get_mod_pq(j*self.p1) for j in s2]
+      s2_tmp = [j*self.p1 for j in s2]
       b = r.ringAdd(b, s2_tmp, pq=True)
 
       return [b, a]
@@ -303,10 +311,14 @@ class LWE(object):
 
   def relinearization_alt(self, b, a, c0, c1, c2):
       r = self.r
-      c0_new = r.ringMul(c2, b)
-      c1_new = r.ringMul(c2, a)
+      c0_new = r.ringMul(c2, b, take_mod=False)
+      c1_new = r.ringMul(c2, a, take_mod=False)
 
       for i in range(self.n):
+           if (c0_new[i] >= self.p/2):
+               c0_new[i] -= self.p
+           if (c1_new[i] >= self.p/2):
+               c1_new[i] -= self.p
            c0_new[i] = self.get_mod(int(round(c0_new[i]/ float(self.p1))))
            c1_new[i] = self.get_mod(int(round(c1_new[i]/ float(self.p1))))
 
@@ -316,43 +328,36 @@ class LWE(object):
       return [c0_new, c1_new]
 
 
-  def add(self, u1, u2):
+  def add(self, u1, u2, take_mod=True):
     r = self.r
-    res = r.ringAdd(u1, u2)
+    res = r.ringAdd(u1, u2, take_mod=take_mod)
     return res
 
-  def mul(self, u1, u2):
+  def mul(self, u1, u2, take_mod=True):
       r = self.r
-      res = r.ringMul(u1, u2)
+      res = r.ringMul(u1, u2, take_mod=take_mod)
       return res
 
   def ciphertext_mult(self, v, u, v1, u1):
-      c0 = self.mul(v, v1)
-      c1 = self.add(self.mul(u,v1), self.mul(v,u1))
-      c2 = self.mul(u, u1)
-      for i in range(self.n):
-          if (c0[i] >= self.p/2):
-              c0[i] -= self.p
-          if (c1[i] >= self.p/2):
-              c1[i] -= self.p
-          if (c2[i] >= self.p/2):
-              c2[i] -= self.p
-      print("################# c0 before round ###################")
-      print(c0)
-      print("################# c1 before round ###################")
-      print(c1)
-      print("################# c2 before round ###################")
-      print(c2)
+      c0 = self.mul(v, v1, take_mod=False)
+      c1 = self.add(self.mul(u,v1,take_mod=False), self.mul(v,u1,take_mod=False), take_mod=False)
+      c2 = self.mul(u, u1, take_mod=False)
+
       for i in range(self.n):
           c0[i] = int(round(c0[i]*self.m / float(self.p)))
           c1[i] = int(round(c1[i]*self.m / float(self.p)))
           c2[i] = int(round(c2[i]*self.m / float(self.p)))
+          c0[i] = self.get_mod(c0[i])
+          c1[i] = self.get_mod(c1[i])
+          c2[i] = self.get_mod(c2[i])
+
       print("################# c0 after round ###################")
       print(c0)
       print("################# c1 after round  ###################")
       print(c1)
       print("################# c2 after round ###################")
       print(c2)
+
       return [c0, c1, c2]
 
 
