@@ -1,6 +1,7 @@
 from ring import Ring
 import numpy as np
 import math
+import random
 
 class LWE(object):
 
@@ -120,7 +121,7 @@ class LWE(object):
     r = self.r
     N = self.N
     a = r.ringRandClear()
-    s = [0 for i in range(self.n)] #r.ringBinom(N)
+    s = [0 for i in range(self.n)] #[random.randrange(0,2) for _ in range(self.n)]#[0 for i in range(self.n)] #r.ringBinom(N)
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
 
@@ -256,17 +257,21 @@ class LWE(object):
 
       s2 = r.ringMul(s, s)
 
-      a = r.ringRandClear() #[0 for _ in range(self.n)] #r.ringRandClear()
-      e = [0 for _ in range(self.n)] #r.ringBinom(N)
-      #b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
-      #b = [-i for i in b]
-      b = r.ringAdd(r.ringMul(a, s), e)
-      b = [-self.get_mod(i) for i in b]
+      a = r.ringRandClear()
+      e = r.ringBinom(N, take_mod=False)
+      b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
+      b = [-i for i in b]
 
       s2_tmp = [j*self.p1 for j in s2]
       b = r.ringAdd(b, s2_tmp, pq=True)
-      print(a)
-      print(b)
+
+      for i in range(self.n):
+          if (a[i] >= (self.p*self.p1)/2):
+               a[i] -= self.p*self.p1
+          if (b[i] >= (self.p*self.p1)/2):
+                b[i] -= self.p*self.p1
+      # print(a)
+      # print(b)
 
       return [b, a]
 
@@ -302,10 +307,6 @@ class LWE(object):
       c1_new = r.ringMul(c2, a, take_mod=False)
 
       for i in range(self.n):
-           # if (c0_new[i] >= self.p/2):
-           #     c0_new[i] -= self.p
-           # if (c1_new[i] >= self.p/2):
-           #     c1_new[i] -= self.p
            c0_new[i] = self.get_mod(int(round(c0_new[i]/ float(self.p1))))
            c1_new[i] = self.get_mod(int(round(c1_new[i]/ float(self.p1))))
 

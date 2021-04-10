@@ -49,18 +49,24 @@ class Ring(object):
 
   # Selects r from (X~B(2n, 0.5) - n) mod p
   # i.e. should be centered at 0
-  def modBinom(self, n, pq=False):
+  def modBinom(self, n, take_mod=True, pq=False):
     #r = sint(0)
     r = 0
     for i in range(0, 2*n):
       if pq:
           r = self.get_mod_pq(r + self.randBit())
       else:
-          r = self.get_mod(r + self.randBit())
+          if take_mod:
+              r = self.get_mod(r + self.randBit())
+          else:
+              r = r + self.randBit()
     if pq:
         return self.get_mod_pq(r - n)
     else:
-        return self.get_mod(r - n)
+        if take_mod:
+            return self.get_mod(r - n)
+        else:
+            return r - n
 
 
   # RING OPERATIONS
@@ -340,14 +346,14 @@ class Ring(object):
 
   # Returns a vector of length n
   # Each item is chosen independently at random from (B(2N, 0.5) - N) mod p
-  def ringBinom(self, N, pq=False):
+  def ringBinom(self, N, pq=False, take_mod=True):
     n = self.n
     #res = sint.Array(n)
     res = [0 for i in range(n)]
     #@for_range(n)
     #def range_body(i):
     for i in range(n):
-      res[i] = self.modBinom(N, pq)
+      res[i] = self.modBinom(N, pq, take_mod)
     return res
 
   def ringRevealPrettyPrint(self, a):
