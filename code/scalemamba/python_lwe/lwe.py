@@ -1,6 +1,7 @@
 from ring import Ring
 import numpy as np
 import math
+import random
 
 
 class LWE(object):
@@ -121,13 +122,23 @@ class LWE(object):
     r = self.r
     N = self.N
     a = r.ringRandClear()
-    s = [0 for i in range(self.n)] #r.ringBinom(N)
-    e = r.ringBinom(N)
-    a_neg = [self.get_mod(-i) for i in a]
+    for i in range(self.n):
+        if (a[i] > self.p/2):
+              a[i] -= self.p
+    s = [random.randrange(0,1) for i in range(self.n)]
 
+    e = r.ringBinom(N, take_mod=False)
+
+<<<<<<< HEAD
 
     b = r.ringAdd(r.ringMul(a, s), e)
+=======
+    b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
+>>>>>>> 19a9be20368ef9cba3672e30cb874316ad8b5f51
     b = [self.get_mod(-i) for i in b]
+    for i in range(self.n):
+        if (b[i] > self.p/2):
+              b[i] -= self.p
 
     res = [b,a,s]
     # print("################# public key b ###################")
@@ -146,10 +157,8 @@ class LWE(object):
     r = self.r
     N = self.N
     m = self.m
-    #e0 = r.ringBinom(N)
-    e1 = r.ringBinom(N)
-    e2 = r.ringBinom(N)
 
+<<<<<<< HEAD
 
     # e1 = [self.get_mod(self.m*i) for i in e1]
     # e2 = [self.get_mod(self.m*i) for i in e2]
@@ -163,22 +172,40 @@ class LWE(object):
 
 
     u = r.ringMul(a, u0)
+=======
+    e1 = r.ringBinom(N, take_mod=False)
+    e2 = r.ringBinom(N, take_mod=False)
+    u0 = r.ringBinom(N, take_mod=False)
+
+    # print("############ u (as in the paper) #############")
+    # print(u0)
+
+    u = r.ringMul(a, u0, take_mod=False)
+>>>>>>> 19a9be20368ef9cba3672e30cb874316ad8b5f51
     u = r.ringAdd(u, e2)
+
+    for i in range(self.n):
+        if (u[i] > self.p/2):
+              u[i] -= self.p
 
     mthP = self.p/m
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = self.get_mod(z[i] * mthP)
+      zMthP[i] = z[i] * mthP
     # print("############ delta * m #############")
     # print(zMthP)
 
-    v = r.ringMul(b, u0)
+    v = r.ringMul(b, u0, take_mod=False)
     # print("############ p0.u #############")
     # print(v)
-    v = r.ringAdd(v, e1)
+    v = r.ringAdd(v, e1, take_mod=False)
     v = r.ringAdd(v, zMthP)
+
+    for i in range(self.n):
+        if (v[i] > self.p/2):
+              v[i] -= self.p
 
     res = [v, u]
     # print("################# error e1 (in encrypt) ###################")
@@ -206,7 +233,7 @@ class LWE(object):
     z = [0 for i in range(self.l)]
     z_tmp = [0 for i in range(self.l)]
     for i in range(self.l):
-         if (zNoisy[i] >= self.p/2):
+         if (zNoisy[i] > self.p/2):
              zNoisy[i] -= self.p
          z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
          z[i] = z_tmp[i] % self.m
@@ -231,7 +258,7 @@ class LWE(object):
       z = [0 for i in range(self.l)]
       z_tmp = [0 for i in range(self.l)]
       for i in range(self.l):
-           if (zNoisy[i] >= self.p/2):
+           if (zNoisy[i] > self.p/2):
                zNoisy[i] -= self.p
            z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
            z[i] = z_tmp[i] % self.m
@@ -268,17 +295,27 @@ class LWE(object):
 
       s2 = r.ringMul(s, s)
 
-      a = r.ringRandClear() #[0 for _ in range(self.n)] #r.ringRandClear()
-      e = [0 for _ in range(self.n)] #r.ringBinom(N)
-      #b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
-      #b = [-i for i in b]
-      b = r.ringAdd(r.ringMul(a, s), e)
-      b = [-self.get_mod(i) for i in b]
+      for i in range(self.n):
+          s2[i] = self.get_mod_pq(s2[i])
+          if (s2[i] >= (self.p*self.p1)/2):
+               s2[i] -= self.p*self.p1
+      # print(s)
+      # print(s2)
+
+      a = r.ringRandClear(pq=True)
+      for i in range(self.n):
+          if (a[i] > (self.p*self.p1)/2):
+                a[i] -= self.p*self.p1
+      e = r.ringBinom(N, take_mod=False)
+      b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
+      b = [-i for i in b]
 
       s2_tmp = [j*self.p1 for j in s2]
       b = r.ringAdd(b, s2_tmp, pq=True)
-      print(a)
-      print(b)
+
+      for i in range(self.n):
+          if (b[i] > (self.p*self.p1)/2):
+                b[i] -= self.p*self.p1
 
       return [b, a]
 
@@ -314,15 +351,23 @@ class LWE(object):
       c1_new = r.ringMul(c2, a, take_mod=False)
 
       for i in range(self.n):
-           # if (c0_new[i] >= self.p/2):
-           #     c0_new[i] -= self.p
-           # if (c1_new[i] >= self.p/2):
-           #     c1_new[i] -= self.p
-           c0_new[i] = self.get_mod(int(round(c0_new[i]/ float(self.p1))))
-           c1_new[i] = self.get_mod(int(round(c1_new[i]/ float(self.p1))))
+           c0_new[i] = self.get_mod(int(round(float(c0_new[i])/ self.p1)))
+           c1_new[i] = self.get_mod(int(round(float(c1_new[i])/ self.p1)))
+
+      for i in range(self.n):
+          if (c0_new[i] > self.p/2):
+                c0_new[i] -= self.p
+          if (c1_new[i] > self.p/2):
+                c1_new[i] -= self.p
 
       c0_new = r.ringAdd(c0_new, c0)
       c1_new = r.ringAdd(c1_new, c1)
+
+      for i in range(self.n):
+           if (c0_new[i] > self.p/2):
+                 c0_new[i] -= self.p
+           if (c1_new[i] > self.p/2):
+                 c1_new[i] -= self.p
 
       return [c0_new, c1_new]
 
@@ -349,6 +394,14 @@ class LWE(object):
           c0[i] = self.get_mod(c0[i])
           c1[i] = self.get_mod(c1[i])
           c2[i] = self.get_mod(c2[i])
+
+      for i in range(self.n):
+           if (c0[i] > self.p/2):
+                c0[i] -= self.p
+           if (c1[i] > self.p/2):
+               c1[i] -= self.p
+           if (c2[i] > self.p/2):
+               c2[i] -= self.p
 
       # print("################# c0 after round ###################")
       # print(c0)
