@@ -6,12 +6,12 @@ import numpy as np
 p = (1 << 192) + 1
 w = 1
 
-lgN = 10
+lgN = 6
 r = Ring(lgN, w, p)
 
 N = 1
 lgM = 22
-l = 200
+l = 32
 n = 2**lgN
 lgP = 193
 lwe = LWE(r, N, lgM, l, n, lgP, p)
