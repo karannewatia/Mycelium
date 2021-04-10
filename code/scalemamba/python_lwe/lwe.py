@@ -1,5 +1,6 @@
 from ring import Ring
 import numpy as np
+import math
 
 
 class LWE(object):
@@ -20,16 +21,21 @@ class LWE(object):
     self.n = n
     self.lgP = lgP
     self.p = p
+    self.p1 = p ** 3
     return
 
   def set_p(self, new_p):
       self.p = new_p
 
   def get_mod(self, a):
-    if a >= 0:
-        return a % self.p
-    else:
-        return a % self.p
+      return a % self.p
+      # tmp = a % self.p
+      # if (tmp >= self.p/2):
+      #   tmp = tmp - self.p
+      # return tmp
+
+  def get_mod_pq(self, a):
+    return a % (self.p * self.p1)
 
   def decompose_gadget(self):
     g = [0 for i in range(self.lgP)]
@@ -119,11 +125,22 @@ class LWE(object):
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
 
-    e = [self.get_mod(self.m*i) for i in e]
 
-    b = r.ringAdd(r.ringMul(a_neg, s), e)
+    #e = [self.get_mod(self.m*i) for i in e]
+
+
+    b = r.ringAdd(r.ringMul(a, s), e)
+    b = [self.get_mod(-i) for i in b]
 
     res = [b,a,s]
+    print("################# public key b ###################")
+    print(b)
+    print("################# public key a ###################")
+    print(a)
+    print("################# secret key s ###################")
+    print(s)
+    print("################# error e (in key gen) ###################")
+    print(e)
     return res
 
   # z is plaintext (array) of l elems each modulo m
@@ -132,93 +149,113 @@ class LWE(object):
     r = self.r
     N = self.N
     m = self.m
-    e0 = r.ringBinom(N)
+    #e0 = r.ringBinom(N)
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
 
 
-    e1 = [self.get_mod(self.m*i) for i in e1]
-    e2 = [self.get_mod(self.m*i) for i in e2]
+    # e1 = [self.get_mod(self.m*i) for i in e1]
+    # e2 = [self.get_mod(self.m*i) for i in e2]
 
-    u = r.ringMul(a, e0)
-    u = r.ringAdd(u, e1)
+    #u = r.ringMul(a, e0)
+    #u = r.ringAdd(u, e1)
+
+    u0 = r.ringBinom(N)
+    print("############ u (as in the paper) #############")
+    print(u0)
+
+
+    u = r.ringMul(a, u0)
+    u = r.ringAdd(u, e2)
 
     # v = b*e0 + 2*e2 + round(p/m)z (mod p)
 
     #mthP = cint(-1)/cint(m)
+
+    #mthP = int(math.ceil(self.p/float(self.m)))
     mthP = self.p/m
 
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
+      #zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
+      zMthP[i] = self.get_mod(z[i] * mthP)
+    print("############ delta * m #############")
+    print(zMthP)
+    #v = r.ringMul(b, e0)
+    #v = r.ringAdd(v, e2)
+    #v = r.ringAdd(v, zMthP)
 
-    v = r.ringMul(b, e0)
-    v = r.ringAdd(v, e2)
+    v = r.ringMul(b, u0)
+    print("############ p0.u #############")
+    print(v)
+    v = r.ringAdd(v, e1)
     v = r.ringAdd(v, zMthP)
 
     res = [v, u]
+    print("################# error e1 (in encrypt) ###################")
+    print(e1)
+    print("################# error e2 (in encrypt)###################")
+    print(e2)
+    print("################# ciphertext v ###################")
+    print(v)
+    print("################# ciphertext u ###################")
+    print(u)
     return res
 
 
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
-    m = 1 << lgM
-    clearM = m
 
     zNoisy = r.ringAdd(v, r.ringMul(u, s))
-
-    halfMthP = self.p/(2*m)
+    print("################# zNoisy ###################")
+    print(zNoisy)
 
     z = [0 for i in range(self.l)]
+    z_tmp = [0 for i in range(self.l)]
     for i in range(self.l):
-      # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
-      # zNotchesI = self.get_mod(zRangeI * clearM)
-      # z[i] = m - 1 - ((zNotchesI - 1) % m)
-      zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
-      zNoisy[i] = zNoisy[i] - halfMthP
-      if abs(zNoisy[i]) >= halfMthP:
-        print(" !!! dec fails !!! ")
-        return [False, False]
+         if (zNoisy[i] >= self.p/2):
+             zNoisy[i] -= self.p
+         z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
+         z[i] = z_tmp[i] % self.m
 
-      z[i] = zNoisy[i] % self.m
+    print("################# z (before doing mod m) ###################")
+    print(z_tmp)
 
     return [z, zNoisy]
 
-  # def dec_mul(self, c0, c1, c2, s):
-  #   r = self.r
-  #   lgM = self.lgM
-  #   m = 1 << lgM
-  #   clearM = m
-  #   s1 = r.ringMul(s,s)
-  #   zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
-  #
-  #   halfMthP = self.p/(2*m)
-  #
-  #   z = [0 for i in range(self.l)]
-  #   for i in range(self.l):
-  #        zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
-  #        zNoisy[i] = zNoisy[i] - halfMthP
-  #        #if zNoisy[i] > p - p/(2*t):
-  #        #  zNoisy[i] = zNoisy[i] - p
-  #        if abs(zNoisy[i]) >= halfMthP:
-  #          #print(" !!! dec fails !!! ")
-  #          return ["Failed"]
-  #
-  #        z[i] = zNoisy[i] % self.m
-  #
-  #   return [z, zNoisy]
+
+  def dec_mul(self, c0, c1, c2, s):
+      r = self.r
+      lgM = self.lgM
+      s1 = r.ringMul(s,s)
+      zNoisy = r.ringAdd(r.ringAdd(c0, r.ringMul(c1, s)), r.ringMul(c2, s1))
+      print("################# zNoisy ###################")
+      print(zNoisy)
+
+      z = [0 for i in range(self.l)]
+      z_tmp = [0 for i in range(self.l)]
+      for i in range(self.l):
+           if (zNoisy[i] >= self.p/2):
+               zNoisy[i] -= self.p
+           z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
+           z[i] = z_tmp[i] % self.m
+
+      print("################# z (before doing mod m) ###################")
+      print(z_tmp)
+
+      return [z, zNoisy]
+
 
   def rl_keys(self, s, s2):
       r = self.r
       N = self.N
 
       tmp_a = r.ringRandClear()
-      tmp_a_neg = [self.get_mod(-i) for i in tmp_a]
       tmp_e = r.ringBinom(N)
-      tmp_e = [self.get_mod(self.m*i) for i in tmp_e]
-      tmp_b = r.ringAdd(r.ringMul(tmp_a_neg, s), tmp_e)
+      tmp_b = r.ringAdd(r.ringMul(tmp_a, s), tmp_e)
+      tmp_b = [self.get_mod(-i) for i in tmp_b]
 
       a = [tmp_a for i in range(self.lgP)]
       b = [tmp_b for i in range(self.lgP)]
@@ -229,7 +266,23 @@ class LWE(object):
 
       return [b, a]
 
-  def relinearization(self, b, a, c0, c1, c2, s):
+  def rl_keys_alt(self, s):
+      r = self.r
+      N = self.N
+
+      s2 = r.ringMul(s, s, pq=True)
+
+      a = r.ringRandClear(pq=True)
+      e = r.ringBinom(self.N, pq=True)
+      b = r.ringAdd(r.ringMul(a, s, pq=True), e, pq=True)
+      b = [self.get_mod_pq(-i) for i in b]
+
+      s2_tmp = [self.get_mod_pq(j*self.p1) for j in s2]
+      b = r.ringAdd(b, s2_tmp, pq=True)
+
+      return [b, a]
+
+  def relinearization(self, b, a, c0, c1, c2):
       r = self.r
       c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
@@ -255,6 +308,21 @@ class LWE(object):
 
       return [c0_new, c1_new]
 
+  def relinearization_alt(self, b, a, c0, c1, c2):
+      r = self.r
+      c0_new = r.ringMul(c2, b)
+      c1_new = r.ringMul(c2, a)
+
+      for i in range(self.n):
+           c0_new[i] = self.get_mod(int(round(c0_new[i]/ float(self.p1))))
+           c1_new[i] = self.get_mod(int(round(c1_new[i]/ float(self.p1))))
+
+      c0_new = r.ringAdd(c0_new, c0)
+      c1_new = r.ringAdd(c1_new, c1)
+
+      return [c0_new, c1_new]
+
+
   def add(self, u1, u2):
     r = self.r
     res = r.ringAdd(u1, u2)
@@ -264,6 +332,36 @@ class LWE(object):
       r = self.r
       res = r.ringMul(u1, u2)
       return res
+
+  def ciphertext_mult(self, v, u, v1, u1):
+      c0 = self.mul(v, v1)
+      c1 = self.add(self.mul(u,v1), self.mul(v,u1))
+      c2 = self.mul(u, u1)
+      for i in range(self.n):
+          if (c0[i] >= self.p/2):
+              c0[i] -= self.p
+          if (c1[i] >= self.p/2):
+              c1[i] -= self.p
+          if (c2[i] >= self.p/2):
+              c2[i] -= self.p
+      print("################# c0 before round ###################")
+      print(c0)
+      print("################# c1 before round ###################")
+      print(c1)
+      print("################# c2 before round ###################")
+      print(c2)
+      for i in range(self.n):
+          c0[i] = int(round(c0[i]*self.m / float(self.p)))
+          c1[i] = int(round(c1[i]*self.m / float(self.p)))
+          c2[i] = int(round(c2[i]*self.m / float(self.p)))
+      print("################# c0 after round ###################")
+      print(c0)
+      print("################# c1 after round  ###################")
+      print(c1)
+      print("################# c2 after round ###################")
+      print(c2)
+      return [c0, c1, c2]
+
 
   def custom_round(self, x, base):
       return int(base * round(x/base))

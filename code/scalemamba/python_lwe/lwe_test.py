@@ -4,39 +4,42 @@ import random
 import numpy as np
 
 
-#generate p using code/scalemamba/lwe/params/genP.py
-p = 285896339783634948757783167889218300929
-w = 1 #unused in Python version
 
+p = 97 #186490730596755183941466682335143648393
+w = 1
 
-lgN = 4
+lgN = 1
+
 r = Ring(lgN, w, p)
-N = 1
 
-lgM = 7
-l = 16
-n = 16
-lgP = 128
+N = 1
+lgM = 2
+l = 2
+n = 2
+
+lgP = 7
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
-# for i in range(l):
-#   x[i] = random.randrange(0, 100)
-x[1] = 1
-print("################# plaintext ###################")
+
+for i in range(l):
+  x[i] = 0 #random.randrange(0, 10)
+x[0] = 1
+print("################# Plaintext ###################")
 
 print(x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
 
-######### try modulus switching this does not work yet) ###########
+#s2 = lwe.mul(s,s)
+
 # new_p = 14543227543197505793
 # lwe.set_p(new_p)
 # [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
 
 
-############### expand ##################
+####### expand #######
 # zeros = [0 for i in range(n)]
 # expand_outer_loop_count = 4
 # c0 = [zeros for i in range(2**expand_outer_loop_count)]
@@ -57,24 +60,23 @@ print(x)
 
 ###### check addition on ciphertext #######
 # [v1, u1] = lwe.enc(b, a, x)
-# u2 = lwe.add(u, u1)
-# v2 = lwe.add(v, v1)
+# u2 = lwe.add(u0, u1)
+# v2 = lwe.add(v0, v1)
 # x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
-# s2 = lwe.mul(s,s)
-# [rlk_b, rlk_a] = lwe.rl_keys(s, s2)
-#
+#[rlk_b, rlk_a] = lwe.rl_keys_alt(s)
 # [v1, u1] = [v0, u0]
-# v, u = v0, u0
-# c0 = lwe.mul(v, v1)
-# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-# c2 = lwe.mul(u, u1)
-# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-#
+# [v, u] = [v0, u0]
+#[v1, u1] = lwe.enc(b, a, x)
+[c0, c1, c2] = lwe.ciphertext_mult(v0, u0, v0, u0)
+#[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
+#x2 = lwe.dec(c0_mul, c1_mul, s)
+x2 = lwe.dec_mul(c0, c1, c2, s)
+
 # mult_count = 0
-#
-# for k in range(5):
+
+# for k in range(1):
 #     tmp = lwe.dec(c0_mul, c1_mul, s)
 #     if (tmp[0] == False):
 #         break
@@ -86,7 +88,7 @@ print(x)
 #     c2 = lwe.mul(u, u1)
 #     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
 #     mult_count += 1
-#
+
 # print(mult_count)
 # print(x2[0])
 
@@ -139,7 +141,7 @@ print(x)
 
 ######################################
 
+#x2 = lwe.dec(v0, u0, s)
 
-x2 = lwe.dec(v0, u0, s)
 print("################# decrypted text ###################")
 print(x2[0])
