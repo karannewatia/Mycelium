@@ -3,28 +3,26 @@ from lwe import LWE
 import random
 import numpy as np
 
-
-
-p = 97 #186490730596755183941466682335143648393
+#p = 256221310147029912091797699793176569857
+p = (1<<192)+1
 w = 1
 
-lgN = 1
-
+lgN = 10
 r = Ring(lgN, w, p)
 
 N = 1
-lgM = 2
-l = 2
-n = 2
+lgM = 22
+l = 20
+n = 2**lgN
+lgP = 193
 
-lgP = 7
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
 
 for i in range(l):
-  x[i] = 0 #random.randrange(0, 10)
-x[0] = 1
+  x[i] = 0 #random.randrange(0, 100)
+x[1] = 1
 print("################# Plaintext ###################")
 
 print(x)
@@ -65,83 +63,61 @@ print(x)
 # x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
-#[rlk_b, rlk_a] = lwe.rl_keys_alt(s)
-# [v1, u1] = [v0, u0]
-# [v, u] = [v0, u0]
-#[v1, u1] = lwe.enc(b, a, x)
-[c0, c1, c2] = lwe.ciphertext_mult(v0, u0, v0, u0)
-#[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
+[rlk_b, rlk_a] = lwe.rl_keys_alt(s)
+[v1, u1] = [v0, u0]
+[v, u] = [v0, u0]
+[c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+[c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
 #x2 = lwe.dec(c0_mul, c1_mul, s)
-x2 = lwe.dec_mul(c0, c1, c2, s)
+#x2 = lwe.dec_mul(c0, c1, c2, s)
 
-# mult_count = 0
+mult_count = 0
+for k in range(7):
+    x2 = lwe.dec(c0_mul, c1_mul, s)
+    v,u = c0_mul, c1_mul
+    [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+    [c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
+    mult_count += 1
 
-# for k in range(1):
-#     tmp = lwe.dec(c0_mul, c1_mul, s)
-#     if (tmp[0] == False):
-#         break
-#     else:
-#         x2 = tmp
-#     v,u = c0_mul, c1_mul
-#     c0 = lwe.mul(v, v1)
-#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#     c2 = lwe.mul(u, u1)
-#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-#     mult_count += 1
-
-# print(mult_count)
-# print(x2[0])
+print(mult_count)
 
 ##################  check multiplicative depth ##############
-# plaintexts = []
-# for i in range(32):
-#     x = [0 for _ in range(l)]
-#     x[1] = 1
-#     plaintexts.append(x)
-
+# [rlk_b, rlk_a] = lwe.rl_keys_alt(s)
 # mult_lvl_1 = []
-# for i in range(0, 16, 2):
-#     [v, u] = [v0, u0] #lwe.enc(b, a, plaintexts[i])
-#     [v1, u1] = [v0, u0] #lwe.enc(b, a, plaintexts[i+1])
-#     c0 = lwe.mul(v, v1)
-#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#     c2 = lwe.mul(u, u1)
-#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+# for i in range(0, 4, 2):
+#     [v, u] = [v0, u0]
+#     [v1, u1] = [v0, u0]
+#     [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
 #     mult_lvl_1.append([c0_mul, c1_mul])
 #
-# mult_lvl_2 = []
-# for i in range(0, 8, 2):
-#     [v, u] = mult_lvl_1[i]
-#     [v1, u1] = mult_lvl_1[i+1]
-#     c0 = lwe.mul(v, v1)
-#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#     c2 = lwe.mul(u, u1)
-#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-#     mult_lvl_2.append([c0_mul, c1_mul])
+# # mult_lvl_2 = []
+# # for i in range(0, 4, 2):
+# #     [v, u] = mult_lvl_1[i]
+# #     [v1, u1] = mult_lvl_1[i+1]
+# #     [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+# #     [c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
+# #     mult_lvl_2.append([c0_mul, c1_mul])
 #
-# mult_lvl_3 = []
-# for i in range(0, 4, 2):
-#     [v, u] = mult_lvl_2[i]
-#     [v1, u1] = mult_lvl_2[i+1]
-#     c0 = lwe.mul(v, v1)
-#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#     c2 = lwe.mul(u, u1)
-#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-#     mult_lvl_3.append([c0_mul, c1_mul])
+# # mult_lvl_3 = []
+# # for i in range(0, 4, 2):
+# #     [v, u] = mult_lvl_2[i]
+# #     [v1, u1] = mult_lvl_2[i+1]
+# #     [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+# #     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2)
+# #     mult_lvl_3.append([c0_mul, c1_mul])
 #
-# [v, u] = mult_lvl_3[0]
-# [v1, u1] = mult_lvl_3[1]
-# c0 = lwe.mul(v, v1)
-# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-# c2 = lwe.mul(u, u1)
-# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+# [v, u] = mult_lvl_1[0]
+# [v1, u1] = mult_lvl_1[1]
+# [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
+# [c0_mul, c1_mul] = lwe.relinearization_alt(rlk_b, rlk_a, c0, c1, c2)
 #
 # x2 = lwe.dec(c0_mul, c1_mul, s)
-# print(x2[0])
 
 ######################################
-
 #x2 = lwe.dec(v0, u0, s)
 
 print("################# decrypted text ###################")
 print(x2[0])
+
+
