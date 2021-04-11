@@ -140,10 +140,10 @@ class LWE(object):
     # print(b)
     # print("################# public key a ###################")
     # print(a)
-    print("################# secret key s ###################")
-    print(s)
-    print("################# error e (in key gen) ###################")
-    print(e)
+    # print("################# secret key s ###################")
+    # print(s)
+    # print("################# error e (in key gen) ###################")
+    #print(e)
     return res
 
   # z is plaintext (array) of l elems each modulo m
@@ -158,8 +158,8 @@ class LWE(object):
     e2 = r.ringBinom(N, take_mod=False)
     u0 = r.ringBinom(N, take_mod=False)
 
-    print("############ u (as in the paper) #############")
-    print(u0)
+    # print("############ u (as in the paper) #############")
+    # print(u0)
 
     u = r.ringMul(a, u0, take_mod=False)
 
@@ -189,14 +189,14 @@ class LWE(object):
               v[i] -= self.p
 
     res = [v, u]
-    print("################# error e1 (in encrypt) ###################")
-    print(e1)
-    print("################# error e2 (in encrypt)###################")
-    print(e2)
-    print("################# ciphertext v ###################")
-    print(v)
-    print("################# ciphertext u ###################")
-    print(u)
+    # print("################# error e1 (in encrypt) ###################")
+    # print(e1)
+    # print("################# error e2 (in encrypt)###################")
+    # print(e2)
+    # print("################# ciphertext v ###################")
+    # print(v)
+    # print("################# ciphertext u ###################")
+    # print(u)
     return res
 
 
@@ -233,8 +233,8 @@ class LWE(object):
       zNoisy = r.ringAdd(zNoisy, r.ringMul(c2, s1, take_mod=False), take_mod=False)
       for i in range(self.n):
           zNoisy[i] = self.get_mod(zNoisy[i])
-      print("################# zNoisy ###################")
-      print(zNoisy)
+      # print("################# zNoisy ###################")
+      #print(zNoisy)
 
       z = [0 for i in range(self.l)]
       z_tmp = [0 for i in range(self.l)]
@@ -244,8 +244,8 @@ class LWE(object):
            z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
            z[i] = z_tmp[i] % self.m
 
-      print("################# z (before doing mod m) ###################")
-      print(z_tmp)
+      # print("################# z (before doing mod m) ###################")
+      # print(z_tmp)
 
       return [z, zNoisy]
 
@@ -261,8 +261,8 @@ class LWE(object):
 
       for i in range(self.n):
           zNoisy[i] = self.get_mod(zNoisy[i])
-      print("################# zNoisy ###################")
-      print(zNoisy)
+      # print("################# zNoisy ###################")
+      # print(zNoisy)
 
       z = [0 for i in range(self.l)]
       z_tmp = [0 for i in range(self.l)]
@@ -271,9 +271,9 @@ class LWE(object):
                zNoisy[i] -= self.p
            z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
            z[i] = z_tmp[i] % self.m
-
-      print("################# z (before doing mod m) ###################")
-      print(z_tmp)
+      #
+      # print("################# z (before doing mod m) ###################")
+      # print(z_tmp)
 
       return [z, zNoisy]
 

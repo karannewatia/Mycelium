@@ -8,7 +8,7 @@ p = (1 << 192) + 1
 w = 1
 lgN = 6
 r = Ring(lgN, w, p)
-N = 64
+N = 1
 lgM = 12
 
 l = 16
