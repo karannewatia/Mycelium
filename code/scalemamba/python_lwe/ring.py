@@ -332,7 +332,7 @@ class Ring(object):
 
     for i in range(n):
         if (pq):
-            res[i] = random.randint(0, (self.p * self.p1) - 1)
+            res[i] = random.randint(0,  (self.p * self.p ** 2) - 1)
         else:
             res[i] = random.randint(0, self.p - 1)
 

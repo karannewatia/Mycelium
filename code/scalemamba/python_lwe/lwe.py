@@ -125,7 +125,7 @@ class LWE(object):
     for i in range(self.n):
         if (a[i] > self.p/2):
               a[i] -= self.p
-    s = [random.randrange(-1,2) for i in range(self.n)]
+    s = [random.randrange(0,2) for i in range(self.n)]
 
     e = r.ringBinom(N, take_mod=False)
 
@@ -254,7 +254,7 @@ class LWE(object):
       lgM = self.lgM
       s2 = r.ringMul(s,s)
       s3 = r.ringMul(s,s2)
-    
+
       zNoisy = r.ringAdd(c0, r.ringMul(c1, s, take_mod=False), take_mod=False)
       zNoisy = r.ringAdd(zNoisy, r.ringMul(c2, s2, take_mod=False), take_mod=False)
       zNoisy = r.ringAdd(zNoisy, r.ringMul(c3, s3, take_mod=False), take_mod=False)
@@ -307,8 +307,6 @@ class LWE(object):
           s2[i] = self.get_mod_pq(s2[i])
           if (s2[i] >= (self.p*self.p1)/2):
                s2[i] -= self.p*self.p1
-      # print(s)
-      # print(s2)
 
       a = r.ringRandClear(pq=True)
       for i in range(self.n):
@@ -423,9 +421,9 @@ class LWE(object):
   def ciphertext_mult_more(self, c0, c1, c2, c0x, c1x):
       c0y = self.mul(c0, c0x, take_mod=False)
       c1y = self.add(self.mul(c0, c1x,take_mod=False), self.mul(c1, c0x, take_mod=False), take_mod=False)
-      c2y = self.add(self.mul(c1, c1x,take_mod=False), self.mul(c2, c0x, take_mod=False), take_mod=False) 
+      c2y = self.add(self.mul(c1, c1x,take_mod=False), self.mul(c2, c0x, take_mod=False), take_mod=False)
       c3y = self.mul(c2, c1x, take_mod=False)
-      
+
       for i in range(self.n):
           c0y[i] = int(round(c0y[i]*self.m / float(self.p)))
           c1y[i] = int(round(c1y[i]*self.m / float(self.p)))
@@ -435,7 +433,7 @@ class LWE(object):
           c1y[i] = self.get_mod(c1y[i])
           c2y[i] = self.get_mod(c2y[i])
           c3y[i] = self.get_mod(c3y[i])
-      
+
       return [c0y, c1y, c2y, c3y]
 
   def custom_round(self, x, base):
