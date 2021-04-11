@@ -125,16 +125,11 @@ class LWE(object):
     for i in range(self.n):
         if (a[i] > self.p/2):
               a[i] -= self.p
-    s = [random.randrange(0,1) for i in range(self.n)]
+    s = [random.randrange(-1,2) for i in range(self.n)]
 
     e = r.ringBinom(N, take_mod=False)
 
-<<<<<<< HEAD
-
-    b = r.ringAdd(r.ringMul(a, s), e)
-=======
     b = r.ringAdd(r.ringMul(a, s, take_mod=False), e, take_mod=False)
->>>>>>> 19a9be20368ef9cba3672e30cb874316ad8b5f51
     b = [self.get_mod(-i) for i in b]
     for i in range(self.n):
         if (b[i] > self.p/2):
@@ -145,10 +140,10 @@ class LWE(object):
     # print(b)
     # print("################# public key a ###################")
     # print(a)
-    # print("################# secret key s ###################")
-    # print(s)
-    # print("################# error e (in key gen) ###################")
-    # print(e)
+    print("################# secret key s ###################")
+    print(s)
+    print("################# error e (in key gen) ###################")
+    print(e)
     return res
 
   # z is plaintext (array) of l elems each modulo m
@@ -158,30 +153,16 @@ class LWE(object):
     N = self.N
     m = self.m
 
-<<<<<<< HEAD
 
-    # e1 = [self.get_mod(self.m*i) for i in e1]
-    # e2 = [self.get_mod(self.m*i) for i in e2]
-
-    #u = r.ringMul(a, e0)
-    #u = r.ringAdd(u, e1)
-
-    u0 = r.ringBinom(N)
-    # print("############ u (as in the paper) #############")
-    # print(u0)
-
-
-    u = r.ringMul(a, u0)
-=======
     e1 = r.ringBinom(N, take_mod=False)
     e2 = r.ringBinom(N, take_mod=False)
     u0 = r.ringBinom(N, take_mod=False)
 
-    # print("############ u (as in the paper) #############")
-    # print(u0)
+    print("############ u (as in the paper) #############")
+    print(u0)
 
     u = r.ringMul(a, u0, take_mod=False)
->>>>>>> 19a9be20368ef9cba3672e30cb874316ad8b5f51
+
     u = r.ringAdd(u, e2)
 
     for i in range(self.n):
@@ -208,14 +189,14 @@ class LWE(object):
               v[i] -= self.p
 
     res = [v, u]
-    # print("################# error e1 (in encrypt) ###################")
-    # print(e1)
-    # print("################# error e2 (in encrypt)###################")
-    # print(e2)
-    # print("################# ciphertext v ###################")
-    # print(v)
-    # print("################# ciphertext u ###################")
-    # print(u)
+    print("################# error e1 (in encrypt) ###################")
+    print(e1)
+    print("################# error e2 (in encrypt)###################")
+    print(e2)
+    print("################# ciphertext v ###################")
+    print(v)
+    print("################# ciphertext u ###################")
+    print(u)
     return res
 
 
@@ -268,6 +249,33 @@ class LWE(object):
 
       return [z, zNoisy]
 
+  def dec_mul_more(self, c0, c1, c2, c3, s):
+      r = self.r
+      lgM = self.lgM
+      s2 = r.ringMul(s,s)
+      s3 = r.ringMul(s,s2)
+    
+      zNoisy = r.ringAdd(c0, r.ringMul(c1, s, take_mod=False), take_mod=False)
+      zNoisy = r.ringAdd(zNoisy, r.ringMul(c2, s2, take_mod=False), take_mod=False)
+      zNoisy = r.ringAdd(zNoisy, r.ringMul(c3, s3, take_mod=False), take_mod=False)
+
+      for i in range(self.n):
+          zNoisy[i] = self.get_mod(zNoisy[i])
+      print("################# zNoisy ###################")
+      print(zNoisy)
+
+      z = [0 for i in range(self.l)]
+      z_tmp = [0 for i in range(self.l)]
+      for i in range(self.l):
+           if (zNoisy[i] > self.p/2):
+               zNoisy[i] -= self.p
+           z_tmp[i] = int(round(zNoisy[i]*self.m / float(self.p)))
+           z[i] = z_tmp[i] % self.m
+
+      print("################# z (before doing mod m) ###################")
+      print(z_tmp)
+
+      return [z, zNoisy]
 
   def rl_keys(self, s):
       r = self.r
@@ -412,6 +420,23 @@ class LWE(object):
 
       return [c0, c1, c2]
 
+  def ciphertext_mult_more(self, c0, c1, c2, c0x, c1x):
+      c0y = self.mul(c0, c0x, take_mod=False)
+      c1y = self.add(self.mul(c0, c1x,take_mod=False), self.mul(c1, c0x, take_mod=False), take_mod=False)
+      c2y = self.add(self.mul(c1, c1x,take_mod=False), self.mul(c2, c0x, take_mod=False), take_mod=False) 
+      c3y = self.mul(c2, c1x, take_mod=False)
+      
+      for i in range(self.n):
+          c0y[i] = int(round(c0y[i]*self.m / float(self.p)))
+          c1y[i] = int(round(c1y[i]*self.m / float(self.p)))
+          c2y[i] = int(round(c2y[i]*self.m / float(self.p)))
+          c3y[i] = int(round(c3y[i]*self.m / float(self.p)))
+          c0y[i] = self.get_mod(c0y[i])
+          c1y[i] = self.get_mod(c1y[i])
+          c2y[i] = self.get_mod(c2y[i])
+          c3y[i] = self.get_mod(c3y[i])
+      
+      return [c0y, c1y, c2y, c3y]
 
   def custom_round(self, x, base):
       return int(base * round(x/base))
