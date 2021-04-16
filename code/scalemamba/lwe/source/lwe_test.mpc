@@ -1,24 +1,24 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 #from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
-#p = 11559165781780725761
+#p = 2661133959799589672036590708237675984973638057068497021452622131886244052869803741648438540534925799893994831564937294541065181388700035350795108331241972926532026369
 
-w = cint(11261140336194227983)
-
-lgN = 11
+w = cint(301419518750101562116282763542894785174684810623488677293175151927855506461458330862723098716656974056382031281993530077382791525213745632465639098915828991499462242)
+lgN = 15
 r = Ring(lgN, w)
 
 N = 1
-lgM = 15
-l = 100
-n = 2048
-lgP = 64
+lgM = 30
+l = 11
+n = 32768
+lgP = 550
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 
 ############ Benchmark Key gen separately ########################
 
 #[b, a, s] = lwe.key_gen()
+#s = lwe.secret_key_gen()
 
 #print_ln("public key a")
 #for i in range(len(a)):
@@ -26,6 +26,7 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #print_ln("public key b")
 #for i in range(len(b)):
   #print_ln("%s ", b[i])
+
 #for i in range(n):
   #output_shares(0, s[i])
 
@@ -60,28 +61,28 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 ############ Benchmark Decrypt separately ########################
 
-#v = cint.Array(n)
-#u = cint.Array(n)
+v = cint.Array(n)
+u = cint.Array(n)
 
-#@for_range(n)
-#def set_V(i):
-  #v[i] = cint.public_input(0)
-#@for_range(n)
-#def set_U(i):
-  #u[i] = cint.public_input(0)
+@for_range(n)
+def set_V(i):
+  v[i] = cint.public_input(0)
+@for_range(n)
+def set_U(i):
+  u[i] = cint.public_input(0)
 
-#s = sint.Array(n)
-#@for_range(n)
-#def copy(i):
-  #tmp = [sint()]
-  #input_shares(0, *tmp)
-  #s[i] = tmp[0]
+s = sint.Array(n)
+@for_range(n)
+def copy(i):
+  tmp = [sint()]
+  input_shares(0, *tmp)
+  s[i] = tmp[0]
 
-#x2 = lwe.dec(v, u, s)
+x2 = lwe.dec(v, u, s)
 
-#for i in range(l):
-  #z = x2[i] #+ sint.get_random_bit() #add noise
-  #print_ln("Decrypt result is: %s ", z.reveal_to(0))
+for i in range(l):
+  z = x2[i] + sint.get_random_bit() #lwe.laplace(sint(1)) #sint.get_random_bit() #add noise
+  print_ln("Decrypt result is: %s ", z.reveal())
 
 
 ################# Generate Laplace noise ####################
@@ -109,15 +110,15 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 ##################### Test key gen + decrypt in MPC ########################
 
-x = sint.Array(l)
-for i in range(l):
-  x[i] = sint(1)
-  print_ln("Plaintext is %s ", x[i].reveal())
+#x = sint.Array(l)
+#for i in range(l):
+  #x[i] = sint(1)
+  #print_ln("Plaintext is %s ", x[i].reveal())
 
-[b, a, s] = lwe.key_gen()
-[v,u] = lwe.enc(b, a, x)
+#[b, a, s] = lwe.key_gen()
+#[v,u] = lwe.enc(b, a, x)
 
-x2 = lwe.dec(v, u, s)
-for i in range(l):
-  x2[i].reveal_to(0)
-  print_ln("Decrypted text is %s ", x2[i].reveal())
+#x2 = lwe.dec(v, u, s)
+#for i in range(l):
+  #x2[i].reveal_to(0)
+  #print_ln("Decrypted text is %s ", x2[i].reveal())

@@ -12,7 +12,7 @@ def laplace(scale):
 
 def ones():
     #for i in range(2*2048*64):
-    for i in range(2*2048):
+    for i in range(2*32768):
         print(1)
 
 def g():
@@ -27,7 +27,7 @@ def g():
 #n -> degree of polynomial
 #D-> number of multiplications
 #A -> number of addtions after D multiplications
-def mult_noise(q,t,n,D, A=1):
+def mult_noise(q,t,n,D, A=1000000000):
     noise = 4*((2*t*math.sqrt(n))**(D+1))*((2*n)**(D/2)) * A
     return q >= noise
 
@@ -52,7 +52,8 @@ def main():
     # result = graph_b(0.00, 0.04, 10)
     # print(result)
 
-    #print(mult_noise(10014161924125818881, 2**9, 2**12, 3))
+    # tmp = 5213351276381234054160419996566192858185969047516585959753981767067331398195163076515879100938499184364596466644818565365410708138306357824139022410186753
+    # print(mult_noise((1<<437)+1, 2**30, 2**14, 10))
 
 
 if __name__ == '__main__':
