@@ -240,14 +240,17 @@ class LWE(object):
       r = self.r
       N = self.N
 
-      tmp_a = r.ringRandClear()
-      tmp_a_neg = [self.get_mod(-i) for i in tmp_a]
-      tmp_e = r.ringBinom(N)
-      tmp_e = [self.get_mod(self.m*i) for i in tmp_e]
-      tmp_b = r.ringAdd(self.mult(tmp_a_neg, s), tmp_e)
+      a = []
+      b = []
 
-      a = [tmp_a for i in range(self.lgP)]
-      b = [tmp_b for i in range(self.lgP)]
+      for _ in range(self.lgP):
+          tmp_a = r.ringRandClear()
+          a.append(tmp_a)
+          tmp_a_neg = [self.get_mod(-i) for i in tmp_a]
+          tmp_e = r.ringBinom(N)
+          tmp_e = [self.get_mod(self.m*i) for i in tmp_e]
+          tmp_b = r.ringAdd(self.mult(tmp_a_neg, s), tmp_e)
+          b.append(tmp_b)
 
       for i in range(self.lgP):
           s2_tmp = [self.get_mod((2**i) * j) for j in s2]

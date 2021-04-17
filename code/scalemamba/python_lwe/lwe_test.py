@@ -7,7 +7,7 @@ import sympy
 
 lgP = 550
 lgM = 30
-lgN = 15
+lgN = 13
 n = 1 << lgN
 
 p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
@@ -17,7 +17,7 @@ p = 3608870760655701536654448303084521404059979435669688520664454167677047564331
 # while (not sympy.isprime(p)):
 #   p = random.randrange(2**(lgP-lgM-2), 2**(lgP-lgM-1)-1) * 2**(lgM+1) +1
 #
-# ########### generate w ###############
+########### generate w ###############
 # y = (p-1)/(2*n)
 # z = 1
 # w = p-1
@@ -28,7 +28,8 @@ p = 3608870760655701536654448303084521404059979435669688520664454167677047564331
 # ######################
 # print(w)
 
-w = 1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470
+w = 2045598229240638321386308023607291985190649116465310186072430169077682831946768487055267989561344805737179846193754983218350695476852178331513159697698050015241067541
+#w = 1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470
 
 # print("############ q ###############")
 # print(p)
@@ -39,7 +40,7 @@ start = time.time()
 
 r = Ring(lgN, w, p)
 N = 1 #used in binomial distribution
-l = 15
+l = 16
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
@@ -72,37 +73,45 @@ c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
 c2 = lwe.mul(u, u1)
 
 ########### check mult without relin #############
-# x2 = lwe.dec_mul(c0, c1, c2, s)
-c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-x2 = lwe.dec_mul_more(c, s)
+#x2 = lwe.dec_mul(c0, c1, c2, s)
+# c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# x2 = lwe.dec_mul_more(c, s)
 
 # ############## check mult with relin ###############
-# s2 = lwe.mul(s,s)
-# [rlk_b, rlk_a] = lwe.rl_keys(s, s2)
-# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-# mult_count = 0
-# for k in range(1):
-#     tmp = lwe.dec(c0_mul, c1_mul, s)
-#     if (tmp[0] == False):
-#         break
-#     else:
-#         x2 = tmp
-#     v,u = c0_mul, c1_mul
-#     c0 = lwe.mul(v, v1)
-#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-#     c2 = lwe.mul(u, u1)
-#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-#     mult_count += 1
+s2 = lwe.mul(s,s)
+[rlk_b, rlk_a] = lwe.rl_keys(s, s2)
+
+# relin_start = time.time()
+[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+# relin_end = time.time()
 #
-# print(mult_count)
+# x2 = lwe.dec(c0_mul, c1_mul, s)
+
+mult_count = 0
+for k in range(15):
+    tmp = lwe.dec(c0_mul, c1_mul, s)
+    if (tmp[0] == False):
+        break
+    else:
+        x2 = tmp
+        print(x2[0])
+    v,u = c0_mul, c1_mul
+    c0 = lwe.mul(v, v1)
+    c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+    c2 = lwe.mul(u, u1)
+    [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+    mult_count += 1
+    print(mult_count)
+
+print(mult_count)
 
 ##################  check multiplicative depth ##############
 # plaintexts = []
@@ -157,4 +166,5 @@ print("################# decrypted text ###################")
 print(x2[0])
 
 end = time.time()
-print("time taken", end-start)
+# print(relin_end - relin_start)
+print("total time taken", end-start)
