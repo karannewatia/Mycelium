@@ -193,17 +193,33 @@ class LWE(object):
 
     return [z, zNoisy]
 
-  def dec_mul_more(self, c0, c1, c2, c3, s):
+  def dec_mul_more(self, c, s):
       r = self.r
       lgM = self.lgM
       m = 1 << lgM
       clearM = m
       s2 = self.mult(s,s)
       s3 = self.mult(s,s2)
+      s4 = self.mult(s,s3)
+      s5 = self.mult(s,s4)
+      s6 = self.mult(s,s5)
+      s7 = self.mult(s,s6)
+      s8 = self.mult(s,s7)
+      s9 = self.mult(s,s8)
+      s10 = self.mult(s,s9)
+      s11 = self.mult(s,s10)
 
-      zNoisy = r.ringAdd(c0, self.mult(c1, s))
-      zNoisy = r.ringAdd(zNoisy, self.mult(c2, s2))
-      zNoisy = r.ringAdd(zNoisy, self.mult(c3, s3))
+      zNoisy = r.ringAdd(c[0], self.mult(c[1], s))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[2], s2))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[3], s3))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[4], s4))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[5], s5))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[6], s6))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[7], s7))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[8], s8))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[9], s9))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[10], s10))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c[11], s11))
 
       halfMthP = self.p//(2*m)
 
@@ -275,20 +291,30 @@ class LWE(object):
       res = self.mult(u1, u2)
       return res
 
-  def ciphertext_mult_more(self, c0, c1, c2, c0x, c1x):
-      c0y = self.mul(c0, c0x)
-      c1y = self.add(self.mul(c0, c1x), self.mul(c1, c0x))
-      c2y = self.add(self.mul(c1, c1x), self.mul(c2, c0x))
-      c3y = self.mul(c2, c1x)
+  # def ciphertext_mult_more(self, c0, c1, c2, c0x, c1x):
+  #     c0y = self.mul(c0, c0x)
+  #     c1y = self.add(self.mul(c0, c1x), self.mul(c1, c0x))
+  #     c2y = self.add(self.mul(c1, c1x), self.mul(c2, c0x))
+  #     c3y = self.mul(c2, c1x)
+  #     return [c0y, c1y, c2y, c3y]
 
-      return [c0y, c1y, c2y, c3y]
+  def ciphertext_mult_more(self, ca, cb):
+      result = []
+      c0y = self.mul(ca[0], cb[0])
+      result.append(c0y)
+      for i in range(len(ca) - 1):
+          c1y = self.add(self.mul(ca[i], cb[1]), self.mul(ca[i+1], cb[0]))
+          result.append(c1y)
+      cy = self.mul(ca[len(ca)-1], cb[1])
+      result.append(cy)
+      return result
+
+
 
   def slow_mul(self, u1, u2):
       r = self.r
       res = r.ringMul(u1, u2)
       return res
-
-
 
   def custom_round(self, x, base):
       return int(base * round(x/base))

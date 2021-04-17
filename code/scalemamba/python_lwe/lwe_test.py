@@ -39,7 +39,7 @@ start = time.time()
 
 r = Ring(lgN, w, p)
 N = 1 #used in binomial distribution
-l = 11
+l = 15
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
@@ -73,8 +73,16 @@ c2 = lwe.mul(u, u1)
 
 ########### check mult without relin #############
 # x2 = lwe.dec_mul(c0, c1, c2, s)
-[c0, c1, c2, c3] = lwe.ciphertext_mult_more(c0,c1,c2, v, u)
-x2 = lwe.dec_mul_more(c0, c1, c2, c3, s)
+c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+x2 = lwe.dec_mul_more(c, s)
 
 # ############## check mult with relin ###############
 # s2 = lwe.mul(s,s)
