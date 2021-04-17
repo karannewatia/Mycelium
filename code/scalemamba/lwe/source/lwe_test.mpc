@@ -81,7 +81,7 @@ def copy(i):
 x2 = lwe.dec(v, u, s)
 
 for i in range(l):
-  z = x2[i] + sint.get_random_bit() #lwe.laplace(sint(1)) #sint.get_random_bit() #add noise
+  z = x2[i] + lwe.laplace(sint(1)) #sint.get_random_bit() #add noise
   print_ln("Decrypt result is: %s ", z.reveal())
 
 

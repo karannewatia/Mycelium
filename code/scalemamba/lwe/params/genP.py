@@ -3,7 +3,7 @@
 import sympy
 import random
 
-lgP = 550
+lgP = 128
 
 p = 4
 

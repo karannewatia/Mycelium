@@ -314,8 +314,8 @@ class LWE(object):
     return res
 
   def exp_sample(self, mean):
-    rand = sint.get_random_int(10)
-    rand_fix = sfix.load_sint(rand)/1024
+    rand = sint.get_random_int(7)
+    rand_fix = sfix.load_sint(rand)/128
     log_r = mpc_math.log2_fx(rand_fix)
     return -mean*log_r
 
