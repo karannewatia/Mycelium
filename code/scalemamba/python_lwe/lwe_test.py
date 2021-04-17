@@ -3,17 +3,17 @@ from lwe import LWE
 import random
 import numpy as np
 
-p = (1 << 192) + 1
+p = (1 << 218) + 1
 w = 1
 
-lgN = 6
+lgN = 13
 r = Ring(lgN, w, p)
 
 N = 1
-lgM = 22
+lgM = 10
 l = 32
 n = 2**lgN
-lgP = 193
+lgP = 219
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
@@ -68,7 +68,7 @@ print(x)
 #x2 = lwe.dec_mul(c0, c1, c2, s)
 
 mult_count = 0
-for k in range(1):
+for k in range(2):
     x2 = lwe.dec(c0_mul, c1_mul, s)
     v,u = c0_mul, c1_mul
     [c0, c1, c2] = lwe.ciphertext_mult(v, u, v1, u1)
