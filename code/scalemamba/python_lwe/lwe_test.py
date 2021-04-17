@@ -4,16 +4,16 @@ import random
 import numpy as np
 
 #generate p using code/scalemamba/lwe/params/genP.py
-p = 285896339783634948757783167889218300929
+p = 97 # 285896339783634948757783167889218300929
 w = 1 #unused in Python version
 
-lgN = 4
+lgN = 2
 r = Ring(lgN, w, p)
 N = 1
-lgM = 7
-l = 16
-n = 16
-lgP = 128
+lgM = 2
+l = 4 #16
+n = 4
+lgP = 7 # 128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
@@ -25,13 +25,45 @@ print(x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
-
+print("s=",s)
 ######### try modulus switching this does not work yet) ###########
-# new_p = 14543227543197505793
-# lwe.set_p(new_p)
-# [v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
+new_p = 37 #14543227543197505793
+new_lgP = 6
+
+print("v0, u0:", v0, u0)
+
+for i in range(n):
+    if v0[i] > p/2:
+        v0[i]-=p
+    if u0[i] > p/2:
+        u0[i]-=p
+
+[v0, u0] = lwe.modulus_switching(p, new_p, v0, u0)
+
+print(v0, u0)
+for i in range(n):
+    if v0[i] > new_p/2:
+        v0[i] -= new_p
+    if u0[i] > new_p/2:
+        u0[i] -= new_p
+
+r = Ring(lgN, w, new_p)
+lwe = LWE(r, N, lgM, l, n, new_lgP, new_p)
+
+for i in range(n):
+    if s[i] > p/2:
+        s[i] -= p
+print("middle s=", s)
 
 
+noisyPt= r.ringAdd(v0, r.ringMul(u0, s))
+print("noisyPt=",noisyPt)
+for i in range(n):
+    if noisyPt[i] > new_p/2:
+        noisyPt[i] -= new_p
+    noisyPt[i] = noisyPt[i]%(1<<lgM)
+
+print("Pt=",noisyPt)
 ############### expand ##################
 # zeros = [0 for i in range(n)]
 # expand_outer_loop_count = 4

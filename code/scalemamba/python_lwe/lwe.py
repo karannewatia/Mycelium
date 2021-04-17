@@ -172,13 +172,20 @@ class LWE(object):
       # zRangeI = self.get_mod(zNoisy[i] + halfMthP)
       # zNotchesI = self.get_mod(zRangeI * clearM)
       # z[i] = m - 1 - ((zNotchesI - 1) % m)
-      zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
-      zNoisy[i] = zNoisy[i] - halfMthP
-      if abs(zNoisy[i]) >= halfMthP:
-        print(" !!! dec fails !!! ")
-        return [False, False]
-
+      
+      if zNoisy[i] > self.p/2:
+          zNoisy[i] -= self.p
       z[i] = zNoisy[i] % self.m
+      if z[i] > self.m/2:
+          z[i] -= self.m/2
+
+      #zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
+      #zNoisy[i] = zNoisy[i] - halfMthP
+      #if abs(zNoisy[i]) >= halfMthP:
+      #  print(" !!! dec fails !!! ")
+      #  return [False, False]
+
+      #z[i] = zNoisy[i] % self.m
 
     return [z, zNoisy]
 
@@ -265,9 +272,52 @@ class LWE(object):
       return int(base * round(x/base))
 
   def modulus_switching(self, q0, q1, c0, c1):
-      q1q0 = q1/float(q0)
-      c0_new = [self.get_mod(self.custom_round(i, q1q0)) for i in c0]
-      c1_new = [self.get_mod(self.custom_round(i, q1q0)) for i in c1]
+      
+      pdq = float(q1)/float(q0)
+      print("pdq=",pdq)
+
+      c0_old = [0 for i in range(self.n)]
+      c1_old = [0 for i in range(self.n)]
+
+      for i in range(self.n):
+          c0_old[i] = c0[i]
+          c1_old[i] = c1[i]
+
+      for i in range(self.n):
+          c0[i] = int(float(c0[i]) * pdq)
+          c1[i] = int(float(c1[i]) * pdq)
+
+      print("check old c0, c1", c0_old,c1_old) 
+
+      # round s.t. c_new = c (mod t)
+      print("check c0,c1: ", c0, c1)
+
+      t = (1 << self.lgM)
+      print("t=", t)
+
+      c0_new = [0 for i in range(self.n)]
+      c1_new = [0 for i in range(self.n)]
+
+      for i in range(self.n):
+          for adi in range(int(c0[i]) - t/2-1, int(c0[i]) + t/2 + 1):
+              print("adi=",adi)
+              print("c0_old[i]%t=",c0_old[i]%t)
+              if adi%t == c0_old[i]%t:
+                  c0_new[i] = adi
+                  break
+          print("---")
+
+      for j in range(self.n):
+          for adj in range(int(c1[j]) - t/2-1, int(c1[j]) + t/2 + 1):
+              print("adj=",adj)
+              print("c1_old[i]%t=",c1_old[i]%t)
+              if adj%t == c1_old[j]%t:
+                  c1_new[j] = adj
+                  break
+
+      print("check c0,c1 new: ", c0_new, c1_new)
+      #c0_new = [self.get_mod(self.custom_round(i, q1q0)) for i in c0]
+      #c1_new = [self.get_mod(self.custom_round(i, q1q0)) for i in c1]
       # c0_new = [self.get_mod(int(round(i*q1q0))) for i in c0]
       # c1_new = [self.get_mod(int(round(i*q1q0))) for i in c1]
       return [c0_new, c1_new]
