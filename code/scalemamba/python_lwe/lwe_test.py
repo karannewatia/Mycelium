@@ -4,22 +4,22 @@ import random
 import numpy as np
 
 #generate p using code/scalemamba/lwe/params/genP.py
-p = 97 # 285896339783634948757783167889218300929
+p = (1<<26)+1 # 285896339783634948757783167889218300929 # 97
 w = 1 #unused in Python version
 
-lgN = 2
+lgN = 10
 r = Ring(lgN, w, p)
 N = 1
 lgM = 2
 l = 4 #16
-n = 4
-lgP = 7 # 128
+n = 1024
+lgP = 27 #128
 lwe = LWE(r, N, lgM, l, n, lgP, p)
 
 x = [0 for i in range(l)]
 # for i in range(l):
 #   x[i] = random.randrange(0, 100)
-x[1] = 1
+x[1] = 2
 print("################# plaintext ###################")
 print(x)
 
@@ -27,8 +27,8 @@ print(x)
 [v0, u0] = lwe.enc(b, a, x)
 print("s=",s)
 ######### try modulus switching this does not work yet) ###########
-new_p = 37 #14543227543197505793
-new_lgP = 6
+new_p = (1<<18)+1 #14543227543197505793 # 37
+new_lgP = 19
 
 print("v0, u0:", v0, u0)
 
