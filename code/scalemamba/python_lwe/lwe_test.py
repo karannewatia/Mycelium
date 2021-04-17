@@ -1,5 +1,6 @@
 from ring import Ring
 from lwe import LWE
+
 import random
 import numpy as np
 
@@ -10,7 +11,7 @@ w = 1 #unused in Python version
 lgN = 10
 r = Ring(lgN, w, p)
 N = 1
-lgM = 2
+lgM = 4
 l = 4 #16
 n = 1024
 lgP = 27 #128
@@ -19,14 +20,14 @@ lwe = LWE(r, N, lgM, l, n, lgP, p)
 x = [0 for i in range(l)]
 # for i in range(l):
 #   x[i] = random.randrange(0, 100)
-x[1] = 2
+x[1] = 1
 print("################# plaintext ###################")
 print(x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
 print("s=",s)
-######### try modulus switching this does not work yet) ###########
+######### New modulus switching (Please test for large parameters) ###########
 new_p = (1<<18)+1 #14543227543197505793 # 37
 new_lgP = 19
 
