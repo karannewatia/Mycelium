@@ -77,14 +77,13 @@ class Ring(object):
       res[i] = self.get_mod(a[i] - b[i])
     return res
 
-  def ringMulTest(self, seq1, seq2):
-    for i in range (len(seq1)):
-        seq1[i] = int(seq1[i])
-        seq2[i] = int(seq2[i])
+  def ringMulTest(self, a, b):
+    seq1 = [0 for i in range(self.n)]
+    seq2 = [0 for i in range(self.n)]
 
     for i in range (len(seq1)):
-        seq1[i] = (seq1[i] * pow(self.w, i, self.p)) % self.p
-        seq2[i] = (seq2[i] * pow(self.w, i, self.p)) % self.p
+        seq1[i] = (a[i] * pow(self.w, i, self.p)) % self.p
+        seq2[i] = (b[i] * pow(self.w, i, self.p)) % self.p
 
     # compute NTT
     transform1 = ntt(seq1, self.p)
@@ -101,11 +100,11 @@ class Ring(object):
     # compute inv nega-cyclic vector
     for i in range (len(seq)):
         psi_pow = pow(self.w, i, self.p)
-        inv_psi_pow = pow(psi_pow, -1) % self.p #pow(psi_pow, -1, self.p)
+        inv_psi_pow = pow(psi_pow, -1, self.p) #pow(psi_pow, -1) % self.p #pow(psi_pow, -1, self.p)
         seq[i] = (seq[i] * inv_psi_pow) % self.p
 
-    for i in range (len(seq)):
-        seq[i] = int(round(seq[i]))
+    # for i in range (len(seq)):
+    #     seq[i] = int(round(seq[i]))
     return seq
 
   # Ring multiplication (i.e. convolution)
@@ -126,7 +125,7 @@ class Ring(object):
     #def range_body_mul(i):
     for i in range(n**2):
       j = i % n
-      k = i / n
+      k = i // n
       conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
 
     #res = sint.Array(n)

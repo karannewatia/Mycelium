@@ -20,7 +20,7 @@ class LWE(object):
     self.n = n
     self.lgP = lgP
     self.p = p
-    self.mult = self.r.ringMul
+    self.mult = self.r.ringMulTest
 
   def set_p(self, new_p):
       self.p = new_p
@@ -135,7 +135,7 @@ class LWE(object):
     u = self.mult(a, e0)
     u = r.ringAdd(u, e1)
 
-    mthP = self.p/m
+    mthP = self.p//m
 
     zMthP = r.zero()
 
@@ -157,7 +157,7 @@ class LWE(object):
     clearM = m
     zNoisy = r.ringAdd(v, self.mult(u, s))
 
-    halfMthP = self.p/(2*m)
+    halfMthP = self.p//(2*m)
 
     z = [0 for i in range(self.l)]
     for i in range(self.l):
@@ -179,7 +179,7 @@ class LWE(object):
     s1 = self.mult(s,s)
     zNoisy = r.ringAdd(r.ringAdd(c0, self.mult(c1, s)), self.mult(c2, s1))
 
-    halfMthP = self.p/(2*m)
+    halfMthP = self.p//(2*m)
 
     z = [0 for i in range(self.l)]
     for i in range(self.l):
