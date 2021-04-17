@@ -193,6 +193,33 @@ class LWE(object):
 
     return [z, zNoisy]
 
+  def dec_mul_more(self, c0, c1, c2, c3, s):
+      r = self.r
+      lgM = self.lgM
+      m = 1 << lgM
+      clearM = m
+      s2 = self.mult(s,s)
+      s3 = self.mult(s,s2)
+
+      zNoisy = r.ringAdd(c0, self.mult(c1, s))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c2, s2))
+      zNoisy = r.ringAdd(zNoisy, self.mult(c3, s3))
+
+      halfMthP = self.p//(2*m)
+
+      z = [0 for i in range(self.l)]
+      for i in range(self.l):
+           zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
+           zNoisy[i] = zNoisy[i] - halfMthP
+           if abs(zNoisy[i]) >= halfMthP:
+             print(" !!! dec fails !!! ")
+             return [False, False]
+
+           z[i] = zNoisy[i] % self.m
+
+      return [z, zNoisy]
+
+
   def rl_keys(self, s, s2):
       r = self.r
       N = self.N
@@ -247,6 +274,14 @@ class LWE(object):
       r = self.r
       res = self.mult(u1, u2)
       return res
+
+  def ciphertext_mult_more(self, c0, c1, c2, c0x, c1x):
+      c0y = self.mul(c0, c0x)
+      c1y = self.add(self.mul(c0, c1x), self.mul(c1, c0x))
+      c2y = self.add(self.mul(c1, c1x), self.mul(c2, c0x))
+      c3y = self.mul(c2, c1x)
+
+      return [c0y, c1y, c2y, c3y]
 
   def slow_mul(self, u1, u2):
       r = self.r
