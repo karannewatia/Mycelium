@@ -15,7 +15,6 @@ def bytesto(bytes, to, bsize=1024):
         r = r / bsize
     return(r)
 
-num_copies = 2
 num_friends = 10
 degree = 32768
 prime_bitsize = 550
@@ -26,7 +25,7 @@ establish_keys_node2 = 3591
 establish_keys_node3 = 1799
 establish_keys_dst = 304
 
-telescoping = num_copies*num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
+telescoping = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
 telescoping = bytesto(telescoping, 'm')
 
 encryption_src = 8388872
@@ -35,7 +34,7 @@ encryption_node2 = 16777553/2
 encryption_node3 = 16777425/2
 encryption_dst = 0
 
-forwarding = num_copies*num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
+forwarding = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
 
 shift_src = 13317176
 shift_node1 = 26634289/2
@@ -43,7 +42,7 @@ shift_node2 = 26634161/2
 shift_node3 = 26634033/2
 shift_dst = 0
 
-forwarding += num_copies*num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
+forwarding += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
 forwarding = bytesto(forwarding, 'm')
 
 final_upload = prime_bitsize * degree * 2 / 8 #add size of the multiplication proof here
@@ -53,12 +52,13 @@ final_upload  = bytesto(final_upload , 'm')
 
 #print(bytesto(total_cost, 'm'))
 
-N = 2
 
-telescoping_plt = (telescoping, telescoping)
-forwarding_plt = (forwarding, 2*forwarding)
-final_upload_plt = (final_upload, final_upload)
-sums = (telescoping+forwarding, telescoping+2*forwarding)
+N = 3
+
+telescoping_plt = (telescoping, telescoping*2, telescoping*3)
+forwarding_plt = (forwarding, forwarding*2, forwarding*3)
+final_upload_plt = (final_upload, final_upload, final_upload)
+sums = (telescoping+forwarding, 2*(telescoping+forwarding),  3*(telescoping+forwarding))
 
 ind = np.arange(N)
 width = 0.25
@@ -67,10 +67,10 @@ p2 = plt.bar(ind, forwarding_plt, width, bottom=telescoping_plt, color='tab:oran
 p3 = plt.bar(ind, final_upload_plt, width, bottom=sums, color='tab:green')
 
 
-plt.xlabel('Number of hops in the query')
+plt.xlabel('Number of copies sent per message')
 plt.ylabel('Traffic (MB sent)')
 # plt.title('Total number of bytes sent by a client on average')
-plt.xticks(ind, ('1', '2'))
+plt.xticks(ind, ('1', '2','3'))
 
 plt.legend((p1[0], p2[0], p3[0]), ('Telescoping', 'Message forwarding', 'Final upload'))
-plt.savefig('../graphs/users/User_bandwidth.eps', format='eps')
+plt.savefig('../graphs/users/user_bandwidth.eps', format='eps')

@@ -20,10 +20,10 @@ plot_4 = [int((r[0]/f_vals[3])**k) for k in k_vals]
 # plot_8 = [int((r[1]/f_vals[3])**k) for k in k_vals]
 
 
-plt.plot(k_vals, plot_1, label = "f=0.005, r=2", color='tab:blue')
-plt.plot(k_vals, plot_2, label = "f=0.01, r=2", color='tab:orange')
-plt.plot(k_vals, plot_3, label = "f=0.015, r=2", color='tab:green')
-plt.plot(k_vals, plot_4, label = "f=0.02, r=2", color='tab:red')
+plt.plot(k_vals, plot_1, label = "f=0.005, r=2", color='tab:blue', marker="X")
+plt.plot(k_vals, plot_2, label = "f=0.01, r=2", color='tab:orange', marker="X")
+plt.plot(k_vals, plot_3, label = "f=0.015, r=2", color='tab:green', marker="X")
+plt.plot(k_vals, plot_4, label = "f=0.02, r=2", color='tab:red', marker="X")
 
 # plt.plot(k_vals, plot_5, label = "f=0.005, r=3", color='tab:blue')
 # plt.plot(k_vals, plot_6, label = "f=0.01, r=3", color='tab:orange')

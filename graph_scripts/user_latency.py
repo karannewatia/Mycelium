@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 num_copies = 3
 num_friends = 10
 
-establish_keys = 0.100233/2
+establish_keys = 0.100233
 
 telescoping = num_copies * num_friends * establish_keys
 
-send_encrypt = 1.39565/2
+send_encrypt = 1.39565
 
 forwarding = num_copies * num_friends * send_encrypt
 
-send_shift = 1.69511/2
+send_shift = 1.69511
 
 forwarding += num_copies * num_friends * send_encrypt
 
