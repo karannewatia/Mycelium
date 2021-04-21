@@ -285,6 +285,7 @@ class LWE(object):
 
     return z
 
+
   def dec_mul(self, c0, c1, c2, s):
     r = self.r
     lgM = self.lgM
@@ -303,6 +304,45 @@ class LWE(object):
 
     return z
 
+  def dec_mul_more(self, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, s):
+       r = self.r
+       lgM = self.lgM
+       m = self.m
+       clearM = cint(m)
+       s2 = r.ringMulFastSecret(s,s)
+       s3 = r.ringMulFastSecret(s,s2)
+       s4 = r.ringMulFastSecret(s,s3)
+       s5 = r.ringMulFastSecret(s,s4)
+       s6 = r.ringMulFastSecret(s,s5)
+       s7 = r.ringMulFastSecret(s,s6)
+       s8 = r.ringMulFastSecret(s,s7)
+       s9 = r.ringMulFastSecret(s,s8)
+       s10 = r.ringMulFastSecret(s,s9)
+       s11 = r.ringMulFastSecret(s,s10)
+
+       zNoisy = r.ringAdd(c0, r.ringMulFast(c1, s))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c2, s2))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c3, s3))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c4, s4))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c5, s5))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c6, s6))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c7, s7))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c8, s8))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c9, s9))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c10, s10))
+       zNoisy = r.ringAdd(zNoisy, r.ringMulFast(c11, s11))
+
+       halfMthP = cint(-1)/(2*m)
+       z = sint.Array(self.l)
+       @for_range(self.l)
+       def round(i):
+         zNoisy[i] = zNoisy[i] + halfMthP
+         zNoisy[i] = zNoisy[i] - halfMthP
+         z[i] = zNoisy[i] % self.m
+
+       return z
+
+
   def add(self, u1, u2):
     r = self.r
     res = r.reveal(r.ringAdd(u1, u2))
@@ -314,8 +354,8 @@ class LWE(object):
     return res
 
   def exp_sample(self, mean):
-    rand = sint.get_random_int(7)
-    rand_fix = sfix.load_sint(rand)/128
+    rand = sint.get_random_int(15)
+    rand_fix = sfix.load_sint(rand)/32768
     log_r = mpc_math.log2_fx(rand_fix)
     return -mean*log_r
 

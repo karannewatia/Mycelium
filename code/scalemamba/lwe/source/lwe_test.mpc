@@ -1,21 +1,18 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 #from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
-#p = 2661133959799589672036590708237675984973638057068497021452622131886244052869803741648438540534925799893994831564937294541065181388700035350795108331241972926532026369
+#p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
 
-#w = cint(301419518750101562116282763542894785174684810623488677293175151927855506461458330862723098716656974056382031281993530077382791525213745632465639098915828991499462242)
-#lgN = 15
+w = cint(1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470)
 
-w = cint(167879783232265466024376834694752)
-lgN = 4
-
+lgN = 15
 r = Ring(lgN, w)
 
 N = 1
-lgM = 5
-l = 8
-n = 16
-lgP = 109
+lgM = 30
+l = 12
+n = 32768
+lgP = 550
 lwe = LWE(r, N, lgM, l, n, lgP)
 
 
@@ -23,6 +20,11 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 
 #[b, a, s] = lwe.key_gen()
 #s = lwe.secret_key_gen()
+#tmp = sint.get_random_bit()
+
+#for i in range(n):
+  #output_shares(0, s[i])
+  #output_shares(0, tmp)
 
 #print_ln("public key a")
 #for i in range(len(a)):
@@ -31,85 +33,52 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #for i in range(len(b)):
   #print_ln("%s ", b[i])
 
-#for i in range(n):
-  #output_shares(0, s[i])
-
-#g = cint.Array(lgP)
-#e = sint.Matrix(lgP, n)
-#rlk_a_in = cint.Matrix(lgP, n)
-
-#@for_range(lgP)
-#def set_G(i):
-  #g[i] = cint.public_input(0)
-
-#@for_range(lgP)
-#def _(i):
-  #@for_range(n)
-  #def _(j):
-    #rlk_a_in[i][j] = cint.public_input(0)
-
-#@for_range(lgP)
-#def _(i):
-  #@for_range(n)
-  #def _(j):
-    #e[i][j] = sint(cint.public_input(0))
-
-#rlk_b, rlk_a] = lwe.rl_keys(s, rlk_a_in, g, e)
-
-#@for_range(lgP)
-#def _(i):
-  #@for_range(n)
-  #def _(j):
-    #print_ln("%s ", rlk_a[i][j])
-    #print_ln("%s ",  rlk_b[i][j])
 
 ############ Benchmark Decrypt separately ########################
 
-#v = cint.Array(n)
-#u = cint.Array(n)
+bin1 = cint.public_input(0)
+bin2 = cint.public_input(0)
 
-#@for_range(n)
-#def set_V(i):
-  #v[i] = cint.public_input(0)
-#@for_range(n)
-#def set_U(i):
-  #u[i] = cint.public_input(0)
+binning = sint.Array(2)
+for i in range(2):
+  binning[i] = 0
 
-#s = sint.Array(n)
-#@for_range(n)
-#def copy(i):
-  #tmp = [sint()]
-  #input_shares(0, *tmp)
-  #s[i] = tmp[0]
+v = cint.Array(n)
+u = cint.Array(n)
 
-#x2 = lwe.dec(v, u, s)
+@for_range(n)
+def set_V(i):
+  v[i] = cint.public_input(0)
+@for_range(n)
+def set_U(i):
+  u[i] = cint.public_input(0)
 
-#for i in range(l):
-  #z = x2[i] + lwe.laplace(sint(1)) #sint.get_random_bit() #add noise
-  #print_ln("Decrypt result is: %s ", z.reveal())
+s = sint.Array(n)
+@for_range(n)
+def copy(i):
+  tmp = [sint()]
+  input_shares(0, *tmp)
+  s[i] = tmp[0]
+
+x2 = lwe.dec(v, u, s)
+
+for i in range(l):
+  z = x2[i]
+  if_then(l <= bin1)
+  binning[0] += z
+  else_then()
+  binning[1] += z
+  end_if()
+
+for i in range(2):
+  z = binning[i] + lwe.laplace(sint(1)) #add noise
+  print_ln("Decrypt result is: %s ", z.reveal())
 
 
 ################# Generate Laplace noise ####################
 
 #noise = lwe.laplace(sint(1))
 #print_ln("Noise is %s ", noise.reveal())
-
-
-################# test if rounding works (for BFV scheme) ###############
-
-#mthP = sfix(3.93633066929844e-3)
-#test = sfix(sint(2) * mthP)
-#print_ln("Testing %s ", test.reveal())
-
-#test = sfix(1.2)
-#y = mpc_math.floor_fx(test) + cfix(0.5)
-#compare = y < test
-#result = mpc_math.floor_fx(test) + compare
-#x = sfix(5.5)
-#result = x.v >> x.f #AdvInteger.Trunc(x.v >> x.f, x.v, x.k, x.f, x.kappa, True)
-#result = x % 1024
-
-#print_ln("Testing %s ", result.reveal())
 
 
 ##################### Test key gen + decrypt in MPC ########################
@@ -126,20 +95,3 @@ lwe = LWE(r, N, lgM, l, n, lgP)
 #for i in range(l):
   #x2[i].reveal_to(0)
   #print_ln("Decrypted text is %s ", x2[i].reveal())
-
-
-################## test re-sharing ############
-#s = lwe.secret_key_gen()
-#for i in range(n):
-  #output_shares(0, s[i])
-
-s = sint.Array(n)
-@for_range(n)
-def copy(i):
-  tmp = [sint()]
-  input_shares(0, *tmp)
-  s[i] = tmp[0]
-  print_ln("Secret is %s ", s[i].reveal())
-
-for i in range(n):
-  output_shares(0, s[i])

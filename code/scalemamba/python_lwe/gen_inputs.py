@@ -28,7 +28,7 @@ def g():
 #D-> number of multiplications
 #A -> number of addtions after D multiplications
 def mult_noise(q,t,n,D, A=1000000000):
-    noise = 4*((2*t*math.sqrt(n))**(D+1))*((2*n)**(D/2)) * A
+    noise = 4*((2*t*math.sqrt(n))**(D+1))*((2*n)**(D/2)) * math.sqrt(A)
     return q >= noise
 
 def graph_a(f, C):
@@ -45,15 +45,18 @@ def main():
     #print(laplace(10))
 
     #g()
-    #ones()
+
+    # print(5)
+    # print(10)
+    # ones()
 
     # result = graph_a(0.02, 10)
     # print(result)
     # result = graph_b(0.00, 0.04, 10)
     # print(result)
 
-    tmp = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
-    print(mult_noise(tmp, 2**30, 2**4, 13))
+    # tmp = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
+    print(mult_noise((1<<438)+1, 2**30, 2**14, 9))
 
 
 if __name__ == '__main__':
