@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+# Follow instructions here to download zokrates
+#curl -LSfs get.zokrat.es | sh
+# set $ZOKRATES_HOME variable to stdlib
+
+
 # compile
 echo "compiling..."
 time zokrates compile -i shift.zok

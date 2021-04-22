@@ -1,30 +1,12 @@
 import "hashes/mimc7/mimc7R90" as mimc
 
-/*struct Ciphertext {
-    field[32768] u
-    field[32768] v
-}*/
+#Multiply a ciphertext [u,v] by a vector x
+def main(field[32768] u, field[32768] v, field[32768] res_u, field[32768] res_v, field[32768] x) ->  field:
 
-//def main(field[32768] u, field[32768] v) ->  (Ciphertext):
-def main(field[32768] u, field[32768] v, field[32768] c_u, field[32768] c_v) ->  field:
-
-  //field[32768] res_u = [1; 32768] // initialize an array of n values all equal to 1
-  //field[32768] res_v = [1; 32768] // initialize an array of n values all equal to 1
-
-
-  //field[4091] partial_u = u[0..4091]
-  //field[4091] partial_v = v[0..4091]
-
-  field[32768] res_u = [...u[0..32763], 0, 0, 0, 0, 0]
-  field[32768] res_v = [...v[0..32763], 0, 0, 0, 0, 0]
-
-  
   for field i in 0..32768 do
-      assert(res_u[i] == c_u[i]) 
-      assert(res_v[i] == c_v[i]) 
+      assert(res_u[i] ==  u[i]*x[i]) 
+      assert(res_v[i] ==  u[i]*x[i]) 
   endfor
   
-
-  //Ciphertext c = Ciphertext {u: res_u, v: res_v}
-  return mimc(u[0]+v[0], 1) 
+  return mimc(res_u[0] + res_v[0], 1) 
 
