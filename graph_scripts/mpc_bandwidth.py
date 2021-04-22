@@ -15,22 +15,24 @@ def bytesto(bytes, to, bsize=1024):
         r = r / bsize
     return(r)
 
-N = 4
 
-decryption = (bytesto(633026584, 'g'), bytesto(5432784056, 'g'), bytesto(13670440818, 'g'), bytesto(25866507647, 'g'))
+N = 3
+
+decryption = (bytesto(633026584, 'g'), bytesto(5432784056, 'g'), bytesto(13670440818, 'g'))
 
 # resharing_cost = (32768*550/8) + (6*550/8)
 # resharing = (bytesto(resharing_cost*5, 'g'), bytesto(resharing_cost*10, 'g'), bytesto(resharing_cost*15, 'g'), bytesto(resharing_cost*20, 'g'))
 
 ind = np.arange(N)
-width = 0.25
+width = 0.15
 p1 = plt.bar(ind, decryption, width, color='tab:blue')
 # p2 = plt.bar(ind, resharing, width, bottom=decryption, color='tab:orange')
 
 plt.xlabel('Size of the committee')
 plt.ylabel('Traffic (GB)')
 # plt.title('MPC bandwidth')
-plt.xticks(ind, ('5', '10', '15', '20'))
+plt.xticks(ind, ('5', '10', '15'))
+plt.yticks(np.arange(0, 16, 2))
 
 # plt.legend((p1[0], p2[0]), ('Decryption', 'Re-sharing'))
-plt.savefig('../graphs/committee/mpc_bandwidth.eps', format='eps')
+plt.savefig('../graphs/committee/mpc_bandwidth.pdf', format='pdf')

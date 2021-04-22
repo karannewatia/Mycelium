@@ -15,41 +15,39 @@ def bytesto(bytes, to, bsize=1024):
         r = r / bsize
     return(r)
 
+
 num_copies = 2
 num_friends = 10
 degree = 32768
 prime_bitsize = 550
 
-establish_keys_src = 3502
-establish_keys_node1 = 5431
-establish_keys_node2 = 3381
-establish_keys_node3 = 3381
-establish_keys_dst = 557
-
-telescoping = num_copies*num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
-
-encryption_node1 = 9542312
-encryption_node2 = 9542312
-encryption_node3 = 9542312
-encryption_dst = 9542120
-
-forwarding = num_copies*num_friends*(encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
-
-shift_node1 = 14470616
-shift_node2 = 14470552
-shift_node3 = 14470488
-shift_dst = 14470424
-
-forwarding += num_copies*num_friends*(shift_node1 + shift_node2 + shift_node3 + shift_dst)
-
-final_upload = prime_bitsize * degree * 2 / 8 #add size of the multiplication proof here
+ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 
 
-total_cost = round(telescoping + forwarding + final_upload)
+establish_keys_src = 2214
+establish_keys_node1 = 2660
+establish_keys_node2 = 1525
+establish_keys_dst = 549
+
+
+telescoping = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_dst)
+
+
+encryption_src = 8192
+encryption_node1 = (1048774*ct_size) + 8192
+encryption_node2 = (1048710*ct_size) + 8192
+encryption_dst = (1048646*ct_size) + 8192
+forwarding = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_dst)
+
+shift_src = 8192
+shift_node1 = (1048774*ct_size) + 8192
+shift_node2 = (1048710*ct_size) + 8192
+shift_dst = (1048646*ct_size) + 8192
+forwarding += num_friends*(shift_src + shift_node1 + shift_node2 + shift_dst)
+
+
+total_cost = round((num_copies*telescoping) + (num_copies*forwarding))
 total_cost = bytesto(total_cost, 't')
-
-total_cost2 = round(telescoping + 2*forwarding + final_upload)
-total_cost2 = bytesto(total_cost2, 't')
 # print(total_cost)
 
 
@@ -58,10 +56,10 @@ N = 4
 ind = [1e6, 1e7, 1e8, 1e9]
 
 bandwidth = (total_cost*1e06, total_cost*1e07, total_cost*1e08, total_cost*1e09)
-bandwidth2 = (total_cost2*1e06, total_cost2*1e07, total_cost2*1e08, total_cost2*1e09)
+
 
 p1 = plt.plot(ind, bandwidth, marker="X")
-p2 = plt.plot(ind, bandwidth2, marker="X")
+
 plt.yscale('log')
 plt.xscale('log')
 
@@ -69,8 +67,6 @@ plt.xlabel('Number of participants')
 plt.ylabel('Traffic (TB sent)')
 # plt.title('Total number of bytes sent by a client on average')
 #plt.xticks(ind, ('1e6', '1e7','1e8', '1e9'))
-plt.yticks([1e3, 1e4, 1e5, 1e6, 1e7])
+plt.yticks([1e3, 1e4, 1e5, 1e6])
 
-plt.legend(['1-hop query', '2-hop query'])
-
-plt.savefig('../graphs/aggregator/aggregator_bandwidth.eps', format='eps')
+plt.savefig('../graphs/aggregator/aggregator_bandwidth.pdf', format='pdf')

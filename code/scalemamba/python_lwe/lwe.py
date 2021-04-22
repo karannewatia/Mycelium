@@ -1,6 +1,7 @@
 from ring import Ring
 import numpy as np
 import random
+import math
 
 class LWE(object):
 
@@ -20,6 +21,7 @@ class LWE(object):
     self.n = n
     self.lgP = lgP
     self.p = p
+    self.lgP_base_m = math.ceil(math.log(self.p, self.m))
     self.mult = self.r.ringMulTest
 
   def set_p(self, new_p):
@@ -49,6 +51,18 @@ class LWE(object):
             number = 0
 
       return res
+
+  def number_to_base(self, number):
+    if number == 0:
+        return [0]
+    digits = [0 for _ in range(self.lgP_base_m)]
+    count = 0
+    while number:
+        digits[count] = int(number % self.m)
+        count += 1
+        number //= self.m
+    return digits[::-1]
+
 
   def key_switching(self, g, s, s0):
       r = self.r
@@ -243,7 +257,7 @@ class LWE(object):
       a = []
       b = []
 
-      for _ in range(self.lgP):
+      for _ in range(self.lgP_base_m):
           tmp_a = r.ringRandClear()
           a.append(tmp_a)
           tmp_a_neg = [self.get_mod(-i) for i in tmp_a]
@@ -252,26 +266,24 @@ class LWE(object):
           tmp_b = r.ringAdd(self.mult(tmp_a_neg, s), tmp_e)
           b.append(tmp_b)
 
-      for i in range(self.lgP):
-          s2_tmp = [self.get_mod((2**i) * j) for j in s2]
+      for i in range(self.lgP_base_m):
+          s2_tmp = [self.get_mod((self.m**i) * j) for j in s2]
           b[i] = r.ringAdd(b[i], s2_tmp)
 
       return [b, a]
 
   def relinearization(self, b, a, c0, c1, c2, s):
       r = self.r
-      c2_inverse = [[0 for i in range(self.lgP)] for j in range(self.n)]
+      c2_inverse = [[0 for i in range(self.lgP_base_m)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
       c1_new = [0 for i in range(self.n)]
 
       for i in range(self.n):
-        tmp_binary = self.to_binary(c2[i])[::-1]
-        for j in range(self.lgP):
-          if (c2[i] < 0):
-              tmp_binary[j] = -tmp_binary[j]
+        tmp_binary = self.number_to_base(c2[i])[::-1]
+        for j in range(self.lgP_base_m):
           c2_inverse[i][j] = tmp_binary[j]
 
-      for i in range(self.lgP):
+      for i in range(self.lgP_base_m):
         ct = [0 for _ in range(self.n)]
         for j in range(self.n):
           ct[j] = c2_inverse[j][i]
@@ -283,6 +295,7 @@ class LWE(object):
       c1_new = r.ringAdd(c1_new, c1)
 
       return [c0_new, c1_new]
+      
 
   def add(self, u1, u2):
     r = self.r
