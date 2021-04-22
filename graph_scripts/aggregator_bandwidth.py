@@ -55,7 +55,6 @@ total_cost2 = bytesto(total_cost2, 't')
 
 N = 4
 
-
 ind = [1e6, 1e7, 1e8, 1e9]
 
 bandwidth = (total_cost*1e06, total_cost*1e07, total_cost*1e08, total_cost*1e09)

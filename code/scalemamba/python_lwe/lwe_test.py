@@ -9,7 +9,7 @@ from gmpy2 import mpz
 
 lgP = 550
 lgM = 30
-lgN = 12
+lgN = 15
 n = 1 << lgN
 
 p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
@@ -30,15 +30,14 @@ p = 3608870760655701536654448303084521404059979435669688520664454167677047564331
 # ######################
 # print(w)
 
-w = 2358725313548793953437394003655954801060216040272190506880021058157597902378675657944961344275684323693688877632238499135305262010092352809615726751416655380200150292
-#w = 1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470
+w = 1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470
 
 # print("############ q ###############")
 # print(p)
 # print("############ w ###############")
 # print(w)
 
-start = time.time()
+# start = time.time()
 
 r = Ring(lgN, w, p)
 N = 1 #used in binomial distribution
@@ -56,23 +55,28 @@ print(x)
 # print(y)
 
 [b, a, s] = lwe.key_gen()
-[v0, u0] = lwe.enc(b, a, x)
-
-# x2 = lwe.dec(v0, u0, s)
+# [v0, u0] = lwe.enc(b, a, x)
+#x2 = lwe.dec(v0, u0, s)
 
 ###### check addition on ciphertext #######
-# [v, u] = lwe.enc(b, a, x)
-# [v1, u1] = lwe.enc(b, a, x)
-# u2 = lwe.add(u, u1)
-# v2 = lwe.add(v, v1)
-# x2 = lwe.dec(v2, u2, s)
+[v, u] = lwe.enc(b, a, x)
+[v1, u1] = lwe.enc(b, a, x)
+
+add_start = time.time()
+v2, u2 = v1, u1
+for _ in range(1000):
+    v2 = lwe.add(v, v2)
+    u2 = lwe.add(u, u2)
+add_end = time.time()
+print("ciphertext addition time: ", add_end - add_start)
+x2 = lwe.dec(v2, u2, s)
 
 ###### check multiplication on ciphertext #######
-v1, u1 = v0, u0
-v, u = v0, u0
-c0 = lwe.mul(v, v1)
-c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-c2 = lwe.mul(u, u1)
+# v1, u1 = v0, u0
+# v, u = v0, u0
+# c0 = lwe.mul(v, v1)
+# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+# c2 = lwe.mul(u, u1)
 
 ########### check mult without relin #############
 #x2 = lwe.dec_mul(c0, c1, c2, s)
@@ -88,32 +92,32 @@ c2 = lwe.mul(u, u1)
 # x2 = lwe.dec_mul_more(c, s)
 
 # ############## check mult with relin ###############
-s2 = lwe.mul(s,s)
-[rlk_b, rlk_a] = lwe.rl_keys(s, s2)
-
-# relin_start = time.time()
-[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-# relin_end = time.time()
+# s2 = lwe.mul(s,s)
+# [rlk_b, rlk_a] = lwe.rl_keys(s, s2)
 #
-# x2 = lwe.dec(c0_mul, c1_mul, s)
-
-mult_count = 0
-for k in range(12):
-    tmp = lwe.dec(c0_mul, c1_mul, s)
-    if (tmp[0] == False):
-        break
-    else:
-        x2 = tmp
-        print(x2[0])
-    v,u = c0_mul, c1_mul
-    c0 = lwe.mul(v, v1)
-    c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-    c2 = lwe.mul(u, u1)
-    [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-    mult_count += 1
-    print(mult_count)
-
-print(mult_count)
+# # relin_start = time.time()
+# [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+# # relin_end = time.time()
+# #
+# # x2 = lwe.dec(c0_mul, c1_mul, s)
+#
+# mult_count = 0
+# for k in range(12):
+#     tmp = lwe.dec(c0_mul, c1_mul, s)
+#     if (tmp[0] == False):
+#         break
+#     else:
+#         x2 = tmp
+#         print(x2[0])
+#     v,u = c0_mul, c1_mul
+#     c0 = lwe.mul(v, v1)
+#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#     c2 = lwe.mul(u, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#     mult_count += 1
+#     print(mult_count)
+#
+# print(mult_count)
 
 ##################  check multiplicative depth ##############
 # plaintexts = []
@@ -167,6 +171,5 @@ print(mult_count)
 print("################# decrypted text ###################")
 print(x2[0])
 
-end = time.time()
-# print(relin_end - relin_start)
-print("total time taken", end-start)
+# end = time.time()
+# print("total time taken", end-start)
