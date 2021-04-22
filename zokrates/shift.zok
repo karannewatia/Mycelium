@@ -1,0 +1,12 @@
+import "hashes/mimc7/mimc7R90" as mimc
+
+#Multiply a ciphertext [u,v] by a vector x
+def main(field[32768] u, field[32768] v, field[32768] res_u, field[32768] res_v, field[32768] x) ->  field:
+
+  for field i in 0..32768 do
+      assert(res_u[i] ==  u[i]*x[i]) 
+      assert(res_v[i] ==  u[i]*x[i]) 
+  endfor
+  
+  return mimc(res_u[0] + res_v[0], 1) 
+
