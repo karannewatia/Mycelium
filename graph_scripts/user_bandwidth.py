@@ -28,21 +28,19 @@ establish_keys_dst = 304
 telescoping = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
 telescoping = bytesto(telescoping, 'm')
 
-encryption_src = 8388872
-encryption_node1 = 16777681/2
-encryption_node2 = 16777553/2
-encryption_node3 = 16777425/2
-encryption_dst = 0
+encryption_src = 9542312
+encryption_node1 = 9542248
+encryption_node2 = 9542184
+encryption_node3 = 9542120
 
-forwarding = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
+forwarding = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3)
 
-shift_src = 13317176
-shift_node1 = 26634289/2
-shift_node2 = 26634161/2
-shift_node3 = 26634033/2
-shift_dst = 0
+shift_src = 14470616
+shift_node1 = 14470552
+shift_node2 = 14470488
+shift_node3 = 14470424
 
-forwarding += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
+forwarding += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3)
 forwarding = bytesto(forwarding, 'm')
 
 final_upload = prime_bitsize * degree * 2 / 8 #add size of the multiplication proof here
@@ -71,6 +69,7 @@ plt.xlabel('Number of copies sent per message')
 plt.ylabel('Traffic (MB sent)')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind, ('1', '2','3'))
+plt.yticks(np.arange(0, 3500, 500))
 
 plt.legend((p1[0], p2[0], p3[0]), ('Telescoping', 'Message forwarding', 'Final upload'))
 plt.savefig('../graphs/users/user_bandwidth.eps', format='eps')
