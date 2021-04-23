@@ -6,7 +6,7 @@ hours_to_finish_in = 10
 
 addition = 25.92297887802124*4/1000
 
-zkp = 0.643 + (num_friends*1.081) #TODO add cost of final upload zkp and update shift ZKP time
+zkp = 10 #TODO change this to actual verification time for the final upload zkp
 
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)

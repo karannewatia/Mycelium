@@ -15,58 +15,123 @@ def bytesto(bytes, to, bsize=1024):
         r = r / bsize
     return(r)
 
-
-num_copies = 2
 num_friends = 10
 degree = 32768
 prime_bitsize = 550
 
 ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 
+telescoping = [0,0,0]
+forwarding = [0,0,0]
 
+##################### 2 hops ######################
 establish_keys_src = 2214
 establish_keys_node1 = 2660
 establish_keys_node2 = 1525
 establish_keys_dst = 549
 
-
-telescoping = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_dst)
+telescoping[0] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_dst)
+telescoping[0] = bytesto(telescoping[0], 'm')
 
 
 encryption_src = 8192
 encryption_node1 = (1048774*ct_size) + 8192
 encryption_node2 = (1048710*ct_size) + 8192
 encryption_dst = (1048646*ct_size) + 8192
-forwarding = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_dst)
+
+forwarding[0] = num_friends*(encryption_src + encryption_node1 + encryption_node2)
 
 shift_src = 8192
 shift_node1 = (1048774*ct_size) + 8192
 shift_node2 = (1048710*ct_size) + 8192
 shift_dst = (1048646*ct_size) + 8192
-forwarding += num_friends*(shift_src + shift_node1 + shift_node2 + shift_dst)
+
+forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
+forwarding[0] = bytesto(forwarding[0], 'm')
+#####################  ######################
 
 
-total_cost = round((num_copies*telescoping) + (num_copies*forwarding))
-total_cost = bytesto(total_cost, 't')
-# print(total_cost)
+##################### 3 hops ######################
+establish_keys_src = 3502
+establish_keys_node1 = 5431
+establish_keys_node2 = 3381
+establish_keys_node3 = 3381
+establish_keys_dst = 557
+
+telescoping[1] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
+telescoping[1] = bytesto(telescoping[1], 'm')
 
 
-N = 4
+encryption_src = 8192
+encryption_node1 = (1048838*ct_size) + 8192
+encryption_node2 = (1048774*ct_size) + 8192
+encryption_node3 = (1048710*ct_size) + 8192
+encryption_dst = (1048646*ct_size) + 8192
 
-ind = [1e6, 1e7, 1e8, 1e9]
+forwarding[1] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
 
-bandwidth = (total_cost*1e06, total_cost*1e07, total_cost*1e08, total_cost*1e09)
+shift_src = 8192
+shift_node1 = (1048838*ct_size) + 8192
+shift_node2 = (1048774*ct_size) + 8192
+shift_node3 = (1048710*ct_size) + 8192
+shift_dst = (1048646*ct_size) + 8192
+
+forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
+forwarding[1] = bytesto(forwarding[1], 'm')
+#####################  ######################
+
+##################### 4 hops ######################
+establish_keys_src = 4824
+establish_keys_node1 = 7737
+establish_keys_node2 = 5431
+establish_keys_node3 = 3381
+establish_keys_node4 = 1587
+establish_keys_dst = 557
+
+telescoping[2] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_node4 + establish_keys_dst)
+telescoping[2] = bytesto(telescoping[2], 'm')
 
 
-p1 = plt.plot(ind, bandwidth, marker="X")
+encryption_src = 8192
+encryption_node1 = (1048902*ct_size) + 8192
+encryption_node2 = (1048838*ct_size) + 8192
+encryption_node3 = (1048774*ct_size) + 8192
+encryption_node4 = (1048710*ct_size) + 8192
+encryption_dst = (1048646*ct_size) + 8192
 
-plt.yscale('log')
-plt.xscale('log')
+forwarding[2] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_node4 + encryption_dst)
 
-plt.xlabel('Number of participants')
-plt.ylabel('Traffic (TB sent)')
+shift_src = 8192
+shift_node1 = (1048902*ct_size) + 8192
+shift_node2 = (1048838*ct_size) + 8192
+shift_node3 = (1048774*ct_size) + 8192
+shift_node4 = (1048710*ct_size) + 8192
+shift_dst = (1048646*ct_size) + 8192
+
+forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4 + shift_dst)
+forwarding[2] = bytesto(forwarding[2], 'm')
+#####################  ######################
+
+
+
+N = 3
+
+total = [telescoping[0] + forwarding[0], telescoping[1] + forwarding[1], telescoping[2] + forwarding[2]]
+
+ind = np.arange(N)
+width = 0.15
+p1 = plt.bar(ind, total, width, color='tab:cyan', edgecolor="black")
+p2 = plt.bar(ind+width, [2*x for x in total], width, color='tab:purple', edgecolor="black")
+p3 = plt.bar(ind+2*width, [3*x for x in total], width, color='tab:red', edgecolor="black")
+
+
+plt.xlabel('Number of hops in the communication path')
+plt.ylabel('Traffic (MB sent) per user')
 # plt.title('Total number of bytes sent by a client on average')
-#plt.xticks(ind, ('1e6', '1e7','1e8', '1e9'))
-plt.yticks([1e3, 1e4, 1e5, 1e6])
+plt.xticks(ind+width, ('2', '3','4'))
+plt.yticks(np.arange(0, 1600, 200))
+
+plt.legend((p1[0], p2[0], p3[0]), ('r=1', 'r=2', 'r=3'))
+
 
 plt.savefig('../graphs/aggregator/aggregator_bandwidth.pdf', format='pdf')

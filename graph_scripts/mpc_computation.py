@@ -9,7 +9,7 @@ decryption = (369/60, 788/60, 1450/60)
 
 ind = np.arange(N)
 width = 0.15
-p1 = plt.bar(ind, decryption, width, color='tab:blue')
+p1 = plt.bar(ind, decryption, width, color='tab:blue', edgecolor="black")
 # p2 = plt.bar(ind, resharing, width, bottom=decryption, color='tab:orange')
 
 plt.xlabel('Size of the committee')

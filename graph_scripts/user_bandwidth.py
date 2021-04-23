@@ -21,7 +21,7 @@ prime_bitsize = 550
 
 ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 enc_proof_size = 4.6
-shift_proof_size = 9.3 #TODO update this
+shift_proof_size = 12
 
 telescoping = [0,0,0]
 forwarding = [0,0,0]
@@ -39,15 +39,15 @@ telescoping[0] = num_friends*(establish_keys_src + establish_keys_node1 + establ
 telescoping[0] = bytesto(telescoping[0], 'm')
 
 
-encryption_src = 1048774*(ct_size+enc_proof_size) + 8192
-encryption_node1 = 1048710*ct_size + 8192
-encryption_node2 = 1048646*ct_size + 8192
+encryption_src = (1048774*(ct_size+enc_proof_size)) + 8192
+encryption_node1 = (1048710*ct_size) + 8192
+encryption_node2 = (1048646*ct_size) + 8192
 
 forwarding[0] = num_friends*(encryption_src + encryption_node1 + encryption_node2)
 
-shift_src = 1048774*(ct_size+shift_proof_size) + 8192
-shift_node1 = 1048710*ct_size + 8192
-shift_node2 = 1048646*ct_size + 8192
+shift_src = (1048774*(ct_size+shift_proof_size)) + 8192
+shift_node1 = (1048710*ct_size) + 8192
+shift_node2 = (1048646*ct_size) + 8192
 
 forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
 forwarding[0] = bytesto(forwarding[0], 'm')
@@ -65,17 +65,17 @@ telescoping[1] = num_friends*(establish_keys_src + establish_keys_node1 + establ
 telescoping[1] = bytesto(telescoping[1], 'm')
 
 
-encryption_src = 1048838*(ct_size+enc_proof_size) + 8192
-encryption_node1 = 1048774*ct_size + 8192
-encryption_node2 = 1048710*ct_size + 8192
-encryption_node3 = 1048646*ct_size + 8192
+encryption_src = (1048838*(ct_size+enc_proof_size)) + 8192
+encryption_node1 = (1048774*ct_size) + 8192
+encryption_node2 = (1048710*ct_size) + 8192
+encryption_node3 = (1048646*ct_size) + 8192
 
 forwarding[1] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3)
 
-shift_src = 1048838*(ct_size+shift_proof_size) + 8192
-shift_node1 = 1048774*ct_size + 8192
-shift_node2 = 1048710*ct_size + 8192
-shift_node3 = 1048646*ct_size + 8192
+shift_src = (1048838*(ct_size+shift_proof_size)) + 8192
+shift_node1 = (1048774*ct_size) + 8192
+shift_node2 = (1048710*ct_size) + 8192
+shift_node3 = (1048646*ct_size) + 8192
 
 forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3)
 forwarding[1] = bytesto(forwarding[1], 'm')
@@ -93,19 +93,19 @@ telescoping[2] = num_friends*(establish_keys_src + establish_keys_node1 + establ
 telescoping[2] = bytesto(telescoping[2], 'm')
 
 
-encryption_src = 1048902*(ct_size+enc_proof_size) + 8192
-encryption_node1 = 1048838*ct_size + 8192
-encryption_node2 = 1048774*ct_size + 8192
-encryption_node3 = 1048710*ct_size + 8192
-encryption_node4 = 1048646*ct_size + 8192
+encryption_src = (1048902*(ct_size+enc_proof_size)) + 8192
+encryption_node1 = (1048838*ct_size) + 8192
+encryption_node2 = (1048774*ct_size) + 8192
+encryption_node3 = (1048710*ct_size) + 8192
+encryption_node4 = (1048646*ct_size) + 8192
 
 forwarding[2] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_node4)
 
-shift_src = 1048902*(ct_size+shift_proof_size) + 8192
-shift_node1 = 1048838*ct_size + 8192
-shift_node2 = 1048774*ct_size + 8192
-shift_node3 = 1048710*ct_size + 8192
-shift_node4 = 1048646*ct_size + 8192
+shift_src = (1048902*(ct_size+shift_proof_size)) + 8192
+shift_node1 = (1048838*ct_size) + 8192
+shift_node2 = (1048774*ct_size) + 8192
+shift_node3 = (1048710*ct_size) + 8192
+shift_node4 = (1048646*ct_size) + 8192
 
 forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4)
 forwarding[2] = bytesto(forwarding[2], 'm')
@@ -119,9 +119,9 @@ total = [telescoping[0] + forwarding[0], telescoping[1] + forwarding[1], telesco
 
 ind = np.arange(N)
 width = 0.15
-p1 = plt.bar(ind, [x + final_upload for x in total], width, color='tab:blue')
-p2 = plt.bar(ind+width, [2*x + final_upload for x in total], width, color='tab:orange')
-p3 = plt.bar(ind+2*width, [3*x + final_upload for x in total], width, color='tab:green')
+p1 = plt.bar(ind, [x + final_upload for x in total], width, color='tab:blue', edgecolor="black")
+p2 = plt.bar(ind+width, [2*x + final_upload for x in total], width, color='tab:orange', edgecolor="black")
+p3 = plt.bar(ind+2*width, [3*x + final_upload for x in total], width, color='tab:green', edgecolor="black")
 
 
 plt.xlabel('Number of hops in the communication path')

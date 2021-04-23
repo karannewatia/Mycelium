@@ -25,7 +25,7 @@ decryption = (bytesto(633026584, 'g'), bytesto(5432784056, 'g'), bytesto(1367044
 
 ind = np.arange(N)
 width = 0.15
-p1 = plt.bar(ind, decryption, width, color='tab:blue')
+p1 = plt.bar(ind, decryption, width, color='tab:blue', edgecolor="black")
 # p2 = plt.bar(ind, resharing, width, bottom=decryption, color='tab:orange')
 
 plt.xlabel('Size of the committee')

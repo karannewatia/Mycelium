@@ -2,37 +2,26 @@ import random
 import datetime
 import numpy as np
 
-malicious_fracs = [0.005, 0.01, 0.015, 0.02,]
-drops_fracs = [0.01, 0.02, 0.03, 0.04, 0.05] #churn
-churn_plus_malice = {}
-num_runs = 10
-
-for malicious_frac in malicious_fracs:
-    for drops_frac in drops_fracs:
-        if malicious_frac + drops_frac in churn_plus_malice:
-            continue
-        else:
-            churn_plus_malice[malicious_frac + drops_frac] = (malicious_frac, drops_frac)
-
-churn_plus_malice = {k: v for k, v in sorted(churn_plus_malice.items(), key=lambda item: item[0])}
-del churn_plus_malice[0.034999999999999996]
-del churn_plus_malice[0.060000000000000005]
 results = []
+num_runs = 10
+churn_plus_malice = [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09]
 
-for (malicious_frac, drops_frac) in churn_plus_malice.values():
+for rate in churn_plus_malice:
+    malicious_frac = rate*0.5
+    drops_frac = rate*0.5
     success_ratio = 0.0
     for run in range(num_runs): #average over 5 runs
         num_hops = 3
         num_users = 10000
         users = [i for i in range(num_users)]
-        num_send_msgs = int(0.02 * len(users)) #send 200 messages
+        num_send_msgs = int(0.01 * len(users)) #send 200 messages
         senders = random.sample(users, num_send_msgs)
         non_senders = [i for i in users if i not in senders]
 
         num_malicious = int(malicious_frac * (num_users - num_send_msgs))
         num_drops = int(drops_frac * (num_users - num_send_msgs))
 
-        num_copies = 3 #r
+        num_copies = 1 #r
         msg = "success"
         random.shuffle(users)
         malicious = random.sample(non_senders, num_malicious)
@@ -48,7 +37,7 @@ for (malicious_frac, drops_frac) in churn_plus_malice.values():
         drops = random.sample(noncrashed_users, num_drops)
         drops_dict = {}
         for i in drops:
-            drops_dict[i] = random.randint(1, num_hops**2 + 2*num_hops)
+            drops_dict[i] = 1 #random.randint(1, num_hops**2 + 2*num_hops)
 
         for j in range(num_copies):
             for i in senders:
@@ -60,7 +49,7 @@ for (malicious_frac, drops_frac) in churn_plus_malice.values():
             time_lst = []
             for u in range(num_users):
                 times = []
-                if u in drops and drops_dict[u] <= i:
+                if u in drops:# and drops_dict[u] <= i:
                     continue
                 curr = startDate + datetime.timedelta(seconds=random.randrange(180))
                 times.append((curr, u))
@@ -133,5 +122,5 @@ for (malicious_frac, drops_frac) in churn_plus_malice.values():
     print("Fraction of messages that make it: ", success_ratio /num_runs)
     results.append(success_ratio/num_runs)
 
-print(churn_plus_malice.keys())
+print(churn_plus_malice)
 print(results)
