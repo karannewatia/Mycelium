@@ -13,8 +13,8 @@ width = 0.2
 p1 = plt.bar(ind, telescoping, width, color='tab:orange', edgecolor="black")
 p2 = plt.bar(ind, message_forwarding_1hop, width, bottom=telescoping, color='tab:purple', edgecolor="black")
 
-plt.xlabel('Number of hops in the communication path')
-plt.ylabel('Duration of the query (in hours)')
+plt.xlabel('Number of hops in the communication path', fontsize='large')
+plt.ylabel('Number of C-rounds needed', fontsize='large')
 # plt.title('Duration of queries if C-rounds are 1 hour long')
 plt.xticks(ind, ('2', '3', '4'))
 plt.yticks(np.arange(0, 35, 5))

@@ -6,7 +6,7 @@ hours_to_finish_in = 10
 
 addition = 25.92297887802124*4/1000
 
-zkp = 10 #TODO change this to actual verification time for the final upload zkp
+zkp = 6.74 + (1.081*10) + 0.643 #TODO change this to actual verification time for the final upload zkp
 
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)
@@ -32,8 +32,8 @@ p2 = plt.bar(ind, addition_cores, width, bottom=zkp_cores, color='tab:green')
 plt.yscale('log')
 plt.xticks(np.arange(4), ["$10^6$", "$10^7$", "$10^8$", "$10^9$"])
 plt.yticks([1e2, 1e3, 1e4, 1e5, 1e6])
-plt.xlabel('Number of participants')
-plt.ylabel('Computation (cores)')
+plt.xlabel('Number of participants', fontsize='large')
+plt.ylabel('Computation (cores)', fontsize='large')
 
 plt.legend((p1[0], p2[0]), ('ZKP verification', 'Global aggregation'))
 

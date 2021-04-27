@@ -125,8 +125,8 @@ p2 = plt.bar(ind+width, [2*x for x in total], width, color='tab:purple', edgecol
 p3 = plt.bar(ind+2*width, [3*x for x in total], width, color='tab:red', edgecolor="black")
 
 
-plt.xlabel('Number of hops in the communication path')
-plt.ylabel('Traffic (MB sent) per user')
+plt.xlabel('Number of hops in the communication path', fontsize='large')
+plt.ylabel('Traffic (MB sent) per user', fontsize='large')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
 plt.yticks(np.arange(0, 1600, 200))

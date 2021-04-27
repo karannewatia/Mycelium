@@ -28,8 +28,8 @@ width = 0.15
 p1 = plt.bar(ind, decryption, width, color='tab:blue', edgecolor="black")
 # p2 = plt.bar(ind, resharing, width, bottom=decryption, color='tab:orange')
 
-plt.xlabel('Size of the committee')
-plt.ylabel('Traffic (GB)')
+plt.xlabel('Size of the committee', fontsize='large')
+plt.ylabel('Traffic (GB)', fontsize='large')
 # plt.title('MPC bandwidth')
 plt.xticks(ind, ('5', '10', '15'))
 plt.yticks(np.arange(0, 16, 2))

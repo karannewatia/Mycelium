@@ -14,7 +14,7 @@ for rate in churn_plus_malice:
         num_hops = 3
         num_users = 10000
         users = [i for i in range(num_users)]
-        num_send_msgs = int(0.01 * len(users)) #send 200 messages
+        num_send_msgs = int(0.01 * len(users))
         senders = random.sample(users, num_send_msgs)
         non_senders = [i for i in users if i not in senders]
 

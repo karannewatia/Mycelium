@@ -26,8 +26,8 @@ shift_proof_size = 12
 telescoping = [0,0,0]
 forwarding = [0,0,0]
 
-final_upload = prime_bitsize * degree * 2 / 8 #TODO add size of the multiplication proof here
-final_upload = bytesto(final_upload , 'm')
+final_upload = (prime_bitsize * degree * 2 / 8) #TODO add size of the actual multiplication proof here
+final_upload = bytesto(final_upload , 'm') + 51
 
 ##################### 2 hops ######################
 establish_keys_src = 2001
@@ -124,8 +124,8 @@ p2 = plt.bar(ind+width, [2*x + final_upload for x in total], width, color='tab:o
 p3 = plt.bar(ind+2*width, [3*x + final_upload for x in total], width, color='tab:green', edgecolor="black")
 
 
-plt.xlabel('Number of hops in the communication path')
-plt.ylabel('Traffic (MB sent)')
+plt.xlabel('Number of hops in the communication path', fontsize='large')
+plt.ylabel('Traffic (MB sent)', fontsize='large')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
 plt.yticks(np.arange(0, 2200, 200))

@@ -74,7 +74,8 @@ forwarding_lst[2] = forwarding
 
 encryption_zkp = 15.146
 shift_zkp = 4.460 #TODO change shift proof generation time and add time for final upload proof
-zkp = encryption_zkp + (shift_zkp * num_friends)
+final_upload_zkp = 72
+zkp = encryption_zkp + (shift_zkp * num_friends) + final_upload_zkp
 zkp /= 60
 
 fhe = 14.493421077728271 + (20.33608603477478*num_friends) #encryption + shift
@@ -98,20 +99,25 @@ new_sums3 = [zkp+3*(telescoping_lst[0]+forwarding_lst[0]), zkp+3*(telescoping_ls
 ind = np.arange(N)
 width = 0.2
 
-p1 = plt.bar(ind, telescoping_plt, width, color='tab:brown', edgecolor="black")
-p2 = plt.bar(ind, forwarding_plt, width, bottom=telescoping_plt, color='tab:blue', edgecolor="black")
-p3 = plt.bar(ind, zkp_plt, width, bottom=sums, color='tab:red', edgecolor="black")
-p4 = plt.bar(ind, fhe_plt, width, bottom=new_sums, color='tab:green', edgecolor="black")
+p1 = plt.bar(ind+width, [2*x for x in telescoping_plt], width, color='tab:brown', edgecolor="black")
+p2 = plt.bar(ind+width, [2*x for x in forwarding_plt], width, bottom=[2*x for x in telescoping_plt], color='tab:blue', edgecolor="black")
+p3 = plt.bar(ind+width, zkp_plt, width, bottom=[2*x for x in sums], color='tab:red', edgecolor="black")
+p4 = plt.bar(ind+width, fhe_plt, width, bottom=new_sums2, color='tab:green', edgecolor="black")
 
-p5 = plt.bar(ind+width, [2*x for x in telescoping_plt], width, color='tab:brown', edgecolor="black")
-p6 = plt.bar(ind+width, [2*x for x in forwarding_plt], width, bottom=[2*x for x in telescoping_plt], color='tab:blue', edgecolor="black")
-p7 = plt.bar(ind+width, zkp_plt, width, bottom=[2*x for x in sums], color='tab:red', edgecolor="black")
-p8 = plt.bar(ind+width, fhe_plt, width, bottom=new_sums2, color='tab:green', edgecolor="black")
+# p1 = plt.bar(ind, telescoping_plt, width, color='tab:brown', edgecolor="black")
+# p2 = plt.bar(ind, forwarding_plt, width, bottom=telescoping_plt, color='tab:blue', edgecolor="black")
+# p3 = plt.bar(ind, zkp_plt, width, bottom=sums, color='tab:red', edgecolor="black")
+# p4 = plt.bar(ind, fhe_plt, width, bottom=new_sums, color='tab:green', edgecolor="black")
 
-p9 = plt.bar(ind+2*width, [3*x for x in telescoping_plt], width, color='tab:brown', edgecolor="black")
-p10 = plt.bar(ind+2*width, [3*x for x in forwarding_plt], width, bottom=[3*x for x in telescoping_plt], color='tab:blue', edgecolor="black")
-p11 = plt.bar(ind+2*width, zkp_plt, width, bottom=[3*x for x in sums], color='tab:red', edgecolor="black")
-p12 = plt.bar(ind+2*width, fhe_plt, width, bottom=new_sums3, color='tab:green', edgecolor="black")
+# p5 = plt.bar(ind+width, [2*x for x in telescoping_plt], width, color='tab:brown', edgecolor="black")
+# p6 = plt.bar(ind+width, [2*x for x in forwarding_plt], width, bottom=[2*x for x in telescoping_plt], color='tab:blue', edgecolor="black")
+# p7 = plt.bar(ind+width, zkp_plt, width, bottom=[2*x for x in sums], color='tab:red', edgecolor="black")
+# p8 = plt.bar(ind+width, fhe_plt, width, bottom=new_sums2, color='tab:green', edgecolor="black")
+
+# p9 = plt.bar(ind+2*width, [3*x for x in telescoping_plt], width, color='tab:brown', edgecolor="black")
+# p10 = plt.bar(ind+2*width, [3*x for x in forwarding_plt], width, bottom=[3*x for x in telescoping_plt], color='tab:blue', edgecolor="black")
+# p11 = plt.bar(ind+2*width, zkp_plt, width, bottom=[3*x for x in sums], color='tab:red', edgecolor="black")
+# p12 = plt.bar(ind+2*width, fhe_plt, width, bottom=new_sums3, color='tab:green', edgecolor="black")
 
 plt.xlabel('Number of hops in the communication path')
 plt.ylabel('Computation time (min)')
@@ -119,17 +125,17 @@ plt.ylabel('Computation time (min)')
 plt.xticks(ind+width, ('2', '3','4'))
 plt.yticks(np.arange(0, 90, 10))
 
-for rect in p4:
-    height = rect.get_height()
-    plt.text(rect.get_x() + rect.get_width()/2., 1.05*height, "r=1", ha='center', va='bottom')
+# for rect in p4:
+#     height = rect.get_height()
+#     plt.text(rect.get_x() + rect.get_width()/2., 1.05*height, "r=2", ha='center', va='bottom')
 
-for rect in p8:
-    height = rect.get_height()
-    plt.text(rect.get_x() + rect.get_width()/2., 1.05*height, "r=2", ha='center', va='bottom')
-
-for rect in p12:
-    height = rect.get_height()
-    plt.text(rect.get_x() + rect.get_width()/2., 1.05*height, "r=3", ha='center', va='bottom')
+# for rect in p8:
+#     height = rect.get_height()
+#     plt.text(rect.get_x() + rect.get_width()/2., 1.05*height, "r=2", ha='center', va='bottom')
+#
+# for rect in p12:
+#     height = rect.get_height()
+#     plt.text(rect.get_x() + rect.get_width()/2., 1.05*height, "r=3", ha='center', va='bottom')
 
 
 plt.legend((p4[0], p2[0], p1[0], p3[0]), ('Ciphertext operations', 'Message forwarding', 'Telescoping', 'ZKP')) #, loc='center right')
