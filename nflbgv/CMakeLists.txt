@@ -10,5 +10,7 @@ add_compile_options(-fPIC)
 add_compile_options(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 include_directories("/usr/local/include")
+
 add_executable(bgv main.cpp)
-target_link_libraries(bgv nfllib gmp)
+target_link_libraries(bgv "/usr/local/lib/libgmp.a")
+target_link_libraries(bgv "/usr/local/lib/libnfllib_static.a")

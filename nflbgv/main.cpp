@@ -5,6 +5,9 @@
 #include "tools.h"
 using namespace std;
 
+using poly_t = nfl::poly_from_modulus<uint32_t, 16, 312>;
+
+/*
 template <size_t degree, size_t modulus, class T>
 bool run() {
   using poly_t = nfl::poly_from_modulus<T, degree, modulus>;
@@ -13,10 +16,17 @@ bool run() {
 
   // Set a random number generator
   gmp_randclass prng(gmp_randinit_default);
-  prng.seed(0);
+  //prng.seed(0);
 
   // define a random polynomial
   poly_t& p0 = *alloc_aligned<poly_t, 32>(1, nfl::uniform());
+  //poly_t P(nfl::non_uniform(2));
+  poly_t P{1,1};
+  poly_t Q{1,2};
+  //P.ntt_pow_phi();
+  P = P - Q;
+  //P.invntt_pow_invphi();
+  cout << "P = " << P << endl;
 
   // get the corresponding array of mpz_t
   std::array<mpz_t, degree> coefficients = p0.poly2mpz();
@@ -25,9 +35,10 @@ bool run() {
   poly_t& p1 = *alloc_aligned<poly_t, 32>(1, 0);
   p1.mpz2poly(coefficients);
 
-  cout << p1 << endl;
+  //cout << p1 << endl;
   // verify that the first and second polynomials are equal
   ret_value &= (p0 == p1);
+  cout << ret_value << endl;
 
   // construct a vector of mpz_class
   std::vector<mpz_class> coefficients_mpz_class(poly_t::degree);
@@ -75,8 +86,27 @@ bool run() {
 
   return ret_value;
 }
+*/
 
 int main() {
-  run<1024, 60, uint32_t>();
+  //run<64, 248, uint32_t>();
+  
+  poly_t P{1,1};
+  poly_t Q{1,2};
+  P.ntt_pow_phi();
+  Q.ntt_pow_phi();
+  //poly_t numerator{P - Q*Q};
+  //numerator.invntt_pow_invphi();
+  
+  poly_t R =  Q-P;
+  //R = R - Q;
+  //R = R - Q;
+  R.invntt_pow_invphi();
+  //cout << R << endl;
+  std::array<mpz_t, 16> coefficients = R.poly2mpz();
+
+  cout << R << endl;
+  gmp_printf("%Zd\n", coefficients[1]);
+
   return 0;
 }
