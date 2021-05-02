@@ -5,7 +5,8 @@
 #include "tools.h"
 using namespace std;
 
-using poly_t = nfl::poly_from_modulus<uint32_t, 16, 312>;
+// <align, degree, modulus>
+using poly_t = nfl::poly_from_modulus<uint64_t, 16, 550>;
 
 /*
 template <size_t degree, size_t modulus, class T>
@@ -88,9 +89,58 @@ bool run() {
 }
 */
 
+// ****** template for NTT ******
+void DFT (mpz_t *a, int len) {
+  if (len == 1) {
+          cout << "out" <<endl;
+          return;
+  }
+  mpz_t *a0 = new mpz_t[len/2];
+  mpz_t *a1 = new mpz_t[len/2];
+  cout << "here" << endl;
+  for (int i = 0; i < len; i+=2) {
+    cout << "III" << endl;
+    mpz_set(a0[i/2], a[i]);
+    cout << "i+1=" << i+1 << endl;
+    mpz_set(a1[i/2], a[i+1]);
+    
+  }
+  
+  DFT(a0, len/2);
+  DFT(a1, len/2);
+
+  //cout << "middle" <<endl;
+  mpz_t w, wn;
+  
+  cout << "XXXXX" << endl;
+  mpz_init_set_str(wn, "1", 10);  // n-th primitive root
+  mpz_init_set_str(w, "1", 10);
+  for (int i = 0; i < len/2; i++) {
+    mpz_t rop1;
+    mpz_t rop2;
+
+    mpz_mul(rop1, w, a1[i]);
+    mpz_add(rop2, a0[i], rop1);
+    mpz_set(a[i], rop2);
+
+    mpz_t rop3;
+    mpz_t rop4;
+
+    mpz_mul(rop3, w, a1[i]);
+    mpz_sub(rop4, a0[i], rop3);
+    mpz_set(a[i+len/2], rop4);
+    
+    mpz_mul(w, w, wn);
+  }
+  delete[] a0;
+  delete[] a1;
+}
+
 int main() {
   //run<64, 248, uint32_t>();
-  
+
+  auto st = std::chrono::high_resolution_clock::now();
+
   poly_t P{1,1};
   poly_t Q{1,2};
   P.ntt_pow_phi();
@@ -99,13 +149,51 @@ int main() {
   //numerator.invntt_pow_invphi();
   
   poly_t R =  Q-P;
-  //R = R - Q;
+  R = R * Q;
   //R = R - Q;
   R.invntt_pow_invphi();
   //cout << R << endl;
   std::array<mpz_t, 16> coefficients = R.poly2mpz();
 
-  cout << R << endl;
+  mpz_t *test = new mpz_t[16];
+  for (int i = 0; i < 16; i++) {
+    mpz_set(test[i], coefficients[i]);
+  }
+  DFT(test, 16);
+  //delete[] test;
+
+  auto ed = std::chrono::high_resolution_clock::now();
+  auto multime = std::chrono::duration_cast<std::chrono::microseconds>(ed - st).count();
+  std::cout << "mult generated in " << multime << " microsec." << std::endl;
+  //cout << R << endl;
+
+  
+ 
+
+  auto clt_offline_st = std::chrono::high_resolution_clock::now();
+  
+  mpz_t q;
+  mpz_t tmp;
+  mpz_init_set_str(wn, "452312848531021619072928088353457404578753483289040917211364875968704413697", 10);
+  // ******* Estimation of naive poly mult ******
+  std::array<mpz_t, 32> prod;
+  for (int i = 0; i < 16; i++) {
+    for (int j = 0; j < 16; j++) { 
+      mpz_mul(prod[i+j], coefficients[i], coefficient[j]);
+      mpz_mod(prod[i+j], tmp, q);
+    }
+  }
+
+    //mpz_mul(coefficients[0], coefficients[1], coefficients[1]);
+    //mpz_cdiv_q(coefficients[0], coefficients[1], coefficients[0]);
+    //mpz_mod(coefficients[0], coefficients[0], coefficients[0]);
+  
+  //mpz_mul(coefficients[0], coefficients[1], coefficients[1]);
+  auto clt_offline_ed = std::chrono::high_resolution_clock::now();
+  auto clt_offline_time = std::chrono::duration_cast<std::chrono::microseconds>(clt_offline_ed - clt_offline_st).count();
+  std::cout << "mult generated in " << clt_offline_time << " microsec." << std::endl;
+
+
   gmp_printf("%Zd\n", coefficients[1]);
 
   return 0;
