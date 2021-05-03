@@ -87,10 +87,11 @@ print(x)
 
 
 ###### check multiplication on ciphertext #######
-s2 = lwe.mul(s,s)
-[rlk_b, rlk_a] = lwe.rl_keys(s, s2)
+#s2 = lwe.mul(s,s)
+#[rlk_b, rlk_a] = lwe.rl_keys(s, s2)
 
-#mult_start = time.time()
+mult_start = time.time()
+
 v1, u1 = v0, u0
 v, u = v0, u0
 c0 = lwe.mul(v, v1)
@@ -99,39 +100,42 @@ c2 = lwe.mul(u, u1)
 
 ########### check mult without relin #############
 #x2 = lwe.dec_mul(c0, c1, c2, s)
-# c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# c = lwe.ciphertext_mult_more(c, [v, u])
-# x2 = lwe.dec_mul_more(c, s)
+c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+c = lwe.ciphertext_mult_more(c, [v, u])
+
+print(time.time() - mult_start)
+
+x2 = lwe.dec_mul_more(c, s)
 
 # ############## check mult with relin ###############
-[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
 #mult_end = time.time()
 #print("mult time: ", mult_end - mult_start)
 #x2 = lwe.dec(c0_mul, c1_mul, s)
 
-mult_count = 0
-for k in range(10):
-    tmp = lwe.dec(c0_mul, c1_mul, s)
-    if (tmp[0] == False):
-        break
-    else:
-        x2 = tmp
-        print(x2[0])
-    v,u = c0_mul, c1_mul
-    c0 = lwe.mul(v, v1)
-    c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-    c2 = lwe.mul(u, u1)
-    [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
-    mult_count += 1
-
-print(mult_count)
+# mult_count = 0
+# for k in range(10):
+#     tmp = lwe.dec(c0_mul, c1_mul, s)
+#     if (tmp[0] == False):
+#         break
+#     else:
+#         x2 = tmp
+#         print(x2[0])
+#     v,u = c0_mul, c1_mul
+#     c0 = lwe.mul(v, v1)
+#     c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+#     c2 = lwe.mul(u, u1)
+#     [c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
+#     mult_count += 1
+#
+# print(mult_count)
 
 ##################  check multiplicative depth ##############
 # plaintexts = []

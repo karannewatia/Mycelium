@@ -41,12 +41,13 @@ encryption_dst = (1048646*ct_size) + 8192
 
 forwarding[0] = num_friends*(encryption_src + encryption_node1 + encryption_node2)
 
-shift_src = 8192
-shift_node1 = (1048774*ct_size) + 8192
-shift_node2 = (1048710*ct_size) + 8192
-shift_dst = (1048646*ct_size) + 8192
+# shift_src = 8192
+# shift_node1 = (1048774*ct_size) + 8192
+# shift_node2 = (1048710*ct_size) + 8192
+# shift_dst = (1048646*ct_size) + 8192
+#
+# forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
 
-forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
 forwarding[0] = bytesto(forwarding[0], 'm')
 #####################  ######################
 
@@ -70,13 +71,14 @@ encryption_dst = (1048646*ct_size) + 8192
 
 forwarding[1] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
 
-shift_src = 8192
-shift_node1 = (1048838*ct_size) + 8192
-shift_node2 = (1048774*ct_size) + 8192
-shift_node3 = (1048710*ct_size) + 8192
-shift_dst = (1048646*ct_size) + 8192
+# shift_src = 8192
+# shift_node1 = (1048838*ct_size) + 8192
+# shift_node2 = (1048774*ct_size) + 8192
+# shift_node3 = (1048710*ct_size) + 8192
+# shift_dst = (1048646*ct_size) + 8192
+#
+# forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
 
-forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
 forwarding[1] = bytesto(forwarding[1], 'm')
 #####################  ######################
 
@@ -101,18 +103,22 @@ encryption_dst = (1048646*ct_size) + 8192
 
 forwarding[2] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_node4 + encryption_dst)
 
-shift_src = 8192
-shift_node1 = (1048902*ct_size) + 8192
-shift_node2 = (1048838*ct_size) + 8192
-shift_node3 = (1048774*ct_size) + 8192
-shift_node4 = (1048710*ct_size) + 8192
-shift_dst = (1048646*ct_size) + 8192
+# shift_src = 8192
+# shift_node1 = (1048902*ct_size) + 8192
+# shift_node2 = (1048838*ct_size) + 8192
+# shift_node3 = (1048774*ct_size) + 8192
+# shift_node4 = (1048710*ct_size) + 8192
+# shift_dst = (1048646*ct_size) + 8192
+#
+# forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4 + shift_dst)
 
-forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4 + shift_dst)
 forwarding[2] = bytesto(forwarding[2], 'm')
 #####################  ######################
 
-
+font = {'size'   : 17}
+plt.rc('font', **font)
+plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(left=0.14)
 
 N = 3
 
@@ -129,7 +135,7 @@ plt.xlabel('Number of hops in the communication path', fontsize='large')
 plt.ylabel('Traffic (MB sent) per user', fontsize='large')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
-plt.yticks(np.arange(0, 1600, 200))
+plt.yticks(np.arange(0, 900, 100))
 
 plt.legend((p1[0], p2[0], p3[0]), ('r=1', 'r=2', 'r=3'))
 

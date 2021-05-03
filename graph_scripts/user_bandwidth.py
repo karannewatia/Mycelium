@@ -21,13 +21,12 @@ prime_bitsize = 550
 
 ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 enc_proof_size = 4.6
-shift_proof_size = 12
 
 telescoping = [0,0,0]
 forwarding = [0,0,0]
 
-final_upload = (prime_bitsize * degree * 2 / 8) #TODO add size of the actual multiplication proof here
-final_upload = bytesto(final_upload , 'm') + 51
+final_upload = (prime_bitsize * degree * 12 / 8)
+final_upload = bytesto(final_upload , 'm') + 51 # 51 is for size of aggregation proof
 
 ##################### 2 hops ######################
 establish_keys_src = 2001
@@ -39,17 +38,19 @@ telescoping[0] = num_friends*(establish_keys_src + establish_keys_node1 + establ
 telescoping[0] = bytesto(telescoping[0], 'm')
 
 
-encryption_src = (1048774*(ct_size+enc_proof_size)) + 8192
+encryption_src = (1048774*ct_size) + 8192
 encryption_node1 = (1048710*ct_size) + 8192
 encryption_node2 = (1048646*ct_size) + 8192
 
 forwarding[0] = num_friends*(encryption_src + encryption_node1 + encryption_node2)
+forwarding[0] += enc_proof_size
 
-shift_src = (1048774*(ct_size+shift_proof_size)) + 8192
-shift_node1 = (1048710*ct_size) + 8192
-shift_node2 = (1048646*ct_size) + 8192
+# shift_src = (1048774*(ct_size+shift_proof_size)) + 8192
+# shift_node1 = (1048710*ct_size) + 8192
+# shift_node2 = (1048646*ct_size) + 8192
+#
+# forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
 
-forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
 forwarding[0] = bytesto(forwarding[0], 'm')
 #####################  ######################
 
@@ -65,19 +66,21 @@ telescoping[1] = num_friends*(establish_keys_src + establish_keys_node1 + establ
 telescoping[1] = bytesto(telescoping[1], 'm')
 
 
-encryption_src = (1048838*(ct_size+enc_proof_size)) + 8192
+encryption_src = (1048838*ct_size) + 8192
 encryption_node1 = (1048774*ct_size) + 8192
 encryption_node2 = (1048710*ct_size) + 8192
 encryption_node3 = (1048646*ct_size) + 8192
 
 forwarding[1] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3)
+forwarding[1] += enc_proof_size
 
-shift_src = (1048838*(ct_size+shift_proof_size)) + 8192
-shift_node1 = (1048774*ct_size) + 8192
-shift_node2 = (1048710*ct_size) + 8192
-shift_node3 = (1048646*ct_size) + 8192
+# shift_src = (1048838*(ct_size+shift_proof_size)) + 8192
+# shift_node1 = (1048774*ct_size) + 8192
+# shift_node2 = (1048710*ct_size) + 8192
+# shift_node3 = (1048646*ct_size) + 8192
+#
+# forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3)
 
-forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3)
 forwarding[1] = bytesto(forwarding[1], 'm')
 #####################  ######################
 
@@ -93,21 +96,23 @@ telescoping[2] = num_friends*(establish_keys_src + establish_keys_node1 + establ
 telescoping[2] = bytesto(telescoping[2], 'm')
 
 
-encryption_src = (1048902*(ct_size+enc_proof_size)) + 8192
+encryption_src = (1048902*ct_size) + 8192
 encryption_node1 = (1048838*ct_size) + 8192
 encryption_node2 = (1048774*ct_size) + 8192
 encryption_node3 = (1048710*ct_size) + 8192
 encryption_node4 = (1048646*ct_size) + 8192
 
 forwarding[2] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_node4)
+forwarding[2] += enc_proof_size
+#
+# shift_src = (1048902*(ct_size+shift_proof_size)) + 8192
+# shift_node1 = (1048838*ct_size) + 8192
+# shift_node2 = (1048774*ct_size) + 8192
+# shift_node3 = (1048710*ct_size) + 8192
+# shift_node4 = (1048646*ct_size) + 8192
+#
+# forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4)
 
-shift_src = (1048902*(ct_size+shift_proof_size)) + 8192
-shift_node1 = (1048838*ct_size) + 8192
-shift_node2 = (1048774*ct_size) + 8192
-shift_node3 = (1048710*ct_size) + 8192
-shift_node4 = (1048646*ct_size) + 8192
-
-forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4)
 forwarding[2] = bytesto(forwarding[2], 'm')
 #####################  ######################
 
@@ -128,7 +133,7 @@ plt.xlabel('Number of hops in the communication path', fontsize='large')
 plt.ylabel('Traffic (MB sent)', fontsize='large')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
-plt.yticks(np.arange(0, 2200, 200))
+plt.yticks(np.arange(0, 900, 100))
 
 plt.legend((p1[0], p2[0], p3[0]), ('r=1', 'r=2', 'r=3'))
 plt.savefig('../graphs/users/user_bandwidth.pdf', format='pdf')

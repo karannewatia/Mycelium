@@ -3,11 +3,11 @@
 import sympy
 import random
 
-lgP = 109
+lgP = 300
 
 p = 4
 
-lgM = 5
+lgM = 28
 
 while (not sympy.isprime(p)):
   p = random.randrange(2**(lgP-lgM-2), 2**(lgP-lgM-1)-1) * 2**(lgM+1) +1

@@ -5,18 +5,32 @@ import math
 k_vals = [2,3,4] #number of hops in the communication path
 r = [1,2,3] #number of copies sent
 c_vals = [0.005, 0.01, 0.02, 0.04] #fractions of malicious users who collude with the aggregator
-f = 0.005
+f = 0.1
+
+n = 2**30
+
+def intersect(set_size, num_mal, r):
+    return 1
+    #q = 1-1/(r*n) #prob of any one message being selected
+    #if num_mal == 2:
+    #    res = (r*n)*(1-2*q**set_size+2**(2*set_size))
+    #else:
+    #    res = 1 #TODO: CHANGE!
+    #
+    #print('Intersect is %d' % res)
+    #return res
 
 
 def anon_set(c,r,f,k):
     t = (1-c)*r/f
+    print('t is %d' % t)
     result = 0
     if k==2:
         result = ((1-c)**k) * (t**k) + (k*c*(1-c)) * (t**(k-1)) + (c**k) * (t**(k-2))
     if k == 3:
-        result = ((1-c)**k) * (t**k) + ((k*c*(1-c))**(k-1)) * (t**(k-1)) + (k*(c**(k-1))*(1-c)*(t**(k-2))) + (c**k)*(t**(k-3))
+        result = ((1-c)**k) * (t**k) + ((k*c*(1-c))**(k-1)) * (t**(k-1)) + (k*(c**(k-1))*(1-c)*(intersect(t**2, 2,  r))) + (c**k)*(t**(k-3))
     if k == 4:
-        result = ((1-c)**k) * (t**k) + ((k*c*(1-c))**(k-1)) * (t**(k-1)) + (k**2)*(c**(k-2))*((1-c)**(k-2))*(t**(k-2)) + (k*(c**(k-1))*(1-c)*(t**(k-3))) + (c**k)*(t**(k-4))
+        result = ((1-c)**k) * (t**k) + ((k*c*(1-c))**(k-1)) * (t**(k-1)) + (k**2)*(c**(k-2))*((1-c)**(k-2))*(intersect(t**3, 2, r)) + (k*(c**(k-1))*(1-c)*(intersect(t**3,3, r))) + (c**k)*(t**(k-4))
 
     return min(result, 1e9)
 

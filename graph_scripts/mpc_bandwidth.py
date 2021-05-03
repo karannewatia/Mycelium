@@ -18,6 +18,10 @@ def bytesto(bytes, to, bsize=1024):
 
 N = 3
 
+font = {'size'   : 17}
+plt.rc('font', **font)
+plt.gcf().subplots_adjust(bottom=0.15)
+
 decryption = (bytesto(633026584, 'g'), bytesto(5432784056, 'g'), bytesto(13670440818, 'g'))
 
 # resharing_cost = (32768*550/8) + (6*550/8)

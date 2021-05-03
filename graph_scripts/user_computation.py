@@ -21,7 +21,6 @@ prime_bitsize = 550
 
 ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 enc_proof_size = 4.6
-shift_proof_size = 12
 
 
 telescoping_lst = [0,0,0]
@@ -36,8 +35,9 @@ telescoping_lst[0] = telescoping
 send_encrypt = 0.034193 + 0.01483 + 0.0157621 + 0.00722612
 forwarding = num_friends * send_encrypt * ct_size
 
-send_shift = 0.034193 + 0.01483 + 0.0157621 + 0.00722612
-forwarding += num_friends * send_shift * ct_size
+# send_shift = 0.034193 + 0.01483 + 0.0157621 + 0.00722612
+# forwarding += num_friends * send_shift * ct_size
+
 forwarding /= 60
 forwarding_lst[0] = forwarding
 ##########################################
@@ -51,8 +51,9 @@ telescoping_lst[1] = telescoping
 send_encrypt = 0.042593 + 0.0147645 + 0.0150112 + 0.0159831 + 0.00906639
 forwarding = num_friends * send_encrypt * ct_size
 
-send_shift = 0.042593 + 0.0147645 + 0.0150112 + 0.0159831 + 0.00906639
-forwarding += num_friends * send_shift * ct_size
+# send_shift = 0.042593 + 0.0147645 + 0.0150112 + 0.0159831 + 0.00906639
+# forwarding += num_friends * send_shift * ct_size
+
 forwarding /= 60
 forwarding_lst[1] = forwarding
 ############################################
@@ -66,21 +67,26 @@ telescoping_lst[2] = telescoping
 send_encrypt = 0.047799 + 0.0155274 + 0.0157811 + 0.0157041 + 0.0147972 + 0.00981608
 forwarding = num_friends * send_encrypt * ct_size
 
-send_shift = 0.047799 + 0.0155274 + 0.0157811 + 0.0157041 + 0.0147972 + 0.00981608
-forwarding += num_friends * send_shift * ct_size
+# send_shift = 0.047799 + 0.0155274 + 0.0157811 + 0.0157041 + 0.0147972 + 0.00981608
+# forwarding += num_friends * send_shift * ct_size
+
 forwarding /= 60
 forwarding_lst[2] = forwarding
 ##################################################
 
 encryption_zkp = 15.146
-shift_zkp = 4.460 #TODO change shift proof generation time and add time for final upload proof
 final_upload_zkp = 72
-zkp = encryption_zkp + (shift_zkp * num_friends) + final_upload_zkp
+zkp = encryption_zkp + final_upload_zkp
 zkp /= 60
 
-fhe = 14.493421077728271 + (20.33608603477478*num_friends) #encryption + shift
-fhe += 275.0299119949341*num_friends #ciphertext mult
+fhe = 14.493421077728271 #encryption
+# fhe += 275.0299119949341*num_friends #ciphertext mult
+fhe += 851.4942331314087 #10 mults without relin
+
 fhe /= 60
+
+print("fhe", fhe)
+print("zkp", zkp)
 
 # print(telescoping + forwarding + zkp + fhe)
 
@@ -123,7 +129,7 @@ plt.xlabel('Number of hops in the communication path')
 plt.ylabel('Computation time (min)')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
-plt.yticks(np.arange(0, 90, 10))
+plt.yticks(np.arange(0, 30, 5))
 
 # for rect in p4:
 #     height = rect.get_height()

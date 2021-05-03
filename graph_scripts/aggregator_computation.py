@@ -4,15 +4,19 @@ import matplotlib.pyplot as plt
 num_friends = 10
 hours_to_finish_in = 10
 
-addition = 25.92297887802124*4/1000
+addition = 25.92297887802124*4*6/1000
 
-zkp = 6.74 + (1.081*10) + 0.643 #TODO change this to actual verification time for the final upload zkp
+zkp = 6.74 + 0.643 #TODO change this to actual verification time for the final upload zkp
 
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)
 
 total = (addition + zkp)/(3600*hours_to_finish_in)
 
+font = {'size'   : 17}
+plt.rc('font', **font)
+plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(left=0.15)
 
 N = 4
 width = 0.25
