@@ -25,38 +25,32 @@ telescoping = [0,0,0]
 forwarding = [0,0,0]
 
 ##################### 2 hops ######################
-establish_keys_src = 2214
-establish_keys_node1 = 2660
-establish_keys_node2 = 1525
-establish_keys_dst = 549
+establish_keys_src = 4394
+establish_keys_node1 = 4446
+establish_keys_node2 = 1598
+establish_keys_dst = 557
 
 telescoping[0] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_dst)
 telescoping[0] = bytesto(telescoping[0], 'm')
 
 
 encryption_src = 8192
-encryption_node1 = (1048774*ct_size) + 8192
-encryption_node2 = (1048710*ct_size) + 8192
-encryption_dst = (1048646*ct_size) + 8192
+encryption_node1 = (9332557*ct_size/8.9) + 8192
+encryption_node2 = (9332482*ct_size/8.9) + 8192
+encryption_dst = (9332407*ct_size/8.9) + 8192
 
 forwarding[0] = num_friends*(encryption_src + encryption_node1 + encryption_node2)
 
-# shift_src = 8192
-# shift_node1 = (1048774*ct_size) + 8192
-# shift_node2 = (1048710*ct_size) + 8192
-# shift_dst = (1048646*ct_size) + 8192
-#
-# forwarding[0] += num_friends*(shift_src + shift_node1 + shift_node2)
 
 forwarding[0] = bytesto(forwarding[0], 'm')
 #####################  ######################
 
 
 ##################### 3 hops ######################
-establish_keys_src = 3502
-establish_keys_node1 = 5431
-establish_keys_node2 = 3381
-establish_keys_node3 = 3381
+establish_keys_src = 6649
+establish_keys_node1 = 6817
+establish_keys_node2 = 4446
+establish_keys_node3 = 1598
 establish_keys_dst = 557
 
 telescoping[1] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
@@ -64,10 +58,10 @@ telescoping[1] = bytesto(telescoping[1], 'm')
 
 
 encryption_src = 8192
-encryption_node1 = (1048838*ct_size) + 8192
-encryption_node2 = (1048774*ct_size) + 8192
-encryption_node3 = (1048710*ct_size) + 8192
-encryption_dst = (1048646*ct_size) + 8192
+encryption_node1 = (9332632*ct_size/8.9) + 8192
+encryption_node2 = (9332557*ct_size/8.9) + 8192
+encryption_node3 = (9332482*ct_size/8.9) + 8192
+encryption_dst = (9332407*ct_size/8.9) + 8192
 
 forwarding[1] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
 
@@ -83,11 +77,11 @@ forwarding[1] = bytesto(forwarding[1], 'm')
 #####################  ######################
 
 ##################### 4 hops ######################
-establish_keys_src = 4824
-establish_keys_node1 = 7737
-establish_keys_node2 = 5431
-establish_keys_node3 = 3381
-establish_keys_node4 = 1587
+establish_keys_src = 9044
+establish_keys_node1 = 10976
+establish_keys_node2 = 7572
+establish_keys_node3 = 4446
+establish_keys_node4 = 1598
 establish_keys_dst = 557
 
 telescoping[2] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_node4 + establish_keys_dst)
@@ -95,11 +89,11 @@ telescoping[2] = bytesto(telescoping[2], 'm')
 
 
 encryption_src = 8192
-encryption_node1 = (1048902*ct_size) + 8192
-encryption_node2 = (1048838*ct_size) + 8192
-encryption_node3 = (1048774*ct_size) + 8192
-encryption_node4 = (1048710*ct_size) + 8192
-encryption_dst = (1048646*ct_size) + 8192
+encryption_node1 = (9332707*ct_size/8.9) + 8192
+encryption_node2 = (9332632*ct_size/8.9) + 8192
+encryption_node3 = (9332557*ct_size/8.9) + 8192
+encryption_node4 = (9332482*ct_size/8.9) + 8192
+encryption_dst = (9332407*ct_size/8.9) + 8192
 
 forwarding[2] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_node4 + encryption_dst)
 
