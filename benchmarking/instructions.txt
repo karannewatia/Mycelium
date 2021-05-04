@@ -1,0 +1,22 @@
+Create the Linux 2 AMI instance (couldn't figure out how to do programatically). This should be a t2.xlarge instance.
+Default settings should be fine except for security group - make sure to configure the security group so that it can accept ssh from anywhere. 
+Use the myc.pem keypair. 
+
+Go to 'connect' and copy the ip address
+e.g. ip=ec2-18-188-215-39.us-east-2.compute.amazonaws.com
+chmod 400 ~/Downloads/myc.pem
+ssh_key=~/Downloads/myc.pem
+
+Run:
+scp -i ${ssh_key} -o StrictHostKeyChecking=no -r ../code/scalemamba/lwe ec2-user@${ip}://home/ec2-user/lwe/
+
+ssh -i ${ssh_key} -o StrictHostKeyChecking=no ec2-user@${ip} << EOF
+
+sudo yum install -y docker
+
+sudo service docker start
+
+cd lwe
+sudo docker build -t mycelium .
+
+From then on, just run experiments!
