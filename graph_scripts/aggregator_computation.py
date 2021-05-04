@@ -15,7 +15,7 @@ total = (addition + zkp)/(3600*hours_to_finish_in)
 
 font = {'size'   : 17}
 plt.rc('font', **font)
-plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(bottom=0.25)
 plt.gcf().subplots_adjust(left=0.15)
 
 N = 4
@@ -36,7 +36,7 @@ p2 = plt.bar(ind, addition_cores, width, bottom=zkp_cores, color='tab:green')
 plt.yscale('log')
 plt.xticks(np.arange(4), ["$10^6$", "$10^7$", "$10^8$", "$10^9$"])
 plt.yticks([1e2, 1e3, 1e4, 1e5, 1e6])
-plt.xlabel('Number of participants', fontsize='large')
+plt.xlabel('Number of participants\n(b)', fontsize='large')
 plt.ylabel('Computation (cores)', fontsize='large')
 
 plt.legend((p1[0], p2[0]), ('ZKP verification', 'Global aggregation'))

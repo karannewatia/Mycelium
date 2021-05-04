@@ -111,7 +111,7 @@ forwarding[2] = bytesto(forwarding[2], 'm')
 
 font = {'size'   : 17}
 plt.rc('font', **font)
-plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(bottom=0.25)
 plt.gcf().subplots_adjust(left=0.14)
 
 N = 3
@@ -125,7 +125,7 @@ p2 = plt.bar(ind+width, [2*x for x in total], width, color='tab:purple', edgecol
 p3 = plt.bar(ind+2*width, [3*x for x in total], width, color='tab:red', edgecolor="black")
 
 
-plt.xlabel('Number of hops in the communication path', fontsize='large')
+plt.xlabel('Number of hops in the communication path\n(a)', fontsize='large')
 plt.ylabel('Traffic (MB sent) per user', fontsize='large')
 # plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
