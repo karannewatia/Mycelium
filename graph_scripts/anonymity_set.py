@@ -4,7 +4,7 @@ import math
 
 k_vals = [2,3,4] #number of hops in the communication path
 r = [1,2,3] #number of copies sent
-c_vals = [0.005, 0.01, 0.02, 0.04] #fractions of malicious users who collude with the aggregator
+c_vals = [ 0.01, 0.02, 0.04] #fractions of malicious users who collude with the aggregator
 f = 0.1
 
 n = 2**30
@@ -36,30 +36,30 @@ def anon_set(c,r,f,k):
 
 
 
-# print(anon_set(0.01,2,0.01,4))
+print(anon_set(0.04,2,0.1,3))
 
 font = {'size'   : 15}
 plt.rc('font', **font)
 plt.gcf().subplots_adjust(bottom=0.15)
 plt.gcf().subplots_adjust(left=0.12)
 
-plot_1 = [anon_set(0.005,2,f,k) for k in k_vals]
+#plot_1 = [anon_set(0.005,2,f,k) for k in k_vals]
 plot_2 = [anon_set(0.01,2,f,k) for k in k_vals]
 plot_3 = [anon_set(0.02,2,f,k) for k in k_vals]
 plot_4 = [anon_set(0.04,2,f,k) for k in k_vals]
 
-plot_5 = [anon_set(0.005,3,f,k) for k in k_vals]
+#plot_5 = [anon_set(0.005,3,f,k) for k in k_vals]
 plot_6 = [anon_set(0.01,3,f,k) for k in k_vals]
 plot_7 = [anon_set(0.02,3,f,k) for k in k_vals]
 plot_8 = [anon_set(0.04,3,f,k) for k in k_vals]
 
 
-plt.plot(k_vals, plot_1, '--', label = "mal=0.005, r=2", marker="X", markersize=10, linewidth=5)
+#plt.plot(k_vals, plot_1, '--', label = "mal=0.005, r=2", marker="X", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_2, '--', label = "mal=0.01, r=2",  marker="X", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_3, '--', label = "mal=0.02, r=2",  marker="X", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_4, '--', label = "mal=0.04, r=2", marker="X", markersize=10, linewidth=5)
 
-plt.plot(k_vals, plot_5, label = "mal=0.005, r=3", marker="D", markersize=10, linewidth=5)
+#plt.plot(k_vals, plot_5, label = "mal=0.005, r=3", marker="D", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_6, label = "mal=0.01, r=3", marker="D", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_7, label = "mal=0.02, r=3", marker="D", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_8,  label = "mal=0.04, r=3", marker="D", markersize=10, linewidth=5)

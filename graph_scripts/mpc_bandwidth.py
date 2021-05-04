@@ -20,7 +20,7 @@ N = 3
 
 font = {'size'   : 17}
 plt.rc('font', **font)
-plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(bottom=0.25)
 
 decryption = (bytesto(633026584, 'g'), bytesto(5432784056, 'g'), bytesto(13670440818, 'g'))
 
@@ -32,11 +32,10 @@ width = 0.15
 p1 = plt.bar(ind, decryption, width, color='tab:blue', edgecolor="black")
 # p2 = plt.bar(ind, resharing, width, bottom=decryption, color='tab:orange')
 
-plt.xlabel('Size of the committee', fontsize='large')
+plt.xlabel('Size of the committee\n(a)', fontsize='large')
 plt.ylabel('Traffic (GB)', fontsize='large')
 # plt.title('MPC bandwidth')
 plt.xticks(ind, ('5', '10', '15'))
 plt.yticks(np.arange(0, 16, 2))
-
 # plt.legend((p1[0], p2[0]), ('Decryption', 'Re-sharing'))
 plt.savefig('../graphs/committee/mpc_bandwidth.pdf', format='pdf')
