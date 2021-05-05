@@ -22,7 +22,7 @@ font = {'size'   : 17}
 plt.rc('font', **font)
 plt.gcf().subplots_adjust(bottom=0.25)
 
-decryption = (bytesto(633026584, 'g'), bytesto(5432784056, 'g'), bytesto(13670440818, 'g'))
+decryption = (bytesto(950848352, 'g'), bytesto(4487875435, 'g'), bytesto(12427673470, 'g'))
 
 # resharing_cost = (32768*550/8) + (6*550/8)
 # resharing = (bytesto(resharing_cost*5, 'g'), bytesto(resharing_cost*10, 'g'), bytesto(resharing_cost*15, 'g'), bytesto(resharing_cost*20, 'g'))

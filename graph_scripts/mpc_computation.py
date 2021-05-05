@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 N = 3
 
-decryption = (369/60, 788/60, 1450/60)
+decryption = (84/60, 180/60, 382/60)
 
 # resharing = (1/60, 1/60, 1/60, /60)
 font = {'size'   : 17}

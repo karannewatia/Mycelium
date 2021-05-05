@@ -1,18 +1,14 @@
 ###### Committee size 5 #######
-Run time (s): 369
-Communication Cost (bytes): 633026584
+Run time (s): 84
+Communication Cost (bytes): 950848352
 
 
 ###### Committee size 10 #######
-Run time (s): 788
-Communication Cost (bytes): 5432784056
+Run time (s): 180
+Communication Cost (bytes): 4487875435
 
 
 ###### Committee size 15 #######
-Run time (s): 1450
-Communication Cost (bytes): 13670440818
+Run time (s): 382
+Communication Cost (bytes): 12427673470
 
-
-###### Committee size 20 #######
-Run time (s): 2304
-Communication Cost (bytes): 25866507647
