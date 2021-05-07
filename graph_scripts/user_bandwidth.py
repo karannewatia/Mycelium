@@ -137,9 +137,6 @@ p4 = plt.bar(ind[3:], [x + final_upload for x in total_forwarder], width, color=
 p5 = plt.bar(ind[3:]+width, [2*x + final_upload for x in total_forwarder], width, color='tab:pink', edgecolor="black")
 p6 = plt.bar(ind[3:]+2*width, [3*x + final_upload for x in total_forwarder], width, color='tab:olive', edgecolor="black")
 
-print([2*x + final_upload for x in total])
-print([2*x + final_upload for x in total_forwarder])
-
 
 plt.xlabel('Number of hops in the communication path', fontsize='large')
 plt.ylabel('Traffic (MB sent)', fontsize='large')
