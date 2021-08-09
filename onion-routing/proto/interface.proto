@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package interface;
+
+message Msg {
+    required bytes msg = 1;
+    required bytes addr = 2;
+    optional int32 id = 3;
+    optional int32 id_place_holder = 4;
+}
+
+message Request {
+    required int32 request_type = 1;
+    required bytes msg = 2;
+}
+
+message EncMsg {
+    required bytes iv = 1;
+    required bytes enc_msg = 2;
+    required bytes tag = 3;
+}

@@ -1,6 +1,12 @@
 # Creates a Linux 2 instance
 # Must configure to use region us-east-1 (that is where that image is located.)
-aws ec2 run-instances --key-name AWScis --instance-type t2.micro --image-id ami-062f7200baf2fa504 --count 1
+#aws ec2 run-instances --key-name ec2_0 --instance-type t2.xlarge --image-id ami-062f7200baf2fa504 --count 1
+#aws ec2 run-instances --instance-type t2.xlarge --image-id ami-062f7200baf2fa504 --count 1
+
+
+aws ec2 create-key-pair --key-name ec2
+# save the private key in ~/Downloads/ec2.pem
+aws ec2 run-instances --instance-type t2.xlarge --image-id ami-0d5eff06f840b45e9 --count 1
 
 
 SRC_LOC=$1     # e.g. ec_elgamal
@@ -14,7 +20,8 @@ ip=$(aws ec2 describe-instances --filters Name=instance-state-name,Values=runnin
 
 instance_id=$(aws ec2 describe-instances --filters Name=instance-state-name,Values=running,pending | grep InstanceId | grep -o i-\[0-9a-f\]*)
 
-ssh_key="~/Downloads/AWScis.pem"
+#ssh_key="~/Downloads/AWScis.pem"
+ssh_key="~/.ssh/ec2.pem"
 
 # For some reason scp connection is being refused... maybe needs time to start up?
 sleep 45

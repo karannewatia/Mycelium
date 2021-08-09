@@ -1,0 +1,8 @@
+CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
+
+ADD_SUBDIRECTORY(proto)
+
+add_definitions(-std=c++11)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+ADD_EXECUTABLE(router router.cpp)
+TARGET_LINK_LIBRARIES(router proto ${PROTOBUF_LIBRARY} m ssl crypto pthread)

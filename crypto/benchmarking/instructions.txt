@@ -20,3 +20,17 @@ cd lwe
 sudo docker build -t mycelium .
 
 From then on, just run experiments!
+
+
+aws ec2 create-image --instance-id i-0721a46b83c0cfa45 --name amzn2-ami-hvm-2.0.20210427.0-x86_64-gp2
+
+resulting:
+image_id=ami-07e08a563dc11a816
+
+
+docker_name=80d7d284596d
+
+./create_player.sh 3 1 ami_myc
+./run_test ...
+
+MAKE SURE TO TERMINATE ALL AFTERWARDS

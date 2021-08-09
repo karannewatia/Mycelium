@@ -4,25 +4,29 @@ n_players=$1
 threshold=$2
 image_name=$3
 
-key_name=AWScis
-docker_name=docker0
+key_name=myc
+docker_name=80d7d284596d
 
 # Before doing anything else, terminate any existing instances.
 # There should only be one type of instance running at a time
-./terminate_all.sh
+#./terminate_all.sh
 
 # Seems that sometimes they stick around in the running state
 #   from aws's perspective, even though I've asked them to terminate.
 #   Therefore wait a bit so that they really terminate.
-sleep 10
+#sleep 10
 
 # Assumes ami names begin with "ami"
 ami_id=$(cat ${image_name}.ami_id)
 # Using t2.small (2GB RAM) since t2.micro (1GB RAM) does not seem to have enough RAM
-aws ec2 run-instances --key-name ${key_name} --instance-type t2.small --image-id ${ami_id} --count ${n_players}
+#aws ec2 run-instances --key-name ${key_name} --instance-type t2.small --image-id ${ami_id} --count ${n_players}
+aws ec2 run-instances --key-name ${key_name} --instance-type t2.xlarge --image-id ${ami_id} --count ${n_players}
 
-rm ip_addresses.txt
-aws ec2 describe-instances --filter Name=instance-state-name,Values=running,pending | grep PublicIpAddress | grep -o \[0-9\.\]* > ip_addresses.txt
+#rm ip_addresses.txt
+aws ec2 describe-instances --filter Name=instance-state-name,Values=running,pending | grep PublicIpAddress | grep -o \[0-9\]\+\.\*\[0-9\]+ > ip_addresses.txt
+
+
+# DO ALL PREVIOUS STUFF MANUALLY
 
 rm NetworkData.txt
 
@@ -42,7 +46,7 @@ cat NetworkData.txt
 while [ "$(aws ec2 describe-instances --filter Name=instance-state-name,Values=pending )" != "$(aws ec2 describe-instances --filter Name=instance-state-name,Values= )" ]; do echo 'instances pending...'; sleep 1; done
 
 # I don't know why my ssh connections are being dropped... This seems to help.
-sleep 20
+#sleep 20
 
 ssh_key="~/Downloads/${key_name}.pem"
 for i in $(seq 1 ${n_players}); do
@@ -60,17 +64,21 @@ for i in $(seq 1 ${n_players}); do
     echo 'Copying file to ' ${player_i_ip}
 
     scp -i ${ssh_key} ./NetworkData.txt ec2-user@${player_i_ip}://home/ec2-user/NetworkData.txt
+    scp -i ${ssh_key} ../code/scalemamba/lwe/config/genSecretSharingOptions.sh ec2-user@${player_i_ip}://home/ec2-user/genSecretSharingOptions.sh
     
     echo 'connecting by ssh to ' ${player_i_ip}
 
     ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo service docker start
     port_id=$(( 5000 + ${i} - 1))
+    #container_id=$(ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker run -id -p ${port_id}:${port_id} ${docker_name})
     container_id=$(ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker run -id -p ${port_id}:${port_id} ${docker_name})
 
     # This is dark magic... but it works. See comment by dr.doom at:
     #   https://stackoverflow.com/questions/3314660/passing-variables-in-remote-ssh-command
+    ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker cp ./genSecretSharingOptions.sh ${container_id}://root/SCALE-MAMBA/ 
     ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker exec -i ${container_id} bash -c '"cd SCALE-MAMBA; ./runSetup.sh '${n_players} ${threshold}'"'
-    ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker cp ./NetworkData.txt ${container_id}://root/SCALE-MAMBA/Data/NetworkData.txt 
+    ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker exec -i ${container_id} bash -c '"curl --proto ’=https’ --tlsv1.2 -sSf https://sh.rustup.rs | sh"'
+    ssh -i ${ssh_key} ec2-user@${player_i_ip} sudo docker cp ./NetworkData.txt ${container_id}:/root/SCALE-MAMBA/Data/
 
 done 
   
