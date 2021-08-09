@@ -1,32 +1,24 @@
 #!/bin/bash
+PROG=$1
+SIZE=${2:-32768}
 
-
-# Follow instructions here to download zokrates
-#curl -LSfs get.zokrat.es | sh
-# set $ZOKRATES_HOME variable to stdlib
-
-
-# compile
-echo "compiling..."
-time zokrates compile -i shift.zok
-echo "compiled."
 # perform the setup phase
-zokrates setup
+zokrates setup -i $PROG
 # execute the program
-#zokrates compute-witness -a $2 $3 $4
-#zokrates compute-witness -a $(seq 500)
-#python genInput.py 32768 > witnessInput
-python shiftInput.py 32768 > shiftWitnessInput
-#time zokrates compute-witness -a $(cat witnessInput)
-#cat witnessInput | time zokrates compute-witness --stdin
-cat shiftWitnessInput | time zokrates compute-witness --stdin
+
+# compute witness
+python ${PROG}Input.py $SIZE > ${PROG}Witness
+cat ${PROG}Witness | zokrates compute-witness --stdin -i $PROG
 echo "computed witness."
+
 # generate a proof of computation
-time zokrates generate-proof
-echo "^ Proof generated"
+time zokrates generate-proof -i $PROG
+echo "Proof generated."
 echo ""
+
 # export a solidity verifier
-zokrates export-verifier
+#zokrates export-verifier
+
 # Do verification step
 time zokrates verify
 

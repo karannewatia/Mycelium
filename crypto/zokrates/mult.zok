@@ -1,18 +1,20 @@
-import "hashes/mimc7/mimc7R90" as mimc
+//import "hashes/mimc7/mimc7R90" as mimc
 
-#Multiply together 10 ciphertexts (stored together in u and v)
-def main(field[327680] u, field[327680] v, field[32768] res_u, field[32768] res_v) ->  field:
+//Multiply together 10 ciphertexts (stored together in u and v) and return product
+def main(private field[327680] u, private field[327680] v) ->  field[65536]:
 
-  for field i in 0..32768 do
+  field[65536] result = [0; 65536]
+
+  for u32 i in 0..32768 do
     field tmp_u = 1
     field tmp_v = 1
-    for field j in 0..9 do
-      tmp_u = tmp_u *  u[i+j*23768] 
-      tmp_v = tmp_v *  v[i+j*23768] 
+    for u32 j in 0..9 do
+      tmp_u = tmp_u *  u[i+j*32768] 
+      tmp_v = tmp_v *  v[i+j*32768] 
     endfor
-    assert(res_u[i] == tmp_u)
-    assert(res_v[i] == tmp_v)
+    result[i] = tmp_u
+    result[i+32768] = tmp_v
   endfor
 
-  return mimc(res_u[0] + res_v[0], 1) 
+  return result
 

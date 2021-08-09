@@ -1,24 +1,11 @@
 import "hashes/sha256/512bit" as sha256
-import "hashes/mimc7/mimc7R90" as mimc
+// import "hashes/mimc7/mimc7R90" as mimc
 
-/* 1024bit
-def hash(u32[8] a, u32[8] b, u32[8] c, u32[8] d) -> u32[8]:
-  return sha256(a, b, c, d)
+// Encrypt local value into a ciphertext [u,v] and ensure its properly constructed
+def main(private field[32768] z, private field[32768] a, private field[32768] b, private field[32768] u, private field[32768] v) -> field:
 
-def hash(u32[16] hashMe) -> u32[8]:
-  u32[8] h = sha256(hashMe[0..8], hashMe[8..16])
-  return h
-*/
+  field m = 2**30 // plaintext modulus
 
-
-def main(private field[32768] z, private field[32768] a, private field[32768] b, field[32768] u, field[32768] v) -> field:
-//def main(private field[32768] z, private field[32768] a, private field[32768] b, field[32768] u, field[32768] v) -> u32[8]:
-
-  field m = 2
-
-  //field[32768] e0 = [mimc(0,1) ; 32768] // initialize an array of n random values
-  //field[32768] e1 = [m*mimc(0,1) ; 32768] // initialize an array of n random values
-  //field[32768] e2 = [m*mimc(2,1) ; 32768]
   field[32768] e0 = [1 ; 32768]
   field[32768] e1 = [2 ; 32768]
   field[32768] e2 = [2 ; 32768]
@@ -26,10 +13,11 @@ def main(private field[32768] z, private field[32768] a, private field[32768] b,
   u32[16] hashMe = [0x00000001; 16]
   u32[8] h = sha256(hashMe[0..8], hashMe[8..16]) // Just to test hash
 
-  for field i in 0..32768 do
-    assert(v[i]  == b[i]*e0[i] + 2*e2[i] + z[i])
-    assert(u[i] == a[i]*e0[i] + 2*e1[i])
+  for u32 i in 0..32768 do
+    assert(v[i]  == b[i]*e0[i] + m*e2[i] + z[i])
+    assert(u[i] == a[i]*e0[i] + m*e1[i])
   endfor
 
-  return mimc(u[0]+v[0], 1) // for now to make sure we can return a hash
+  return u[0] 
+ //return sha256(u) // for now to make sure we can return a hash
 
