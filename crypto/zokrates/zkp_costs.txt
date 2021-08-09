@@ -1,0 +1,7 @@
+encryption zkp proof generation time (in seconds): 15.146
+encryption zkp size (in MB): 4.6
+encryption zkp verification time (in seconds): 0.643
+
+final upload (multiplying) zkp proof generation  time (in seconds): 72
+final upload zkp size (in MB): 51
+final upload (multiplying) zkp verification time (in seconds): 6.74
