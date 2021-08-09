@@ -1,9 +1,9 @@
 # Mycelium submission for SOSP 2021
 
-onion-routing-main:
+onion-routing:
 - all onion routing code
 
-LWE-main:
+crypto:
 - MPC files for decryption and benchmarking for local multiplications, etc. (code/scalemamba/lwe/ and code/scalemamba/python_lwe/)
 - EC2 experiment instructions/scripts (benchmarking/)
 - Resharing rough version (re_sharing/)
