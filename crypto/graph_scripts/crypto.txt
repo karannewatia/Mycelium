@@ -1,5 +1,4 @@
 time for ciphertext addition (in seconds): 0.025922978878021242
 time for encryption (in seconds): 14.493421077728271
-time for shifting (in seconds): 20.33608603477478
 time for a ciphertext multiplication with relin (in seconds): 275.0299119949341
 time for 10 ciphertext multiplications without relin (in seconds): 851.4942331314087

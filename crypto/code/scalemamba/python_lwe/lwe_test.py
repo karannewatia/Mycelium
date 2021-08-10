@@ -4,8 +4,6 @@ import random
 import numpy as np
 import time
 import sympy
-# import gmpy2
-# from gmpy2 import mpz
 
 lgP = 550
 lgM = 30
@@ -51,15 +49,13 @@ x[1] = 1
 print("################# plaintext ###################")
 print(x)
 
-# y = lwe.mul(x,x)
-# print(y)
 
 [b, a, s] = lwe.key_gen()
 #enc_start = time.time()
 [v0, u0] = lwe.enc(b, a, x)
 # enc_end = time.time()
 # print("encryption time: ", enc_end - enc_start)
-#x2 = lwe.dec(v0, u0, s)
+x2 = lwe.dec(v0, u0, s)
 
 ###### check addition on ciphertext #######
 # [v, u] = lwe.enc(b, a, x)
@@ -74,45 +70,34 @@ print(x)
 # print("ciphertext addition time: ", add_end - add_start)
 # x2 = lwe.dec(v2, u2, s)
 
-######### check shift on ciphertext ##########
-
-# shift_start = time.time()
-# shift = [0 for i in range(n)]
-# shift[1] = 1
-# v = lwe.mul(v0, shift)
-# u = lwe.mul(u0, shift)
-# x2 = lwe.dec(v, u, s)
-# shift_end = time.time()
-# print("ciphertext shift time: ", shift_end - shift_start)
-
 
 ###### check multiplication on ciphertext #######
 #s2 = lwe.mul(s,s)
 #[rlk_b, rlk_a] = lwe.rl_keys(s, s2)
 
-mult_start = time.time()
-
-v1, u1 = v0, u0
-v, u = v0, u0
-c0 = lwe.mul(v, v1)
-c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
-c2 = lwe.mul(u, u1)
-
-########### check mult without relin #############
-#x2 = lwe.dec_mul(c0, c1, c2, s)
-c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-c = lwe.ciphertext_mult_more(c, [v, u])
-
-print(time.time() - mult_start)
-
-x2 = lwe.dec_mul_more(c, s)
+# mult_start = time.time()
+#
+# v1, u1 = v0, u0
+# v, u = v0, u0
+# c0 = lwe.mul(v, v1)
+# c1 = lwe.add(lwe.mul(u,v1), lwe.mul(v,u1))
+# c2 = lwe.mul(u, u1)
+#
+# ########### check mult without relin #############
+# #x2 = lwe.dec_mul(c0, c1, c2, s)
+# c = lwe.ciphertext_mult_more([c0,c1,c2], [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+# c = lwe.ciphertext_mult_more(c, [v, u])
+#
+# print(time.time() - mult_start)
+#
+# x2 = lwe.dec_mul_more(c, s)
 
 # ############## check mult with relin ###############
 #[c0_mul, c1_mul] = lwe.relinearization(rlk_b, rlk_a, c0, c1, c2, s)
