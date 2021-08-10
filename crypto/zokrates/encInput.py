@@ -12,9 +12,11 @@ def gen_input(N):
 
     u = [0]*N
     v = [0]*N
+
+    m = 2**30
     for i in range(N):
-        u[i] = a[i]*e0[i] + 2*e1[i]
-        v[i] = b[i]*e0[i] + 2*e2[i] + z[i]
+        u[i] = a[i]*e0[i] + m*e1[i]
+        v[i] = b[i]*e0[i] + m*e2[i] + z[i]
     
 
     print(*z, *a, *b, *u, *v)
