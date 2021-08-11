@@ -1,0 +1,32 @@
+execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
+#from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
+
+#p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
+
+w = cint(1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470)
+
+lgN = 15
+r = Ring(lgN, w)
+
+N = 1
+lgM = 30
+l = 12
+n = 32768
+lgP = 550
+lwe = LWE(r, N, lgM, l, n, lgP)
+
+
+##################### Test key gen + decrypt in MPC ########################
+
+x = sint.Array(l)
+for i in range(l):
+  x[i] = sint(i)
+  print_ln("Plaintext is %s ", x[i].reveal())
+
+[b, a, s] = lwe.key_gen()
+[v,u] = lwe.enc(b, a, x)
+
+x2 = lwe.dec(v, u, s)
+for i in range(l):
+  x2[i].reveal_to(0)
+  print_ln("Decrypted text is %s ", x2[i].reveal())

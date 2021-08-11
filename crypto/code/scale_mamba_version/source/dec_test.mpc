@@ -4,34 +4,14 @@ execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 #p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
 
 w = cint(1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470)
-
 lgN = 15
 r = Ring(lgN, w)
-
 N = 1
 lgM = 30
 l = 12
 n = 32768
 lgP = 550
 lwe = LWE(r, N, lgM, l, n, lgP)
-
-
-############ Benchmark Key gen separately ########################
-
-#[b, a, s] = lwe.key_gen()
-#s = lwe.secret_key_gen()
-#tmp = sint.get_random_bit()
-
-#for i in range(n):
-  #output_shares(0, s[i])
-  #output_shares(0, tmp)
-
-#print_ln("public key a")
-#for i in range(len(a)):
-  #print_ln("%s ", a[i])
-#print_ln("public key b")
-#for i in range(len(b)):
-  #print_ln("%s ", b[i])
 
 
 ############ Benchmark Decrypt separately ########################
@@ -73,25 +53,3 @@ for i in range(l):
 for i in range(2):
   z = binning[i] + lwe.laplace(sint(1)) #add noise
   print_ln("Decrypt result is: %s ", z.reveal())
-
-
-################# Generate Laplace noise ####################
-
-#noise = lwe.laplace(sint(1))
-#print_ln("Noise is %s ", noise.reveal())
-
-
-##################### Test key gen + decrypt in MPC ########################
-
-#x = sint.Array(l)
-#for i in range(l):
-  #x[i] = sint(i)
-  #print_ln("Plaintext is %s ", x[i].reveal())
-
-#[b, a, s] = lwe.key_gen()
-#[v,u] = lwe.enc(b, a, x)
-
-#x2 = lwe.dec(v, u, s)
-#for i in range(l):
-  #x2[i].reveal_to(0)
-  #print_ln("Decrypted text is %s ", x2[i].reveal())
