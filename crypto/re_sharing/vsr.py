@@ -3,11 +3,11 @@ from lagrange import lagrange
 
 n = 10 #size of the committee
 m = 6 #threshold size of the committee needed to reconstruct the secret
+p = 11 #prime modulus
+generator = 9
+r = 23 #size of the finite field of the generator
 
-p = 11
-r = 23
-
-k = random.randint(0, p-1)
+k = random.randint(0, p-1) #secret
 print("original secret: ", k)
 
 a = [random.randint(0, p-1) for _ in range(m-1)]
@@ -21,7 +21,6 @@ print("shares: ", s_shares)
 
 print("original secret reconstructed: ", lagrange(s_shares, p))
 
-generator = 9
 generator_lst = [0 for _ in range(m)]
 generator_lst[0] = (generator ** k) % r
 for i in range(1, m):
@@ -30,6 +29,7 @@ for player in range(n):
     prod = generator_lst[0]
     for l in range(1, m):
         prod = (prod * (generator_lst[l] ** ((player+1)**l)) % r) % r
+
 sub_shares = [[0 for _ in range(n)] for _ in range(n)]
 for member in range(n):
     a_prime = [random.randint(0, p-1) for _ in range(m-1)]
@@ -46,3 +46,4 @@ new_shares = [lagrange(sub_shares[i], p) for i in range(n)]
 print("new shares: ", new_shares)
 
 print("secret reconstructed by new committee: ", lagrange(new_shares, p))
+print("secret can also be reconstructed if there's at least m members in the new committee: ", lagrange(new_shares[:m], p))

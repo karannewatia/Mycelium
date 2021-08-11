@@ -8,7 +8,7 @@ class Ring(object):
   # i.e. A ring of polynomials where coefficients are
   #   in Z/pZ, and where polynomial multiplication is
   #   reduced over X^n+1
-  # p is the prime modulus natively used by SCALE-MAMBA
+  # p is the prime modulus
   # Require also that p = 1 (mod 2n)
   # n = 2^nBitsN
   # w is a 2nth primitive root of unity

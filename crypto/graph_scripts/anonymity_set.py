@@ -5,9 +5,10 @@ import math
 k_vals = [2,3,4] #number of hops in the communication path
 r = [1,2,3] #number of copies sent
 c_vals = [ 0.01, 0.02, 0.04] #fractions of malicious users who collude with the aggregator
-f = 0.1
-n = 2**30
+f = 0.1 #fraction of forwarders
+n = 2**30 #number of users in the system
 
+#equations for calculating the size of the anonymity set
 def anon_set(c,r,f,k):
     t = (1-c)*r/f
     result = 0
@@ -33,7 +34,6 @@ plot_3 = [anon_set(0.04,2,f,k) for k in k_vals]
 plot_4 = [anon_set(0.01,3,f,k) for k in k_vals]
 plot_5 = [anon_set(0.02,3,f,k) for k in k_vals]
 plot_6 = [anon_set(0.04,3,f,k) for k in k_vals]
-
 
 plt.plot(k_vals, plot_1, '--', label = "mal=0.01, r=2",  marker="X", markersize=10, linewidth=5)
 plt.plot(k_vals, plot_2, '--', label = "mal=0.02, r=2",  marker="X", markersize=10, linewidth=5)

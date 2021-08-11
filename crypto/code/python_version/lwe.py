@@ -8,45 +8,19 @@ class LWE(object):
     self.r = r  # Ring used
     self.N = N  # Half-width of binomial distributions
     # Require p = 1 (mod 2m), and m to be a power of 2
-    self.lgM = lgM
-    self.m = (2 ** lgM)  # Plaintext modulus (size per element)
-    self.l = l           # Plaintext length (number of elements)
-    self.n = n
-    self.lgP = lgP
-    self.p = p
-    self.lgP_base_m = math.ceil(math.log(self.p, self.m))
+    self.lgM = lgM #plaintext modulus bitsize
+    self.m = (2 ** lgM) #plaintext modulus (size per element)
+    self.l = l #plaintext length (number of elements)
+    self.n = n #polynomial degree
+    self.lgP = lgP #ciphertext modulus bitsize
+    self.p = p #ciphertext modulus
     self.mult = self.r.ringMul
 
   def get_mod(self, a):
        return a % self.p
 
-  def to_binary(self, number):
-      res = [0 for i in range(self.lgP)]
-      if (number < 0):
-          number = -number
-      for i in range(self.lgP-1, -1, -1):
-        if (number > 1):
-            res[i] = number % 2
-            number = number >> 1
-        else:
-            res[i] = number % 2
-            number = 0
-      return res
-
-  def number_to_base(self, number):
-    if number == 0:
-        return [0]
-    digits = [0 for _ in range(self.lgP_base_m)]
-    count = 0
-    while number:
-        digits[count] = int(number % self.m)
-        count += 1
-        number //= self.m
-    return digits[::-1]
-
-
-  # Returns [a, b, s]
-  # (a, b) is the public key, s is the secret key
+  # Returns [b, a, s]
+  # (b, a) is the public key, s is the secret key
   def key_gen(self):
     r = self.r
     N = self.N
@@ -55,14 +29,13 @@ class LWE(object):
     e = r.ringBinom(N)
     a_neg = [self.get_mod(-i) for i in a]
     e = [self.get_mod(self.m*i) for i in e]
-
     b = r.ringAdd(self.mult(a_neg, s), e)
 
     res = [b,a,s]
     return res
 
   # z is plaintext (array) of l elems each modulo m
-  # returns ciphertext [u, v]
+  # returns ciphertext [v, u]
   def enc(self, b, a, z):
     r = self.r
     N = self.N
@@ -70,19 +43,15 @@ class LWE(object):
     e0 = r.ringBinom(N)
     e1 = r.ringBinom(N)
     e2 = r.ringBinom(N)
-
     e1 = [self.get_mod(self.m*i) for i in e1]
     e2 = [self.get_mod(self.m*i) for i in e2]
-
     u = self.mult(a, e0)
     u = r.ringAdd(u, e1)
-
     mthP = self.p//m
-
     zMthP = r.zero()
 
     for i in range(0, len(z)):
-      zMthP[i] = self.get_mod(z[i]) #self.get_mod(z[i] * mthP)
+      zMthP[i] = self.get_mod(z[i])
 
     v = self.mult(b, e0)
     v = r.ringAdd(v, e2)
@@ -98,7 +67,6 @@ class LWE(object):
     m = 1 << lgM
     clearM = m
     zNoisy = r.ringAdd(v, self.mult(u, s))
-
     halfMthP = self.p//(2*m)
 
     z = [0 for i in range(self.l)]
@@ -106,9 +74,8 @@ class LWE(object):
       zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
       zNoisy[i] = zNoisy[i] - halfMthP
       if abs(zNoisy[i]) >= halfMthP:
-        print(" !!! dec fails !!! ")
+        print(" !!! dec failed !!! ")
         return [False, False]
-
       z[i] = zNoisy[i] % self.m
 
     return [z, zNoisy]
@@ -120,7 +87,6 @@ class LWE(object):
     clearM = m
     s1 = self.mult(s,s)
     zNoisy = r.ringAdd(r.ringAdd(c0, self.mult(c1, s)), self.mult(c2, s1))
-
     halfMthP = self.p//(2*m)
 
     z = [0 for i in range(self.l)]
@@ -128,9 +94,8 @@ class LWE(object):
          zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
          zNoisy[i] = zNoisy[i] - halfMthP
          if abs(zNoisy[i]) >= halfMthP:
-           print(" !!! dec fails !!! ")
+           print(" !!! dec failed !!! ")
            return [False, False]
-
          z[i] = zNoisy[i] % self.m
 
     return [z, zNoisy]
@@ -170,9 +135,8 @@ class LWE(object):
            zNoisy[i] = self.get_mod(zNoisy[i] + halfMthP)
            zNoisy[i] = zNoisy[i] - halfMthP
            if abs(zNoisy[i]) >= halfMthP:
-             print(" !!! dec fails !!! ")
+             print(" !!! dec failed !!! ")
              return [False, False]
-
            z[i] = zNoisy[i] % self.m
 
       return [z, zNoisy]
@@ -181,7 +145,6 @@ class LWE(object):
   def rl_keys(self, s, s2):
       r = self.r
       N = self.N
-
       a = []
       b = []
 
@@ -199,6 +162,17 @@ class LWE(object):
           b[i] = r.ringAdd(b[i], s2_tmp)
 
       return [b, a]
+
+  def number_to_base(self, number):
+    if number == 0:
+        return [0]
+    digits = [0 for _ in range(self.lgP_base_m)]
+    count = 0
+    while number:
+        digits[count] = int(number % self.m)
+        count += 1
+        number //= self.m
+    return digits[::-1]
 
   def relinearization(self, b, a, c0, c1, c2, s):
       r = self.r

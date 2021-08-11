@@ -1,5 +1,58 @@
 
-###### Figure 5(c) ######
+###################### Figure 5(a) #########################
+Script and explanation in anonymity_set.py
+
+X axis:
+Number of hops in the communication path:
+[2,3,4]
+
+Y axis:
+Size of the anonymity set:
+r is the number of copies sent per message
+k is the number of hops
+
+r = 2, malicious rate = 0.01, k = 2,3,4
+[384.6305439999999, 7532.187307771597, 147639.63471843363]
+r = 2, malicious rate = 0.02, k = 2,3,4
+[369.71598399999993, 7088.068441062397, 136125.71820155764]
+r = 2, malicious rate = 0.04, k = 2,3,4
+[341.21478399999995, 6266.959225753599, 115448.00588594611]
+r = 3, malicious rate = 0.01, k = 2,3,4
+[865.1245689999997, 25420.74241459509, 747424.830936443]
+r = 3, malicious rate = 0.02, k = 2,3,4
+[831.2842239999998, 23920.733940166396, 689130.300354399]
+r = 3, malicious rate = 0.04, k = 2,3,4
+[766.6253439999999, 21145.47252520959, 584412.149567663]
+
+
+###################### Figure 5(b) #########################
+Script and explanation in identification_graph.py
+
+X axis:
+Malice rate:
+[0.5, 1, 2, 4]
+
+Y axis:
+Probability of identification (for the 4 different malice rates):
+r is the number of copies sent per message
+k is the number of hops
+
+r = 1, k = 2
+[0.0, 0.0, 0.0008000000000000229, 0.0015999999999999348]
+r = 2, k = 2
+[0.0, 0.0, 0.0008000000000000229, 0.0033000000000004137]
+r = 3, k = 2
+[0.0, 0.000200000000000089, 0.001200000000000201, 0.0049000000000002375]
+r = 1, k = 3
+[0.0, 0.0, 0.0, 0.0]
+r = 2, k = 3
+[0.0, 0.0, 0.0, 9.999999999987796e-05]
+r = 3, k = 3
+[0.0, 0.0, 0.0, 0.000200000000000089]
+
+
+###################### Figure 5(c) #########################
+Script and explanation in goodput_graph.py
 
 X axis:
 Node failure rate (malice + churn):
@@ -7,6 +60,7 @@ Node failure rate (malice + churn):
 
 Y axis:
 r is the number of copies sent per message
+
 Message success rates for r = 1:
 [0.975, 0.9349999999999999, 0.916, 0.893, 0.86, 0.8379999999999999, 0.7859999999999999, 0.765, 0.74]
 Message success rates for r = 2:
@@ -15,7 +69,8 @@ Message success rates for r = 3:
 [1.0, 1.0, 0.999, 1.0, 0.9950000000000001, 0.992, 0.992, 0.986, 0.9850000000000001]
 
 
-###### Figure 5(d) ######
+###################### Figure 5(d) #########################
+Script and explanation in duration.py
 
 X axis:
 Number of hops in the communication path:
@@ -28,23 +83,3 @@ Number of C-rounds needed for message forwarding:
 [4, 6, 8]
 Total number of C-rounds (telescoping + message forwarding):
 [10, 18, 28]
-
-
-################# for anonymity set graph of probability of being identified exactly ################
-[0.005, 0.01, 0.02, 0.04]
-
-
-####################### k = 2 ########################
-[1.0, 1.0, 0.9992, 0.9984000000000001]
-[1.0, 1.0, 0.9992, 0.9966999999999996]
-[1.0, 0.9997999999999999, 0.9987999999999998, 0.9950999999999998]
-
-####################### k = 3 ########################
-[1.0, 1.0, 1.0, 1.0]
-[1.0, 1.0, 1.0, 0.9999000000000001]
-[1.0, 1.0, 1.0, 0.9997999999999999]
-
-####################### k = 4 ########################
-[1.0, 1.0, 1.0, 1.0]
-[1.0, 1.0, 1.0, 1.0]
-[1.0, 1.0, 1.0, 0.9999000000000001]
