@@ -23,10 +23,6 @@ make
 make test
 sudo make install
 
-# cd
-# echo "remove older version openssl"
-# sudo apt-get --purge remove openssl
-
 cd
 echo "install protobuf"
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-cpp-3.14.0.zip

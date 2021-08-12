@@ -14,7 +14,6 @@ use docker ps to get the id of the docker container running, and then
 copy the following from host to docker:
 docker cp crypto/Cert-Store/ id:/root/SCALE-MAMBA/
 docker cp crypto/code/scale_mamba_version/config/decrypt.sh id:/root/SCALE-MAMBA/Data/
-docker cp crypto/code/scale_mamba_version/config/key_gen.sh id:/root/SCALE-MAMBA/Data/
 
 in the docker:
 apt-get install vim
@@ -28,9 +27,8 @@ bash ./genCertOptions.sh N 1 | ./Setup.x
 Then set the mod with: ./Setup.x -> 2 -> 2 -> mod -> then enter the max possible t (threshold value)
 
 To perform secret key gen:
-
 In the docker:
-./benchmark.sh enc_test 0 1 2 ...N-1
+./benchmark.sh secret_keygen 0 1 2 ...N-1
 
 
 To benchmark MPC decryption (do this after performing the secret key gen):

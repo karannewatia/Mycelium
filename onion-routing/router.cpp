@@ -1,22 +1,5 @@
 #include "io.cpp"
 
-/*
-int main() {
-    Router router1 = Router("127.0.0.1:6666");
-    Router router2 = Router("127.0.0.1:6667");
-    Router router3 = Router("127.0.0.1:6668");
-    Router router4 = Router("127.0.0.1:6669");
-    vector<string> ips = {"127.0.0.1:6667", "127.0.0.1:6668", "127.0.0.1:6669"};
-    sleep(2);
-    router1.estabilsh_key_exchange(ips);
-    string msg = "hello world";
-    router1.sendMsg(msg, ips);
-
-    while(1) {}
-    return 0;
-}
-*/
-
 int id = 0;
 
 int main(int argc, char *argv[]) {
@@ -34,7 +17,7 @@ int main(int argc, char *argv[]) {
         memset(cmd, 0, sizeof(cmd));
         cin.getline(cmd, sizeof(cmd));
         string cmd_str = string(cmd, 1);
-        // only accept 0 for handshake 1 for send message
+        // only accept 0 for handshake, 1 for send message
         if (cmd_str != "0" && cmd_str != "1") {
             cout << "invalid command, should be either 0 or 1\n";
             continue;
