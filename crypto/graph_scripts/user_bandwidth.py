@@ -21,6 +21,8 @@ degree = 32768
 prime_bitsize = 550
 
 ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
+print(ct_size)
+exit(0)
 enc_proof_size = 4.6
 
 telescoping = [0,0,0]
