@@ -1,9 +1,9 @@
 This is an implementation of the BGV FHE crypto-system, used to benchmark user-side FHE cost.
 
 Requirements:
-- python3
+- python (version v>3)
 - sympy (can be installed using `pip install sympy`)
-- python2 (for playing around with the FHE implementation; see below)
+- python2 (2.7) (for playing around with the FHE implementation; see below)
 
 
 To test the time taken for a ciphertext encryption:

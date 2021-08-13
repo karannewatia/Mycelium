@@ -7,7 +7,7 @@ Follow instructions here to download zokrates:
 - `cd ..`
 
 Requirements:
-- python3
+- python (version v>3)
 - cargo (can be installed using `curl https://sh.rustup.rs -sSf | sh`)
 - nightly (can be installed using `rustup -v install  nightly`)
 
