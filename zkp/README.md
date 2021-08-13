@@ -1,10 +1,18 @@
-# Follow instructions here to download zokrates:
-# curl -LSfs get.zokrat.es | sh
-# set $ZOKRATES_HOME variable to stdlib
+Follow instructions here to download zokrates:
+- `git clone https://github.com/ZoKrates/ZoKrates`
+- `cd ZoKrates/`
+- `git checkout 0.7.0`
+- `git pull origin 0.7.0`
+- `cargo +nightly build --release`
+
+Requirements:
+- python3
+- cargo (can be installed using `curl https://sh.rustup.rs -sSf | sh`)
+- nightly (can be installed using `rustup -v install  nightly`)
 
 Run the following programs using the command:
-# ./run.sh [prog_name]
-[prog_name] can be one of 2 programs:
+- ./run.sh [prog_name]
+where [prog_name] can be one of 2 programs:
  - enc
  - mult
 
