@@ -2,4 +2,4 @@
 PROG=$1
 
 # compile
-time ./zokrates compile -i $PROG.zok -o $PROG
+time ./ZoKrates/target/release/zokrates compile -i $PROG.zok -o $PROG

@@ -1,5 +1,4 @@
 import "hashes/sha256/512bit" as sha256
-// import "hashes/mimc7/mimc7R90" as mimc
 
 // Encrypt local value into a ciphertext [u,v] and ensure its properly constructed
 def main(private field[32768] z, private field[32768] a, private field[32768] b, private field[32768] u, private field[32768] v) -> field:
@@ -18,6 +17,4 @@ def main(private field[32768] z, private field[32768] a, private field[32768] b,
     assert(u[i] == a[i]*e0[i] + m*e1[i])
   endfor
 
-  return u[0] 
- //return sha256(u) // for now to make sure we can return a hash
-
+  return u[0]
