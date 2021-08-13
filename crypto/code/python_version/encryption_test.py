@@ -19,8 +19,7 @@ x = [0 for i in range(l)]
 for i in range(l):
   x[i] = 0
 x[1] = 1
-print("################# plaintext ###################")
-print(x)
+print("plaintext: ", x)
 
 [b, a, s] = lwe.key_gen()
 enc_start = time.time()
@@ -29,5 +28,4 @@ enc_end = time.time()
 print("encryption time: ", enc_end - enc_start)
 
 x2 = lwe.dec(v0, u0, s)
-print("################# decrypted text ###################")
-print(x2[0])
+print("decrypted text: ", x2[0])

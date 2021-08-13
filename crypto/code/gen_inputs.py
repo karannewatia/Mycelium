@@ -1,5 +1,4 @@
 import math
-import numpy as np
 import random
 
 def mpc_dec_input():
@@ -25,9 +24,8 @@ def mult_noise(q,t,n,D, A=1000000000):
     return q >= noise
 
 def main():
-    #decompose_gadget())
-    #mpc_dec_input
-
+    #decompose_gadget()
+    #mpc_dec_input()
     print(mult_noise((1<<550)+1, 2**30, 2**15, 10))
 
 

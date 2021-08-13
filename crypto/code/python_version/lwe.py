@@ -14,6 +14,7 @@ class LWE(object):
     self.n = n #polynomial degree
     self.lgP = lgP #ciphertext modulus bitsize
     self.p = p #ciphertext modulus
+    self.lgP_base_m = math.ceil(math.log(self.p, self.m))
     self.mult = self.r.ringMul
 
   def get_mod(self, a):
@@ -60,7 +61,9 @@ class LWE(object):
     res = [v, u]
     return res
 
-
+  # decrypt the ciphertext [v,u] using the secret key s
+  # returns [z,zNoisy] where z is the decrypted ciphertext,
+  # and zNoisy is useful for debugging
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
@@ -80,6 +83,7 @@ class LWE(object):
 
     return [z, zNoisy]
 
+  #Same as dec except that the ciphertext is [c0,c1,c2] (obtained after multiplying two size-2 ciphertexts)
   def dec_mul(self, c0, c1, c2, s):
     r = self.r
     lgM = self.lgM
@@ -100,6 +104,7 @@ class LWE(object):
 
     return [z, zNoisy]
 
+  #Same as dec except that the ciphertext is [c0,...,c11] (obtained after multiplying ten ciphertexts)
   def dec_mul_more(self, c, s):
       r = self.r
       lgM = self.lgM
@@ -141,7 +146,7 @@ class LWE(object):
 
       return [z, zNoisy]
 
-
+  #generate the relinearization key [b,a] using the secret key s
   def rl_keys(self, s, s2):
       r = self.r
       N = self.N
@@ -163,6 +168,7 @@ class LWE(object):
 
       return [b, a]
 
+  #helper function used in relinearization
   def number_to_base(self, number):
     if number == 0:
         return [0]
@@ -174,6 +180,9 @@ class LWE(object):
         number //= self.m
     return digits[::-1]
 
+  # perform relinearization on the ciphertext [c0,c1,c2]
+  # using the secret key s and the relinearization key [b,a]
+  # returns a size-2 ciphertext [c0_new, c1_new]
   def relinearization(self, b, a, c0, c1, c2, s):
       r = self.r
       c2_inverse = [[0 for i in range(self.lgP_base_m)] for j in range(self.n)]
@@ -198,17 +207,21 @@ class LWE(object):
 
       return [c0_new, c1_new]
 
-
+  #ring addition on two vectors
   def add(self, u1, u2):
     r = self.r
     res = r.ringAdd(u1, u2)
     return res
 
+  #ring multiplication two vectors
   def mul(self, u1, u2):
       r = self.r
       res = self.mult(u1, u2)
       return res
 
+  #multiply two ciphertexts ca and cb such that
+  #ca is size-n ciphertext and
+  #cb is a size-2 ciphertext
   def ciphertext_mult_more(self, ca, cb):
       result = []
       c0y = self.mul(ca[0], cb[0])

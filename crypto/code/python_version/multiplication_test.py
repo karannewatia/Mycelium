@@ -19,8 +19,7 @@ x = [0 for i in range(l)]
 for i in range(l):
   x[i] = 0
 x[1] = 1
-print("################# plaintext ###################")
-print(x)
+print("plaintext: ", x)
 
 [b, a, s] = lwe.key_gen()
 [v0, u0] = lwe.enc(b, a, x)
@@ -48,8 +47,7 @@ c = lwe.ciphertext_mult_more(c, [v, u])
 c = lwe.ciphertext_mult_more(c, [v, u])
 c = lwe.ciphertext_mult_more(c, [v, u])
 
-print(time.time() - mult_start)
+print("multiplication time (10 ciphertext-ciphertext multiplications): ", time.time() - mult_start)
 
 x2 = lwe.dec_mul_more(c, s)
-print("################# decrypted text ###################")
-print(x2[0])
+print("decrypted text (after 10 ciphertext-ciphertext multiplications): ", x2[0])

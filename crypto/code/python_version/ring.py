@@ -1,5 +1,4 @@
 import random
-import numpy as np
 from sympy import ntt, intt
 
 class Ring(object):
@@ -43,6 +42,7 @@ class Ring(object):
       res[i] = self.get_mod(a[i] + b[i])
     return res
 
+  # Ring multiplication using NTT
   def ringMul(self, a, b):
     seq1 = [0 for i in range(self.n)]
     seq2 = [0 for i in range(self.n)]
@@ -71,7 +71,6 @@ class Ring(object):
 
     return seq
 
-  # Returns 0:
   def zero(self):
     n = self.n
     zero = [0 for i in range(n)]

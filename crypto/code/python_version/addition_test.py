@@ -19,8 +19,7 @@ x = [0 for i in range(l)]
 for i in range(l):
   x[i] = 0
 x[1] = 1
-print("################# plaintext ###################")
-print(x)
+print("plaintext: ", x)
 
 [b, a, s] = lwe.key_gen()
 [v, u] = lwe.enc(b, a, x)
@@ -28,12 +27,11 @@ print(x)
 
 add_start = time.time()
 v2, u2 = v1, u1
-for _ in range(100): #take the average over 1000 additions
+for _ in range(100): #take the average over 100 additions
     v2 = lwe.add(v, v2)
     u2 = lwe.add(u, u2)
 add_end = time.time()
-print("ciphertext addition time: ", (add_end - add_start)/100)
+print("ciphertext addition time (averaged over 100 additions) : ", (add_end - add_start)/100)
 
 x2 = lwe.dec(v2, u2, s)
-print("################# decrypted text ###################")
-print(x2[0])
+print("decrypted text (after 100 additions): ", x2[0])
