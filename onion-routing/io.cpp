@@ -9,7 +9,7 @@
 #include <openssl/rand.h>
 #include <stdio.h>
 #include <sys/socket.h>
-#include <openssl/rsa.h> 
+#include <openssl/rsa.h>
 
 #include "assert.h"
 #include "iostream"
@@ -76,7 +76,7 @@ private:
          */
         if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL))
             handleErrors();
-    
+
         /*
         * Set IV length if default 12 bytes (96 bits) is not appropriate
         */
@@ -169,8 +169,6 @@ private:
         vector<string> results;
         if (s == "") {
             return results;
-            // results.emplace_back("");
-            // return results;
         }
         size_t prev = 0, cur = 0;
         do {
@@ -299,7 +297,6 @@ private:
 
             // wait for socket to be writable; return after given timeout
             res = select(fd + 1, NULL, &wait_set, NULL, &Timeout);
-            // return -1;
         }
         if (fcntl(fd, F_SETFL, flags) < 0) {
             ROUTER_OUTPUT << "connect fcntl failed\n";
@@ -314,7 +311,6 @@ private:
         }
 
         if (FD_ISSET(fd, &wait_set)) {
-            // ROUTER_OUTPUT << "get a valid fd: " << fd << endl;
             return fd;
         } else {
             ROUTER_OUTPUT << "connect timeout\n";
@@ -376,9 +372,7 @@ private:
     string parseIpFromFd(int fd) {
         struct sockaddr_in sa;
         socklen_t len = sizeof(sa);
-        assert(!getpeername(fd, (struct sockaddr *)&sa, &len)); 
-        // ROUTER_OUTPUT << "IP: " << inet_ntoa(sa.sin_addr) << endl;
-        // ROUTER_OUTPUT << "port: " << ntohs(sa.sin_port) << endl;
+        assert(!getpeername(fd, (struct sockaddr *)&sa, &len));
         stringstream ss;
         ss << string(inet_ntoa(sa.sin_addr)) << ":" << ntohs(sa.sin_port);
         return ss.str();
@@ -404,7 +398,7 @@ private:
                 return ip < b.ip;
             }
         }
-        
+
         bool operator == (const idKey b) const {
             return ((ip == b.ip) && (id == b.id));
         }
@@ -568,7 +562,6 @@ private:
         if (!do_write(forward_fd, sendback_msg.c_str(), sendback_msg.size())) {
             ROUTER_OUTPUT << "sending handshake foward msg failed\n";
         }
-        // ROUTER_OUTPUT << "\thandshake msg size: " << msg.size() << endl;
         ROUTER_OUTPUT << "finish forward handshake msg to " << forward_ip << endl;
         assert(forward_fd_map.find(origin_ik) == forward_fd_map.end());
         forward_fd_map[origin_ik] = forward_fd;
@@ -597,7 +590,6 @@ private:
         if (!do_write(forward_fd, sendback_msg.c_str(), sendback_msg.size())) {
             ROUTER_OUTPUT << "sending foward msg failed\n";
         }
-        // ROUTER_OUTPUT << "\thandshake msg size: " << msg.size() << endl;
         ROUTER_OUTPUT << "finish forward msg to " << forward_ip << endl;
     }
 
@@ -610,7 +602,7 @@ private:
         idKey ik;
         ik.id = request.id();
         ik.ip = origin_ip;
-        
+
         // update back mapping
         ROUTER_OUTPUT << "find ik place holder, id: " << id_place_holder << ", ip: " << origin_ip << endl;
         auto it = back_mapping.find(ik_place_holder);
@@ -659,7 +651,7 @@ private:
         ROUTER_OUTPUT << "\tmsg size: " << back_msg_str.size() << endl;
 
         string back_str = formatMsg(back_msg_str);
-        
+
         if (!do_write(back_fd, back_str.c_str(), back_str.size())) {
             ROUTER_OUTPUT << "handshake reply sending back response failed\n";
         }
@@ -670,10 +662,6 @@ private:
         assert(keyInfo.find(in_ik) != keyInfo.end());
         string sessionKey = keyInfo[in_ik].sessionKey;
         int back_fd = keyInfo[in_ik].fd;
-        // if (in_ik.ip != back_ip) {
-        //     ROUTER_OUTPUT << "in ikip: " << in_ik.ip << " back_ip: " << back_ip << endl;
-        // }
-        // assert(in_ik.ip == back_ip);
         int back_id = in_ik.id;
 
         // clear the id
@@ -687,7 +675,6 @@ private:
         interface::Request back_req;
         back_req.set_request_type(FORWARD_BACK);
         back_req.set_msg(cleared_msg);
-        // ROUTER_OUTPUT << "forward back req size: " << cleared_msg.size() << endl;
 
         string back_req_str;
         back_req.SerializeToString(&back_req_str);
@@ -699,10 +686,9 @@ private:
         back_msg.set_id(back_id);
         string back_msg_str;
         back_msg.SerializeToString(&back_msg_str);
-        // ROUTER_OUTPUT << "forward back Msg size: " << back_msg_str.size() << endl;
 
         string back_str = formatMsg(back_msg_str);
-        
+
         if (!do_write(back_fd, back_str.c_str(), back_str.size())) {
             ROUTER_OUTPUT << "handshake reply sending back response failed\n";
         }
@@ -716,7 +702,6 @@ private:
         string encMsg = msg;
         for (int i = 0; i < keys.size(); i++) {
             decMsg = sessionDec(keys[i], encMsg);
-            // ROUTER_OUTPUT << "enter recv back handler " << i << " req size: " << encMsg.size() << endl;
             interface::Request parsed_req;
             if (!parsed_req.ParseFromString(decMsg)) {
                 ROUTER_OUTPUT << "cannot parse decrypted request msg\n";
@@ -725,7 +710,7 @@ private:
             assert(parsed_req.request_type() == FORWARD_BACK);
             interface::Msg back_msg;
             encMsg = parsed_req.msg();
-            if (i != keys.size() - 1) { 
+            if (i != keys.size() - 1) {
                 if (!back_msg.ParseFromString(encMsg)) {
                     ROUTER_OUTPUT << "cannot parse Msg type\n";
                     return;
@@ -746,35 +731,6 @@ private:
         ROUTER_OUTPUT << "received msg size: " << msg.size() << endl;
         if (msg.size() < 100)
             ROUTER_OUTPUT << "received msg: " << msg << endl;
-
-        // ROUTER_OUTPUT << "origin ik: " << origin_ik.id << " " << origin_ik.ip << endl;
-
-        // assert(keyInfo.find(origin_ik) != keyInfo.end());
-
-        // string sessionKey = keyInfo[origin_ik].sessionKey;
-        // int back_fd = fd;
-        // int back_id = origin_ik.id;
-
-        // interface::Request back_req;
-        // back_req.set_request_type(FORWARD_BACK);
-        // back_req.set_msg(msg);
-        // string back_req_str;
-        // back_req.SerializeToString(&back_req_str);
-        // string enc_back_req_str = sessionEnc(sessionKey, back_req_str);
-
-        // interface::Msg back_msg;
-        // back_msg.set_msg(enc_back_req_str);
-        // back_msg.set_addr(back_ip);
-        // back_msg.set_id(back_id);
-        // string back_msg_str;
-        // back_msg.SerializeToString(&back_msg_str);
-        // ROUTER_OUTPUT << "\tmsg size: " << back_msg_str.size() << endl;
-
-        // string back_str = formatMsg(back_msg_str);
-        
-        // if (!do_write(back_fd, back_str.c_str(), back_str.size())) {
-        //     ROUTER_OUTPUT << "handshake reply sending back response failed\n";
-        // }
     }
 
     void query_pk_handler(int fd, idKey origin_ik, string& msg, string back_ip) {
@@ -811,7 +767,7 @@ private:
         ROUTER_OUTPUT << "\tmsg size: " << back_msg_str.size() << endl;
 
         string back_str = formatMsg(back_msg_str);
-        
+
         if (!do_write(back_fd, back_str.c_str(), back_str.size())) {
             ROUTER_OUTPUT << "handshake reply sending back response failed\n";
         }
@@ -863,7 +819,7 @@ private:
             // handshake), then this means the router receive a message back,
             // store in buffer
 
-            // handshake reply, we need to update the forward/back mapping and 
+            // handshake reply, we need to update the forward/back mapping and
             if (request.has_id_place_holder()) {
                 handshake_reply_handler(fd, request, origin_ip);
             }
@@ -942,14 +898,12 @@ private:
         }
     }
 
-    // TODO: placeholder here
     const BIGNUM* pkEnc(const BIGNUM* key) {
         int msg_len = BN_num_bytes(key);
         unsigned char* key_str = (unsigned char*) malloc(sizeof(unsigned char) * msg_len);
         assert(BN_bn2bin(key, key_str) == msg_len);
         unsigned char to[RSA_size(publicKey)];
         int len = RSA_public_encrypt(msg_len, key_str, to, publicKey, RSA_PKCS1_PADDING);
-        // ROUTER_OUTPUT << msg_len << " " << len << " " << RSA_size(publicKey) << endl;
         assert(len == RSA_size(publicKey));
         BIGNUM* new_key = BN_bin2bn(to, len, NULL);
         return new_key;
@@ -964,7 +918,6 @@ private:
         int len = RSA_private_decrypt(msg_len, key_str, to, privKey, RSA_PKCS1_PADDING);
         BIGNUM* new_key = BN_bin2bn(to, len, NULL);
         assert(len > 0);
-        // ROUTER_OUTPUT << msg_len << " " << len << " " << RSA_size(privKey) << endl;
         return new_key;
     }
 
@@ -1076,7 +1029,7 @@ private:
             assert(parsed_req.request_type() == FORWARD_BACK);
             interface::Msg back_msg;
             encMsg = parsed_req.msg();
-            if (i != id - 1) { 
+            if (i != id - 1) {
                 if (!back_msg.ParseFromString(encMsg)) {
                     ROUTER_OUTPUT << "cannot parse Msg type\n";
                     return;
@@ -1101,7 +1054,7 @@ public:
         // init pk and sk
         publicKey = RSA_new();
         privKey = RSA_new();
-        
+
         FILE *PubKeyFile = NULL;
         FILE *PrivKeyFile = NULL;
         if ((PrivKeyFile = fopen("./rsa-keys/private-key", "rb")) == NULL) {
@@ -1163,7 +1116,6 @@ public:
                 handshake_req.set_id_place_holder(get_curr_id_place_holder());
             string sendReq;
             handshake_req.SerializeToString(&sendReq);
-            // ROUTER_OUTPUT << "\tsecond msg size: " << sendReq.size() << endl; 
 
             assert(sessions.size() == i);
             for (int j = i - 1; j >= 0; j--) {
@@ -1229,7 +1181,7 @@ public:
                     ROUTER_OUTPUT << j << " msg size: " << handshake_reply_msg.size() << endl;
                     ROUTER_OUTPUT << j << " msg content: " << handshake_reply_msg << endl;
                     close(fd);
-                    return false;                    
+                    return false;
                 }
                 handshake_reply_msg = new_msg.msg();
             }
@@ -1312,19 +1264,3 @@ public:
     }
 
 };
-
-// int main() {
-//     int ret;
-//     Router router1 = Router("127.0.0.1:6666");
-//     Router router2 = Router("127.0.0.1:6667");
-//     Router router3 = Router("127.0.0.1:6668");
-//     Router router4 = Router("127.0.0.1:6669");
-//     vector<string> ips = {"127.0.0.1:6667", "127.0.0.1:6668", "127.0.0.1:6669"};
-//     sleep(2);
-//     router1.estabilsh_key_exchange(ips);
-//     string msg = "hello world";
-//     router1.sendMsg(msg, ips);
-
-//     while(1) {}
-//     return 0;
-// }

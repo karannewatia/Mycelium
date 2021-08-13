@@ -2,13 +2,51 @@
 Run time (s): 84
 Communication Cost (bytes): 950848352
 
-
 ###### Committee size 10 #######
+on Amazon EC2:
 Run time (s): 180
 Communication Cost (bytes): 4487875435
 
+locally:
+Run time (s): 540
+Communication Cost (bytes): 5443001337
 
 ###### Committee size 15 #######
 Run time (s): 382
 Communication Cost (bytes): 12427673470
 
+
+###################### Figure 8(a) #########################
+Script and explanation in mpc_privacy_failure.py
+
+X axis:
+% of malicious users:
+[0.5, 1, 2, 4]
+
+Y axis:
+Probability of privacy failure:
+
+Committee size = 5
+[0.002252068641818895, 0.008785859475736613, 0.03342947221139633, 0.12099294928825888]
+Committee size = 10
+[2.535906583732002e-06, 3.859566336369542e-05, 0.00055876480616626, 0.007319646888735594]
+Committee size = 15
+[2.8555178479024625e-09, 1.6954803734313197e-07, 9.339606280220624e-06, 0.00044281283240837384]
+
+
+###################### Figure 8(b) #########################
+Script and explanation in mpc_privacy_failure.py
+
+X axis:
+% of malice + churn:
+[1, 2, 3, 4, 5, 6, 7]
+
+Y axis:
+Probability of liveness:
+
+Committee size = 5
+[0.8707145170342077, 0.7540396888843051, 0.6490529722111014, 0.5548918143015066, 0.4707499958468313, 0.3958741877588571, 0.3295607098451363]
+Committee size = 10
+[0.9832852638943018, 0.9395035253558706, 0.876836183686138, 0.8018787030241955, 0.719894433103871, 0.6350320029839793, 0.5505111582166425]
+Committee size = 15
+[0.997839027269929, 0.9851202682751272, 0.9567760247335123, 0.9118145889548672, 0.851754127556898, 0.7795134123606735, 0.698645019982234]
