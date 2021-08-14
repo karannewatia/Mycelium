@@ -134,4 +134,4 @@ plt.yticks(np.arange(0, 900, 100))
 plt.legend((p1[0], p2[0], p3[0]), ('r=1', 'r=2', 'r=3'))
 
 
-plt.savefig('../original_graphs/Aggregator_bandwidth.pdf', format='pdf')
+plt.savefig('../new_graphs/Aggregator_bandwidth.pdf', format='pdf')

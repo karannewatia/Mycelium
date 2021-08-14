@@ -2,6 +2,7 @@ Requirements:
 - python (version v>3)
 - matplotlib (can be installed using `pip install matplotlib`)
 - numpy (can be installed using `pip install numpy`)
+- gnuplot (see http://www.gnuplot.info/download.html)
 
 Raw data used for plotting all graphs is in `graph_data.txt`
 
@@ -23,6 +24,10 @@ To generate the graph for Figure 5(c):
 To generate the graph for Figure 5(d):
 - `python duration.py`
 - equations are in `duration.py`
+
+To generate the graph for Figure 6:
+- `gnuplot bw-user.plot` (requires data to be in `bw-user.data`)
+-  equations are in `user_bandwidth.py`
 
 To generate the graph for Figure 8(a):
 - `python mpc_privacy_failure.py`
