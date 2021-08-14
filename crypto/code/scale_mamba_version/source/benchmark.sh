@@ -3,7 +3,6 @@
 PROG_NAME=$1
 N_IO=1
 
-# Ids of players on this instance are stored in $@[8], $@[9] ...
 PLAYERS=${@:2}
 
 for PLAYER in ${PLAYERS}; do
