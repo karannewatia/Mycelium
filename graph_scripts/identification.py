@@ -1,6 +1,9 @@
 import random
 import numpy as np
 
+#The data is obtained by simulating a small system where senders set up paths for communication.
+#The data generated will be slightly different each time because of the randomization involved.
+
 num_runs = 100 #average over 100 runs
 malice = [0.005, 0.01, 0.02, 0.04] #malice rates
 print("% malice: ", malice)

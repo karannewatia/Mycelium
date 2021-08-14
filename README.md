@@ -16,7 +16,7 @@ zkp
 graph_scripts
 - all scripts used for generating the graphs for the paper
 
-graphs
+original_graphs
 - the graphs we generated from the data we obtained
 
 mycelium-costs.xslx:

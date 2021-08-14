@@ -1,0 +1,68 @@
+[0.0.0.0:10000] start listening on 0.0.0.0:10000
+Please choose cmd to run: 0 for handshake, 1 for sending msg: [0.0.0.0:10000] 0.0.0.0:10000 accept a connection.
+[0.0.0.0:10000] 5 start waiting for request
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 554
+[0.0.0.0:10000] recv from 128.110.217.33:35544
+Digest is: d3d95bf977387b5e4c3df4823c19798473f48e9864c0494c29cca26fe62a2976
+[0.0.0.0:10000] handshake handler generate key finished
+ output key1
+AB2BD08A1814836B422583937C7031D14ABB67E6C67EDA3F5CDA207C1425B44FE2902E160502CB26BAA2D8E0485649A69B3D296D135D42C2BF96F16EFB68409673C145234326452A60EDB6D04A08056736A56E80AD0AE9FF8E8250354ECEF08A3FC32B2B86A8BA42E2A171BF9F5182DE4452D46B8679EFD512D6981769E5451F7B15A6FB5071FD69B34293DA26B7C6D69B226E25381FD494D7EA4A0A3FAA6E0E271892176FBED1F3173A7BBD2E5FA481FBC6CE294C35AA12CE3FBDDE82673BCA1991369D4147A65431654C6433216961ECCA7B7D30743034D5F8913931645A3AA554C2006F894545317248FBB1691BEB29B7FDDD9B68FE82184A65E91072B1EA
+ output key1 finish
+[0.0.0.0:10000] handshake handler send back response start
+[0.0.0.0:10000] write: 303
+[0.0.0.0:10000] handshake handler send back response finished
+[0.0.0.0:10000] request time: 0.0166095
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 118
+[0.0.0.0:10000] recv from 128.110.217.33:35544
+[0.0.0.0:10000] recv query pk req, query for ip:128.110.217.81:10000
+[0.0.0.0:10000] 	msg size: 1607
+[0.0.0.0:10000] write: 1611
+[0.0.0.0:10000] query pk finish send back query response
+[0.0.0.0:10000] request time: 0.000122452
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 613
+[0.0.0.0:10000] recv from 128.110.217.33:35544
+[0.0.0.0:10000] insert back mapping, id: -2, ip: 128.110.217.81:10000
+[0.0.0.0:10000] write: 557
+[0.0.0.0:10000] finish forward handshake msg to 128.110.217.81:10000
+[0.0.0.0:10000] request time: 0.000571601
+[0.0.0.0:10000] 8 start waiting for request
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 300
+[0.0.0.0:10000] recv from 128.110.217.81:10000
+[0.0.0.0:10000] get to handshake reply handler
+[0.0.0.0:10000] find ik place holder, id: -2, ip: 128.110.217.81:10000
+[0.0.0.0:10000] 	msg size: 358
+[0.0.0.0:10000] write: 362
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 185
+[0.0.0.0:10000] recv from 128.110.217.33:35544
+[0.0.0.0:10000] write: 121
+[0.0.0.0:10000] finish forward msg to 128.110.217.112:10000
+[0.0.0.0:10000] request time: 0.000136619
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 1608
+[0.0.0.0:10000] recv from 128.110.217.81:10000
+[0.0.0.0:10000] write: 1682
+[0.0.0.0:10000] forward back msg finish
+[0.0.0.0:10000] request time: 0.000196521
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 684
+[0.0.0.0:10000] recv from 128.110.217.33:35544
+[0.0.0.0:10000] write: 619
+[0.0.0.0:10000] finish forward msg to 128.110.217.81:10000
+[0.0.0.0:10000] request time: 0.000101781
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 358
+[0.0.0.0:10000] recv from 128.110.217.81:10000
+[0.0.0.0:10000] write: 432
+[0.0.0.0:10000] forward back msg finish
+[0.0.0.0:10000] request time: 0.000167338
+[0.0.0.0:10000] read: 4
+[0.0.0.0:10000] read: 9332555
+[0.0.0.0:10000] recv from 128.110.217.33:35544
+[0.0.0.0:10000] write: 9332483
+[0.0.0.0:10000] finish forward msg to 128.110.217.112:10000
+[0.0.0.0:10000] request time: 0.0911948

@@ -1,4 +1,4 @@
-This is an implementation of the BGV FHE crypto-system, used to benchmark user-side FHE costs.
+This is an implementation of the BGV FHE crypto-system, used to benchmark FHE costs.
 
 Requirements:
 - python (version v>3)
@@ -15,7 +15,7 @@ To test the time taken for a ciphertext-ciphertext addition:
 To test the time taken for 10 ciphertext-ciphertext multiplications:
 - `python multiplication_test.py`
 
-The costs we got when benchmarking on our machine are in `crypto_user_costs.txt`.
+The costs we got when benchmarking on our machine are in `crypto_costs.txt`.
 
 To play around with the FHE implementation:
 - change the variables (lgP, lgM, lgN, l) in `input_gen.py` as needed

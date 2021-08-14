@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import math
 
 def liveness(fg, C):
@@ -31,4 +30,4 @@ plt.ylabel('Probability of liveness', fontsize='large')
 plt.xlabel('% malice + churn\n(b)', fontsize='large')
 plt.legend(["C = 5", "C = 10", "C = 15"])
 plt.xticks(x_vals, ('1', '2', '3', '4', '5', '6', '7'))
-plt.savefig('../graphs/committee/mpc_liveness.pdf', format='pdf')
+plt.savefig('../new_graphs/MPC_liveness.pdf', format='pdf')

@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import math
 
@@ -49,4 +48,4 @@ plt.xticks([2,3,4])
 plt.xlabel('Number of hops in the communication path', fontsize='large')
 plt.ylabel('Size of the anonymity set', fontsize='large')
 plt.legend(loc="best", prop={'size': 12})
-plt.savefig('../graphs/users/Anonymity_set.pdf', format='pdf')
+plt.savefig('../new_graphs/Anonymity_set.pdf', format='pdf')

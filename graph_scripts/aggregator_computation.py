@@ -3,13 +3,20 @@ import matplotlib.pyplot as plt
 
 hours_to_finish_in = 10
 
+#time for adding two size-2 ciphertexts (in seconds) on 4 cores is 0.02592297887802124
+#So, to get the time to add two size-12 ciphertexts on 1 core,
+#we multiply the time by 4 and then by 6.
+#See the Mycelium/crypto/code/python_version folder for instructions on how to obtain crypto costs
 addition = 0.02592297887802124 * 4 * 6
-zkp = 6.74 + 0.643
+
+#time to verify the enc proof + time to verify the mult proof (in seconds)
+#See the Mycelium/zkp folder for instructions on how to obtain ZKP costs
+zkp = 0.010 + 4.532
 
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)
 
-total = (addition + zkp)/(3600*hours_to_finish_in)
+total = (addition + zkp)/(3600*hours_to_finish_in) #convert to hours
 
 font = {'size'   : 17}
 plt.rc('font', **font)
@@ -32,4 +39,4 @@ plt.yticks([1e2, 1e3, 1e4, 1e5, 1e6])
 plt.xlabel('Number of participants\n(b)', fontsize='large')
 plt.ylabel('Computation (cores)', fontsize='large')
 plt.legend((p1[0], p2[0]), ('ZKP verification', 'Global aggregation'))
-plt.savefig('../graphs/aggregator/aggregator_computation.pdf', format='pdf')
+plt.savefig('../new_graphs/Aggregator_computation.pdf', format='pdf')

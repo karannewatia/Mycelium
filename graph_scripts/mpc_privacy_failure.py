@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import math
 
 def privacy_failure(f, C, m):
@@ -34,4 +33,4 @@ plt.xlabel('% of malicious users\n(a)', fontsize='large')
 plt.yscale('log')
 plt.legend(["C = 5", "C = 10", "C = 15"])
 plt.xticks(byzantine_rates, ('0.5', '1', '2', '4'))
-plt.savefig('../graphs/committee/mpc_privacy_failure.pdf', format='pdf')
+plt.savefig('../new_graphs/MPC_privacy_failure.pdf', format='pdf')
