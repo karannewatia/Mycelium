@@ -15,14 +15,20 @@ def bytesto(bytes, to, bsize=1024):
         r = r / bsize
     return(r)
 
-num_friends = 10
-degree = 32768
+num_friends = 10 #degree bound
+degree = 32768 #polynomial degree
 prime_bitsize = 550
+proof_hash_size = 8192 #(in bytes)
 
+#size of the ciphertext
 ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 
 telescoping = [0,0,0]
 forwarding = [0,0,0]
+
+#The onion routing bandwidth costs are obtained from running the
+#onion routing code on CloudLab machines, and are also in 'onion_routing_costs.xlsx'
+#For the aggregator, we only consider the write costs (which corresponds to the read costs on the spreadsheet)
 
 ##################### 2 hops ######################
 establish_keys_src = 4394
@@ -30,18 +36,17 @@ establish_keys_node1 = 4446
 establish_keys_node2 = 1598
 establish_keys_dst = 557
 
+#each user will set up a path for all their friends
 telescoping[0] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_dst)
 telescoping[0] = bytesto(telescoping[0], 'm')
 
-
-encryption_src = 8192
-encryption_node1 = (9332557*ct_size/8.9) + 8192
-encryption_node2 = (9332482*ct_size/8.9) + 8192
-encryption_dst = (9332407*ct_size/8.9) + 8192
-
+#costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
+#but the costs scale almost exactly with the same of the message sent
+encryption_src = proof_hash_size
+encryption_node1 = (9332557*ct_size/8.9) + proof_hash_size
+encryption_node2 = (9332482*ct_size/8.9) + proof_hash_size
+encryption_dst = (9332407*ct_size/8.9) + proof_hash_size
 forwarding[0] = num_friends*(encryption_src + encryption_node1 + encryption_node2)
-
-
 forwarding[0] = bytesto(forwarding[0], 'm')
 #####################  ######################
 
@@ -53,26 +58,18 @@ establish_keys_node2 = 4446
 establish_keys_node3 = 1598
 establish_keys_dst = 557
 
+#each user will set up a path for all their friends
 telescoping[1] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
 telescoping[1] = bytesto(telescoping[1], 'm')
 
-
-encryption_src = 8192
-encryption_node1 = (9332632*ct_size/8.9) + 8192
-encryption_node2 = (9332557*ct_size/8.9) + 8192
-encryption_node3 = (9332482*ct_size/8.9) + 8192
-encryption_dst = (9332407*ct_size/8.9) + 8192
-
+#costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
+#but the costs scale almost exactly with the same of the message sent
+encryption_src = proof_hash_size
+encryption_node1 = (9332632*ct_size/8.9) + proof_hash_size
+encryption_node2 = (9332557*ct_size/8.9) + proof_hash_size
+encryption_node3 = (9332482*ct_size/8.9) + proof_hash_size
+encryption_dst = (9332407*ct_size/8.9) + proof_hash_size
 forwarding[1] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_dst)
-
-# shift_src = 8192
-# shift_node1 = (1048838*ct_size) + 8192
-# shift_node2 = (1048774*ct_size) + 8192
-# shift_node3 = (1048710*ct_size) + 8192
-# shift_dst = (1048646*ct_size) + 8192
-#
-# forwarding[1] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_dst)
-
 forwarding[1] = bytesto(forwarding[1], 'm')
 #####################  ######################
 
@@ -84,28 +81,19 @@ establish_keys_node3 = 4446
 establish_keys_node4 = 1598
 establish_keys_dst = 557
 
+#each user will set up a path for all their friends
 telescoping[2] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_node4 + establish_keys_dst)
 telescoping[2] = bytesto(telescoping[2], 'm')
 
-
-encryption_src = 8192
-encryption_node1 = (9332707*ct_size/8.9) + 8192
-encryption_node2 = (9332632*ct_size/8.9) + 8192
-encryption_node3 = (9332557*ct_size/8.9) + 8192
-encryption_node4 = (9332482*ct_size/8.9) + 8192
-encryption_dst = (9332407*ct_size/8.9) + 8192
-
+#costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
+#but the costs scale almost exactly with the same of the message sent
+encryption_src = proof_hash_size
+encryption_node1 = (9332707*ct_size/8.9) + proof_hash_size
+encryption_node2 = (9332632*ct_size/8.9) + proof_hash_size
+encryption_node3 = (9332557*ct_size/8.9) + proof_hash_size
+encryption_node4 = (9332482*ct_size/8.9) + proof_hash_size
+encryption_dst = (9332407*ct_size/8.9) + proof_hash_size
 forwarding[2] = num_friends*(encryption_src + encryption_node1 + encryption_node2 + encryption_node3 + encryption_node4 + encryption_dst)
-
-# shift_src = 8192
-# shift_node1 = (1048902*ct_size) + 8192
-# shift_node2 = (1048838*ct_size) + 8192
-# shift_node3 = (1048774*ct_size) + 8192
-# shift_node4 = (1048710*ct_size) + 8192
-# shift_dst = (1048646*ct_size) + 8192
-#
-# forwarding[2] += num_friends*(shift_src + shift_node1 + shift_node2 + shift_node3 + shift_node4 + shift_dst)
-
 forwarding[2] = bytesto(forwarding[2], 'm')
 #####################  ######################
 
@@ -124,10 +112,8 @@ p1 = plt.bar(ind, total, width, color='tab:cyan', edgecolor="black")
 p2 = plt.bar(ind+width, [2*x for x in total], width, color='tab:purple', edgecolor="black")
 p3 = plt.bar(ind+2*width, [3*x for x in total], width, color='tab:red', edgecolor="black")
 
-
 plt.xlabel('Number of hops in the communication path\n(a)', fontsize='large')
 plt.ylabel('Traffic (MB sent) per user', fontsize='large')
-# plt.title('Total number of bytes sent by a client on average')
 plt.xticks(ind+width, ('2', '3','4'))
 plt.yticks(np.arange(0, 900, 100))
 

@@ -10,7 +10,6 @@
 + Run `./router 0.0.0.0:PORT` for all nodes one by one. (example port number: 10000)
 
 #### Steps to run (all from the sender node):
-curl ifconfig.me
 1. Input `0` to start establishing a path.
 2. Input total number of nodes in the path (including destination). For example,
    if the sender node wants to establish a path consisting of 3 intermediate nodes between

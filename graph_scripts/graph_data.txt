@@ -76,6 +76,23 @@ Number of C-rounds needed for message forwarding:
 Total number of C-rounds (telescoping + message forwarding):
 [10, 18, 28]
 
+
+###################### Figure 6 #########################
+X axis:
+Number of hops in the communication path:
+[2,3,4]
+
+Y axis:
+Traffic (MB sent):
+#row 1 has the costs for 2 hops, row 2 has the costs for 3 hops, row 3 has the costs for 4 hops
+#r is the number of copies sent per message
+#column 1 has the costs for r=1, column 2 has the costs for r=2, column 3 has the costs for r=3 (all for a non-forwarder)
+#column 4 has the costs for r=1, column 5 has the costs for r=2, column 6 has the costs for r=3 (all for a non-forwarder)
+[[122.20056204195066, 165.2728740839013, 208.34518612585197, 553.0812057037228, 1027.0341614074457, 1500.9871171111686],
+ [122.20764984122117, 165.28704968244233, 208.36644952366348, 553.2376870434133, 1027.3471240868266, 1501.4565611302398],
+ [122.21895288097018, 165.30965576194035, 208.4003586429105, 553.4043059410872, 1027.6803618821743, 1501.9564178232613]]
+
+
 ###################### Figure 8(a) #########################
 X axis:
 % of malicious users:
@@ -107,6 +124,20 @@ Committee size = 10
 Committee size = 15
 [0.997839027269929, 0.9851202682751272, 0.9567760247335123, 0.9118145889548672, 0.851754127556898, 0.7795134123606735, 0.698645019982234]
 
+
+###################### Figure 9(a) #########################
+X axis:
+Number of hops in the communication path:
+[2,3,4]
+
+Y axis:
+Traffic (MB sent) per user:
+#row 1 has the costs for 2 hops, row 2 has the costs for 3 hops, row 3 has the costs for 4 hops
+#r is the number of copies sent per message
+#column 1 has the costs for r=1, column 2 has the costs for r=2, column 3 has the costs for r=3
+[86.27850966841987, 172.46055517973525, 215.64389860697005]
+[172.55701933683974, 344.9211103594705, 431.2877972139401]
+[258.8355290052596, 517.3816655392058, 646.9316958209101]
 
 ###################### Figure 9(b) #########################
 X axis:

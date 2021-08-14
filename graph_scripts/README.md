@@ -28,6 +28,9 @@ To generate the graph for Figure 5(d):
 To generate the graph for Figure 6:
 - `gnuplot bw-user.plot` (requires data to be in `bw-user.data`)
 -  equations are in `user_bandwidth.py`
+- Note that the numbers are slightly lower than the ones in the accepted version of the paper
+  since we were able to reduce ZKP costs after the submission. So, the graph generated will have slightly
+  lower costs than the corresponding graph in the paper.
 
 To generate the graph for Figure 8(a):
 - `python mpc_privacy_failure.py`

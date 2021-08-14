@@ -19,5 +19,5 @@ graph_scripts
 original_graphs
 - the graphs we generated from the data we obtained
 
-mycelium-costs.xslx:
+onion_routing_costs.xslx:
 - costs from running the onion routing code on CloudLab machines
