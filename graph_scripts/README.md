@@ -3,10 +3,10 @@ Requirements:
 - matplotlib (can be installed using `pip install matplotlib`)
 - numpy (can be installed using `pip install numpy`)
 
-Raw data used for plotting all graphs is in `graph_dara.txt`
+Raw data used for plotting all graphs is in `graph_data.txt`
 
 To generate all graphs:
-- `python `
+- `./all_graphs.sh`
 
 To generate the graph for Figure 5(a):
 - `python anonymity_set.py`
