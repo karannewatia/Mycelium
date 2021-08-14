@@ -1,4 +1,4 @@
-This is an implementation of the BGV FHE crypto-system, used to benchmark user-side FHE cost.
+This is an implementation of the BGV FHE crypto-system, used to benchmark user-side FHE costs.
 
 Requirements:
 - python (version v>3)

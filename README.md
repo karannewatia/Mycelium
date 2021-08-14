@@ -13,8 +13,11 @@ re_sharing:
 zkp
 - ZK proofs
 
-graphs and graph_scripts
-- all graphs and corresponding scripts (graphs/ and graph_scripts/) for the paper
+graph_scripts
+- all scripts used for generating the graphs for the paper
+
+graphs
+- the graphs we generated from the data we obtained
 
 mycelium-costs.xslx:
-- costs from running the onion routing code on cloudlab machines
+- costs from running the onion routing code on CloudLab machines

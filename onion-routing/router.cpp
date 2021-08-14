@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         }
         vector<string> ips;
         if (cmd_str == "0") {
-            cout << "input number of rounters: ";
+            cout << "input number of routers: ";
             memset(cmd, 0, sizeof(cmd));
             cin.getline(cmd, sizeof(cmd));
             stringstream ss;
