@@ -2,6 +2,7 @@ Requirements:
 - python (version v>3)
 - matplotlib (can be installed using `pip install matplotlib`)
 - numpy (can be installed using `pip install numpy`)
+- datetime (can be installed using `pip install datetime`)
 - gnuplot (see http://www.gnuplot.info/download.html)
 
 Raw data used for plotting all graphs is in `graph_data.txt`
@@ -19,7 +20,7 @@ To generate the graph for Figure 5(b):
 
 To generate the graph for Figure 5(c):
 - `python goodput_graph.py`
-- script used to generate the data is in `goodput.py`
+- script used to generate the data is in `goodput.py`. Change the value of 'r' (number of messages sent per user) in line 9 of `goodput.py` as needed (we tested with r = 1,2,and 3).
 
 To generate the graph for Figure 5(d):
 - `python duration.py`
