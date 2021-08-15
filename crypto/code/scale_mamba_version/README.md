@@ -9,8 +9,6 @@ inside `Mycelium/crypto/code/scale_mamba_version/`:
 In another shell in `Mycelium/crypto/code/scale_mamba_version/`:
 - use `docker ps` to get the id of the docker container running
 - `docker cp inputs/decrypt_input.txt id:/root/SCALE-MAMBA/`
-- Note: decrypt_input.txt assumes polynomial degree = 2^15.
-Generate a new decrypt_input.txt (see `crypto/code/utils.py`) if the degree is different
 
 
 Now, in the docker container:
