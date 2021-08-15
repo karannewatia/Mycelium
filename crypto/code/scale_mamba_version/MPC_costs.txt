@@ -1,4 +1,5 @@
-###### Committee size 10 #######
+###### Committee size = 10 #######
+
 on Amazon EC2:
 Run time (s): 180
 Communication Cost (bytes): 4487875435

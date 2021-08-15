@@ -9,7 +9,7 @@ inside `Mycelium/crypto/code/scale_mamba_version/`:
 In another shell in `Mycelium/crypto/code/scale_mamba_version/`:
 - use `docker ps` to get the id of the docker container running
 - `docker cp inputs/decrypt_input.txt id:/root/SCALE-MAMBA/`
-Note: decrypt_input.txt assumes polynomial degree = 2^15.
+- Note: decrypt_input.txt assumes polynomial degree = 2^15.
 Generate a new decrypt_input.txt (see `crypto/code/utils.py`) if the degree is different
 
 
@@ -30,11 +30,10 @@ To benchmark MPC decryption (do this after performing the secret key gen):
 - `cd ..`
 - `./benchmark.sh dec_test 0 1 2 ...N-1`, where N is the number of committee members
 
-Output for Player i is in output_i.txt (or in Data/Playeri_out.txt)
-Communication cost is in communication.txt
+Output for Player i is in output_i.txt (or in Data/Playeri_out.txt). Communication cost is in communication.txt.
 
 To test/play around with key gen, encryption, and decryption together in SCALE-MAMBA:
-- mod value used in fhe_test.mpc: 12413837415352346609
+- mod value used in `fhe_test.mpc`: 12413837415352346609
 - `./Setup.x` -> 2 -> 2 -> mod -> enter the max possible t (threshold value) (t=4 if N=10)
 - `./benchmark.sh fhe_test 0 1 2 ...N-1`, where N is the number of committee members
-- 
+-

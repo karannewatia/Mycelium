@@ -1,5 +1,4 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
-#from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
 #p = 12413837415352346609
 w = cint(11667162701519046670)
