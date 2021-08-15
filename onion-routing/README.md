@@ -5,7 +5,7 @@
   CloudLab, `ubuntu 20.04`.
 
 #### Usage:
-+ `cmake .``
++ `cmake .`
 + `make`
 + Run `./router 0.0.0.0:PORT` for all nodes one by one. (example port number: 10000)
 
