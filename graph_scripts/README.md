@@ -7,6 +7,10 @@ Requirements:
 
 Raw data used for plotting all graphs is in `graph_data.txt`
 
+Graphs will be generated in `Mycelium/new_graphs`:
+- `mkdir ../new_graphs`
+
+
 To generate all graphs:
 - `./all_graphs.sh`
 

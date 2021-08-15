@@ -1,23 +1,24 @@
 # Mycelium submission for SOSP 2021
 
-onion-routing:
-- all onion routing code
-
 crypto:
-- MPC files for decryption and benchmarking for local multiplications, etc. (crypto/code/scalemamba_version and crypto/code/python_version)
-- EC2 experiment instructions/scripts (crypto/mpc_amazon_ec2_benchmarking/)
-
-re_sharing:
-- Re-sharing (extended VSR protocol) proof-of-concept/rough implementation
+- Python code for user-side/aggregator-side FHE operations (crypto/code/python_version)
+- MPC files for decryption (crypto/code/scale_mamba_version)
+- Amazon EC2 experiment instructions/scripts (crypto/mpc_amazon_ec2_benchmarking/)
 
 zkp
-- ZK proofs
+- code for ZK proofs
+
+original_graphs
+- the graphs we generated from the data we obtained
 
 graph_scripts
 - all scripts used for generating the graphs for the paper
 
-original_graphs
-- the graphs we generated from the data we obtained
+re_sharing:
+- Re-sharing (extended VSR protocol) proof-of-concept/rough implementation
+
+onion-routing:
+- all onion routing code
 
 onion_routing_costs.xslx:
 - costs from running the onion routing code on CloudLab machines
