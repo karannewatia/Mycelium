@@ -1,32 +1,37 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 #from Compiler import mpc_math   #uncomment for testing laplace noise gen/rounding for BFV
 
-#p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
+#p = 12413837415352346609
+w = cint(11667162701519046670)
 
-w = cint(1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470)
+lgN = 2 #polynomial degree
+n = 4 #polynomial degree
+N = 1 #used in binomial distribution
+lgM = 3 #plaintext modulus bitsize
+l = 4 #plaintext length (number of elements)
+lgP = 64 #ciphertext modulus bitsize
 
-lgN = 15
 r = Ring(lgN, w)
-
-N = 1
-lgM = 30
-l = 12
-n = 32768
-lgP = 550
 lwe = LWE(r, N, lgM, l, n, lgP)
-
 
 ##################### Test key gen + decrypt in MPC ########################
 
+#create a plaintext
 x = sint.Array(l)
 for i in range(l):
   x[i] = sint(i)
   print_ln("Plaintext is %s ", x[i].reveal())
 
+#(b,a) is the public key, s is the secret key
 [b, a, s] = lwe.key_gen()
+
+#encrypt the plaintext with the public key; (v,u) is the resulting ciphertext
 [v,u] = lwe.enc(b, a, x)
 
+#decrypt the ciphertext with the secret key
 x2 = lwe.dec(v, u, s)
+
+#reveal the decryption to each player
 for i in range(l):
   x2[i].reveal_to(0)
   print_ln("Decrypted text is %s ", x2[i].reveal())

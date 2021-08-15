@@ -21,11 +21,12 @@ class LWE(object):
     self.lgP = lgP
     return
 
+  #Returns s, where s is the secret key
   def secret_key_gen(self):
     s = r.ringBinom(N)
     return s
 
-  # Returns [a, b, s]
+  # Returns [b, a, s]
   # (b, a) is the public key, s is the secret key
   def key_gen(self):
     r = self.r
@@ -80,7 +81,7 @@ class LWE(object):
     res = [r.reveal(v), r.reveal(u)]
     return res
 
-
+  #decrypts the ciphertext (v,u) using the secret key s
   def dec(self, v, u, s):
     r = self.r
     lgM = self.lgM
@@ -97,8 +98,8 @@ class LWE(object):
       z[i] = zNoisy[i] % self.m
 
     return z
-    
 
+  #The two functions below are used to generate laplace noise
   def exp_sample(self, mean):
     rand = sint.get_random_int(15)
     rand_fix = sfix.load_sint(rand)/32768

@@ -4,28 +4,32 @@ execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 #p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
 
 w = cint(1032221733394210440441659515349146050267235537140279868931207933950081697226615027346242970871325134062515859878795671410046065213016222308552291565188475284037534470)
-lgN = 15
+
+lgN = 15 #polynomial degree
+n = 32768 #polynomial degree
+N = 1 #used in binomial distribution
+lgM = 30 #plaintext modulus bitsize
+l = 12 #plaintext length (number of elements)
+lgP = 550 #ciphertext modulus bitsize
+
 r = Ring(lgN, w)
-N = 1
-lgM = 30
-l = 12
-n = 32768
-lgP = 550
 lwe = LWE(r, N, lgM, l, n, lgP)
 
+############ Benchmark decryption ########################
 
-############ Benchmark Decrypt separately ########################
+#an example of decrypting a ciphertext and then adding noise to each bin
 
 bin1 = cint.public_input(0)
 bin2 = cint.public_input(0)
-
 binning = sint.Array(2)
 for i in range(2):
   binning[i] = 0
 
+# (v,u) is the ciphertext to decrypt
 v = cint.Array(n)
 u = cint.Array(n)
 
+#read (v,u) from public input
 @for_range(n)
 def set_V(i):
   v[i] = cint.public_input(0)
@@ -33,15 +37,19 @@ def set_V(i):
 def set_U(i):
   u[i] = cint.public_input(0)
 
-s = sint.Array(n)
+s = sint.Array(n) #secret key
+
+#read the shares of s from private input
 @for_range(n)
 def copy(i):
   tmp = [sint()]
   input_shares(0, *tmp)
   s[i] = tmp[0]
 
+#decrypt the ciphertext (v,u) using the secret key s
 x2 = lwe.dec(v, u, s)
 
+#coeffecients of the plaintext that fall into each bin are summed up
 for i in range(l):
   z = x2[i]
   if_then(l <= bin1)
@@ -50,6 +58,7 @@ for i in range(l):
   binning[1] += z
   end_if()
 
+#add laplace noise to each bin before revealing the result
 for i in range(2):
-  z = binning[i] + lwe.laplace(sint(1)) #add noise
+  z = binning[i] + lwe.laplace(sint(1))
   print_ln("Decrypt result is: %s ", z.reveal())

@@ -8,6 +8,8 @@ git checkout -b v1.7 46a5fa4be
 mv /root/config/CONFIG.mine .
 mv /root/source/benchmark.sh .
 mv /root/config/genCertOptions.sh .
+mv /root/config/decrypt.sh ./Data
+mv /root/Cert-Store .
 mv /root/config/IO.h ./src/Input_Output/
 mv /root/config/Input_Output_File.cpp ./src/Input_Output/
 mv /root/config/Input_Output_File.h ./src/Input_Output/
