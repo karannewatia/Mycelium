@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir ../new_graphs
 python anonymity_set.py
 python identification_graph.py
 python goodput_graph.py
