@@ -1,8 +1,9 @@
 # Mycelium
 
-This is a partial implementation of Mycelium, a framework for private graph analytics over massive distributed data. This is not a completely distributed end-to-end implementation (we cannot simulate the millions of users required!) - it instead consists of microbenchmarks for user operations, aggregator operations, and elected committee operations.
+This is a partial implementation of Mycelium, a framework for private graph analytics over massive distributed data. This is not a completely distributed end-to-end implementation (we cannot simulate the millions of users required!) 
+It instead consists of microbenchmarks for user operations, aggregator operations, and elected committee operations.
 
-### Summary map of repository contents:
+## Summary map of repository contents:
 
 crypto:
 - Python code for user-side/aggregator-side FHE operations (crypto/code/python_version/)
@@ -35,6 +36,7 @@ Our implementation is composed of a series of micro-benchmarks. Please `cd` into
 
 ### Figure 5
 ### Figure 6
+### User Computation Costs (Section 6.4)
 ### Committee Costs (Section 6.5)
 ### Figure 8
 ### Figure 9
