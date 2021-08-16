@@ -5,5 +5,5 @@ Run time (s): 180.49
 Communication Cost (bytes): 4487875435
 
 locally:
-Run time (s): 749
-Communication Cost (bytes): 5432979130
+Run time (s): 677
+Communication Cost (bytes): 5435193929
