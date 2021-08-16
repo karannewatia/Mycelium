@@ -19,10 +19,10 @@ num_friends = 10 #degree bound
 f = 1/0.1 #fraction of forwarders
 degree = 32768 #polynomial degree
 prime_bitsize = 550
-proof_hash_size = 8192 #(in bytes)
+proof_hash_size = 8192
 
 #size of the ciphertext
-ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
+ct_size = bytesto(proof_hash_size + (degree * prime_bitsize * 2 / 8), 'm')
 
 enc_proof_size = 0.00081
 
@@ -41,9 +41,9 @@ forwarding_forwarder = [0,0,0]
 #We only consider the write costs for users.
 
 ##################### 2 hops ######################
-establish_keys_src = 2167
-establish_keys_node1 = 5688
-establish_keys_node2 = 2836
+establish_keys_src = 2176
+establish_keys_node1 = 5686
+establish_keys_node2 = 2834
 establish_keys_dst = 304
 
 #each user has to establish a path for each friend,
@@ -55,11 +55,9 @@ telescoping[0] = bytesto(telescoping[0], 'm')
 telescoping_forwarder[0] = num_friends*(establish_keys_src + f*((establish_keys_node1 + establish_keys_node2)/2) + establish_keys_dst)
 telescoping_forwarder[0] = bytesto(telescoping_forwarder[0], 'm')
 
-#costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
-#but the costs scale almost exactly with the same of the message sent
-encryption_src = (9332557*ct_size/8.9) + proof_hash_size
-encryption_node1 = (9332482*ct_size/8.9) + proof_hash_size
-encryption_node2 = (9332407*ct_size/8.9) + proof_hash_size
+encryption_src = 4509109
+encryption_node1 = 4509034
+encryption_node2 = 4508958
 
 #each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
 forwarding[0] = num_friends*(encryption_src)
@@ -75,10 +73,10 @@ forwarding_forwarder[0] += enc_proof_size
 
 
 ##################### 3 hops ######################
-establish_keys_src = 3178
-establish_keys_node1 = 8816
-establish_keys_node2 = 5688
-establish_keys_node3 = 2836
+establish_keys_src = 3195
+establish_keys_node1 = 8821
+establish_keys_node2 = 5691
+establish_keys_node3 = 2837
 establish_keys_dst = 304
 
 #each user has to establish a path for each friend,
@@ -90,12 +88,10 @@ telescoping[1] = bytesto(telescoping[1], 'm')
 telescoping_forwarder[1] = num_friends*(establish_keys_src + f*((establish_keys_node1 + establish_keys_node2 + establish_keys_node3)/3) + establish_keys_dst)
 telescoping_forwarder[1] = bytesto(telescoping_forwarder[1], 'm')
 
-#costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
-#but the costs scale almost exactly with the same of the message sent
-encryption_src = (9332632*ct_size/8.9) + proof_hash_size
-encryption_node1 = (9332557*ct_size/8.9) + proof_hash_size
-encryption_node2 = (9332482*ct_size/8.9) + proof_hash_size
-encryption_node3 = (9332407*ct_size/8.9) + proof_hash_size
+encryption_src = 4509185
+encryption_node1 = 4509110
+encryption_node2 = 4509034
+encryption_node3 = 4508958
 
 #each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
 forwarding[1] = num_friends*(encryption_src)
@@ -127,11 +123,11 @@ telescoping_forwarder[2] = bytesto(telescoping_forwarder[2], 'm')
 
 #costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
 #but the costs scale almost exactly with the same of the message sent
-encryption_src = (9332707*ct_size/8.9) + proof_hash_size
-encryption_node1 = (9332632*ct_size/8.9) + proof_hash_size
-encryption_node2 = (9332557*ct_size/8.9) + proof_hash_size
-encryption_node3 = (9332482*ct_size/8.9) + proof_hash_size
-encryption_node4 = (9332407*ct_size/8.9) + proof_hash_size
+encryption_src = (9332707*ct_size/8.9)
+encryption_node1 = (9332632*ct_size/8.9)
+encryption_node2 = (9332557*ct_size/8.9)
+encryption_node3 = (9332482*ct_size/8.9)
+encryption_node4 = (9332407*ct_size/8.9)
 
 #each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
 forwarding[2] = num_friends*(encryption_src)
