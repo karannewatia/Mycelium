@@ -1,6 +1,8 @@
-# Mycelium submission for SOSP 2021
+# Mycelium
 
-`cd` into the folders for detailed instructions.
+This is a partial implementation of Mycelium, a framework for private graph analytics over massive distributed data. This is not a completely distributed end-to-end implementation (we cannot simulate the millions of users required!) - it instead consists of microbenchmarks for user operations, aggregator operations, and elected committee operations.
+
+### Summary map of repository contents:
 
 crypto:
 - Python code for user-side/aggregator-side FHE operations (crypto/code/python_version/)
@@ -24,3 +26,16 @@ onion-routing:
 
 onion_routing_costs.xslx:
 - costs from running the onion routing code on CloudLab machines
+
+
+## Instructions for Artifact Reviewers at SOSP 2021:
+Our implementation is composed of a series of micro-benchmarks. Please `cd` into each of the above folders for detailed explanations and instructions on evaluating each component separately. We summarize the instructions required to replicate all results below:
+
+## Replication of Graphs and Results in Paper
+
+### Figure 5
+### Figure 6
+### Committee Costs (Section 6.5)
+### Figure 8
+### Figure 9
+
