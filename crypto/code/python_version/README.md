@@ -15,7 +15,7 @@ To test the time taken for a ciphertext-ciphertext addition:
 To test the time taken for 10 ciphertext-ciphertext multiplications:
 - `python multiplication_test.py`
 
-The costs we got when benchmarking on our machine are in `crypto_costs.txt`.
+The costs we got when benchmarking on our machine are in `crypto_costs.txt`. Times may vary slightly based on machine resources.
 
 To play around with the FHE implementation:
 - change the variables (lgP, lgM, lgN, l) in `input_gen.py` as needed
