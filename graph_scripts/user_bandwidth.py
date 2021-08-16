@@ -19,7 +19,7 @@ num_friends = 10 #degree bound
 f = 1/0.1 #fraction of forwarders
 degree = 32768 #polynomial degree
 prime_bitsize = 550
-proof_hash_size = 8192
+proof_hash_size = 8192 #(in bytes)
 
 #size of the ciphertext
 ct_size = bytesto(proof_hash_size + (degree * prime_bitsize * 2 / 8), 'm')
