@@ -105,11 +105,11 @@ forwarding_forwarder[1] += enc_proof_size
 #####################  ######################
 
 ##################### 4 hops ######################
-establish_keys_src = 4327
-establish_keys_node1 = 12222
-establish_keys_node2 = 8816
-establish_keys_node3 = 5688
-establish_keys_node4 = 2836
+establish_keys_src = 4344
+establish_keys_node1 = 12244
+establish_keys_node2 = 8821
+establish_keys_node3 = 5691
+establish_keys_node4 = 2837
 establish_keys_dst = 304
 
 #each user has to establish a path for each friend,
@@ -121,13 +121,11 @@ telescoping[2] = bytesto(telescoping[2], 'm')
 telescoping_forwarder[2] = num_friends*(establish_keys_src + f*((establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_node4)/4) + establish_keys_dst)
 telescoping_forwarder[2] = bytesto(telescoping_forwarder[2], 'm')
 
-#costs were benchmarked on CloudLab machines using a message of size 8.9 MB,
-#but the costs scale almost exactly with the same of the message sent
-encryption_src = (9332707*ct_size/8.9)
-encryption_node1 = (9332632*ct_size/8.9)
-encryption_node2 = (9332557*ct_size/8.9)
-encryption_node3 = (9332482*ct_size/8.9)
-encryption_node4 = (9332407*ct_size/8.9)
+encryption_src = 4509260
+encryption_node1 = 4509185
+encryption_node2 = 4509110
+encryption_node3 = 4509034
+encryption_node4 = 4508958
 
 #each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
 forwarding[2] = num_friends*(encryption_src)
