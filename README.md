@@ -1,5 +1,7 @@
 # Mycelium submission for SOSP 2021
 
+`cd` into the folders for detailed instructions.
+
 crypto:
 - Python code for user-side/aggregator-side FHE operations (crypto/code/python_version/)
 - MPC files for decryption (crypto/code/scale_mamba_version/)
