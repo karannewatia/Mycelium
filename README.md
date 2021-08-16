@@ -30,7 +30,9 @@ onion_routing_costs.xslx:
 
 
 ## Instructions for Artifact Reviewers at SOSP 2021:
-Our implementation is composed of a series of micro-benchmarks. Please `cd` into each of the above folders for detailed explanations and instructions on evaluating each component separately. We summarize what is required to replicate all empirical results below:
+Our implementation is composed of a series of micro-benchmarks. Please `cd` into each of the above folders for detailed explanations and instructions on evaluating each component separately. We provide a docker for some of the cryptographic operations, but require access to cloudlab to evaluate our onion-routing costs. The remainder of operations can be evaluated without any specialized hardware or access.
+
+We summarize what is required to replicate all empirical results below:
 
 ## Replication of Graphs and Results in Paper
 
