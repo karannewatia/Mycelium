@@ -1,7 +1,11 @@
 # Mycelium
 
-This is a partial implementation of Mycelium, a framework for private graph analytics over massive distributed data. This is not a completely distributed end-to-end implementation (we cannot simulate the millions of users required!) 
+This is a partial implementation of Mycelium, a framework for private graph analytics over massive distributed data. This is not a completely distributed end-to-end implementation (we cannot simulate the millions of users required!)
 It instead consists of microbenchmarks for user operations, aggregator operations, and elected committee operations.
+
+## Initial installion:
+- git clone https://github.com/karannewatia/Mycelium
+- cd Mycelium
 
 ## Summary map of repository contents:
 
@@ -43,11 +47,8 @@ Follow READMEs in crypto/code/python_version/, onion-routing, and zkp/ to genera
 ### User Computation Costs (Section 6.4)
 Follow READMEs in crypto/code/python_version/, onion-routing, and zkp/ to generate all costs.
 ### Committee Costs (Section 6.5)
-Follow READMEs in crypto/code/scale_mamba_version/ for local simulation and/or crypto/mpc_amazon_ec2_benchmarking/ for single-machine EC2 simulation 
+Follow READMEs in crypto/code/scale_mamba_version/ for local simulation and/or crypto/mpc_amazon_ec2_benchmarking/ for single-machine EC2 simulation
 ### Figure 8
 Follow README in graph_scripts/
 ### Figure 9
 Follow READMEs in crypto/code/python_version/, onion-routing and zkp/ to generate all costs. Then generate graph in graph_scripts/
-
-
-

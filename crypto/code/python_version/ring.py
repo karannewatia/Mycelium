@@ -95,7 +95,7 @@ class Ring(object):
       res[i] = self.modBinom(N)
     return res
 
-# Ring multiplication (i.e. convolution)
+  # Ring multiplication slow version (used for debugging)
   # Polynomials are represented with lowest powers first
   #   e.g. (1 + 2x + 3x^2) is represented as [1, 2, 3]
   # Reduce polynomial modulo x^(len(a)) + 1

@@ -181,9 +181,9 @@ class LWE(object):
         number //= self.m
     return digits[::-1]
 
-  # perform relinearization on the ciphertext [c0,c1,...,ck]
+  # perform relinearization on the ciphertext [c0,c1,...,ck] (reduces the ciphertext size by 1)
   # using the secret key s and the relinearization key [b,a]
-  # returns the first two indices of the new ciphertext after relin: [c0_new, c1_new]
+  # returns the values in the first two indices of the new ciphertext after relin: [c0_new, c1_new]
   def relinearization(self, b, a, c0, c1, ck, s):
       r = self.r
       ck_inverse = [[0 for i in range(self.lgP_base_m)] for j in range(self.n)]
