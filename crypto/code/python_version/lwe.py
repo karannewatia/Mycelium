@@ -147,7 +147,8 @@ class LWE(object):
       return [z, zNoisy]
 
   #generate the relinearization key [b,a] using the secret key s
-  def rl_keys(self, s, s2):
+  #si is s multiplied by itself i-1 times
+  def rl_keys(self, s, si):
       r = self.r
       N = self.N
       a = []
@@ -163,8 +164,8 @@ class LWE(object):
           b.append(tmp_b)
 
       for i in range(self.lgP_base_m):
-          s2_tmp = [self.get_mod((self.m**i) * j) for j in s2]
-          b[i] = r.ringAdd(b[i], s2_tmp)
+          si_tmp = [self.get_mod((self.m**i) * j) for j in si]
+          b[i] = r.ringAdd(b[i], si_tmp)
 
       return [b, a]
 
@@ -180,24 +181,24 @@ class LWE(object):
         number //= self.m
     return digits[::-1]
 
-  # perform relinearization on the ciphertext [c0,c1,c2]
+  # perform relinearization on the ciphertext [c0,c1,...,ck]
   # using the secret key s and the relinearization key [b,a]
-  # returns a size-2 ciphertext [c0_new, c1_new]
-  def relinearization(self, b, a, c0, c1, c2, s):
+  # returns the first two indices of the new ciphertext after relin: [c0_new, c1_new]
+  def relinearization(self, b, a, c0, c1, ck, s):
       r = self.r
-      c2_inverse = [[0 for i in range(self.lgP_base_m)] for j in range(self.n)]
+      ck_inverse = [[0 for i in range(self.lgP_base_m)] for j in range(self.n)]
       c0_new = [0 for i in range(self.n)]
       c1_new = [0 for i in range(self.n)]
 
       for i in range(self.n):
-        tmp_binary = self.number_to_base(c2[i])[::-1]
+        tmp_binary = self.number_to_base(ck[i])[::-1]
         for j in range(self.lgP_base_m):
-          c2_inverse[i][j] = tmp_binary[j]
+          ck_inverse[i][j] = tmp_binary[j]
 
       for i in range(self.lgP_base_m):
         ct = [0 for _ in range(self.n)]
         for j in range(self.n):
-          ct[j] = c2_inverse[j][i]
+          ct[j] = ck_inverse[j][i]
 
         c0_new = r.ringAdd(self.mult(ct, b[i]), c0_new)
         c1_new = r.ringAdd(self.mult(ct, a[i]), c1_new)

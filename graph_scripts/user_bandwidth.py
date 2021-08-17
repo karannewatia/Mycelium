@@ -18,16 +18,15 @@ def bytesto(bytes, to, bsize=1024):
 num_friends = 10 #degree bound
 f = 1/0.1 #fraction of forwarders
 degree = 32768 #polynomial degree
-prime_bitsize = 550
-proof_hash_size = 8192 #(in bytes)
+prime_bitsize = 550 #ciphertext modulus bitsize
 
 #size of the ciphertext
-ct_size = bytesto(proof_hash_size + (degree * prime_bitsize * 2 / 8), 'm')
+ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 
 enc_proof_size = 0.00081
 
 final_upload = (prime_bitsize * degree * 12 / 8)
-final_upload = bytesto(final_upload , 'm') + 53.347 # 53.347 is for size of aggregation proof
+final_upload = bytesto(final_upload , 'm') + 53.347 # 53.347 is for size of the final upload (multiplication) proof
 
 telescoping = [0,0,0]
 forwarding = [0,0,0]

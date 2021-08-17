@@ -16,7 +16,13 @@ zkp = 0.010 + 4.532
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)
 
-total = (addition + zkp)/(3600*hours_to_finish_in) #convert to hours
+#last minute is used to perform the relinearization
+total = (addition + zkp)/((3600*hours_to_finish_in)-60) #convert to hours
+
+#time to perform the relin on 4 cores (in seconds) is 2324.
+#So, to get the number of cores needed to finish the relin in one minute,
+#we multiply the time by 4 and divide by 60.
+relin_cores = 2324 * 4 / 60
 
 font = {'size'   : 17}
 plt.rc('font', **font)
@@ -27,12 +33,13 @@ N = 4
 width = 0.25
 ind = [0,1,2,3]
 
-cores = (total*1e06, total*1e07, total*1e08, total*1e09)
-addition_cores = (cores[0]*add_frac, cores[1]*add_frac, cores[2]*add_frac, cores[3]*add_frac)
+cores = [total*1e06, total*1e07, total*1e08, total*1e09]
+#aggregation is summing up all the ciphertexts and then performing the relinearization
+aggregation_cores = ((cores[0]*add_frac)+relin_cores, (cores[1]*add_frac)+relin_cores, (cores[2]*add_frac)+relin_cores, (cores[3]*add_frac)+relin_cores)
 zkp_cores = (cores[0]*zkp_frac, cores[1]*zkp_frac, cores[2]*zkp_frac, cores[3]*zkp_frac)
 
 p1 = plt.bar(ind, zkp_cores, width, color='tab:red')
-p2 = plt.bar(ind, addition_cores, width, bottom=zkp_cores, color='tab:green')
+p2 = plt.bar(ind, aggregation_cores, width, bottom=zkp_cores, color='tab:green')
 plt.yscale('log')
 plt.xticks(np.arange(4), ["$10^6$", "$10^7$", "$10^8$", "$10^9$"])
 plt.yticks([1e2, 1e3, 1e4, 1e5, 1e6])

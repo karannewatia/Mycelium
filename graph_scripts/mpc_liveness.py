@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import math
 
+#fg is the malice+churn rate
+#C is the size of the committee
 def liveness(fg, C):
     p = math.exp(-(fg)*C)
     p *= (5*math.e*(fg))**(C/5)

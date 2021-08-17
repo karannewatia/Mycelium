@@ -1,3 +1,4 @@
 time for ciphertext addition (in seconds): 0.025922978878021242
 time for encryption (in seconds): 14.493421077728271
 time for 10 ciphertext multiplications without relin (in seconds): 851.4942331314087
+time for performing a relinearization operation to convert a size-12 ciphertext to a size-2 ciphertext (in seconds): 2324

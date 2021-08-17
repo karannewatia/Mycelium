@@ -16,13 +16,17 @@
 - Input `IP:PORT` of nodes (including destination) sequentially. You should be
    able to see the path established successfully after you input all `IPs`.
 - Input `1` to start sending message, and then input id of your established
-   path (it should be 0 if you only established one path).
-- Choose the size of the message you want to send (in MB).
+   path (it is `0` if you only established one path).
+- Choose the size of the message you want to send (in MB). We tested with 4.3 MB based on the ciphertext size.
+
+#### Now, steps to benchmark the costs on each node:
 - `Ctrl+C` to exit the program.
 - To benchmark the costs from the generated `out.txt` file,
   run `python benchmark.py [node_type]` on each node, where node_type is
   `src` if the node is the original source of the message,
   `dst` if the node is the final destination for the message,
   and `hop` otherwise.
+- Note that the costs depend on whether the node was the sender, destination, or an intermediate hop.
+  Additionally, the costs for the intermediate hops are also different. For example, the first hop has to do more work for telescoping than the other hops.
 
   The costs we got are in `Mycelium/onion_routing_costs.xlsx`.

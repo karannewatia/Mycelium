@@ -6,14 +6,18 @@ Requirements:
 - python2 (2.7) (for playing around with the FHE implementation; see below)
 
 
-To test the time taken for a ciphertext encryption:
+To test the time taken for a ciphertext encryption (needed for user computation):
 - `python encryption_test.py`
 
-To test the time taken for a ciphertext-ciphertext addition:
+To test the time taken for a ciphertext-ciphertext addition (needed for aggregator computation):
 - `python addition_test.py`
 
-To test the time taken for 10 ciphertext-ciphertext multiplications:
+To test the time taken for 10 ciphertext-ciphertext multiplications (needed for user computation):
 - `python multiplication_test.py`
+
+To test the time taken to perform a relinearization operation to convert a size-12 ciphertext to a size-2 ciphertext (needed for aggregator computation):
+- `python relin_test.py`
+
 
 The costs we got when benchmarking on our machine are in `crypto_costs.txt`. Times may vary slightly based on machine resources.
 

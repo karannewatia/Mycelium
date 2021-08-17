@@ -17,11 +17,11 @@ def bytesto(bytes, to, bsize=1024):
 
 num_friends = 10 #degree bound
 degree = 32768 #polynomial degree
-prime_bitsize = 550
-proof_hash_size = 8192 #(in bytes)
+prime_bitsize = 550 #ciphertext modulus bitsize
+enc_proof_size = 810 #in bytes
 
 #size of the ciphertext
-ct_size = bytesto(proof_hash_size + (degree * prime_bitsize * 2 / 8), 'm')
+ct_size = bytesto(degree * prime_bitsize * 2 / 8, 'm')
 
 telescoping = [0,0,0]
 forwarding = [0,0,0]
@@ -40,7 +40,7 @@ establish_keys_dst = 562
 telescoping[0] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_dst)
 telescoping[0] = bytesto(telescoping[0], 'm')
 
-encryption_src = proof_hash_size
+encryption_src = enc_proof_size
 encryption_node1 = 4509105
 encryption_node2 = 4509030
 encryption_dst = 4508954
@@ -61,7 +61,7 @@ establish_keys_dst = 562
 telescoping[1] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_dst)
 telescoping[1] = bytesto(telescoping[1], 'm')
 
-encryption_src = proof_hash_size
+encryption_src = enc_proof_size
 encryption_node1 = 4509181
 encryption_node2 = 4509106
 encryption_node3 = 4509030
@@ -83,7 +83,7 @@ establish_keys_dst = 562
 telescoping[2] = num_friends*(establish_keys_src + establish_keys_node1 + establish_keys_node2 + establish_keys_node3 + establish_keys_node4 + establish_keys_dst)
 telescoping[2] = bytesto(telescoping[2], 'm')
 
-encryption_src = proof_hash_size
+encryption_src = enc_proof_size
 encryption_node1 = 4509256
 encryption_node2 = 4509181
 encryption_node3 = 4509106

@@ -13,8 +13,7 @@ l = 5 #plaintext length (number of elements)
 n = 1 << lgN #polynomial degree
 N = 1 #used in binomial distribution
 
-
-# ########### generate p ###############
+# ########### generate p (ciphertext modulus) ###############
 p = 4
 while (not sympy.isprime(p)):
   p = random.randrange(2**(lgP-lgM-2), 2**(lgP-lgM-1)-1) * 2**(lgM+1) +1
@@ -22,7 +21,7 @@ while (not sympy.isprime(p)):
 print("############ p ###############")
 print(p)
 
-########### generate w ###############
+########### generate w (used for polynomial multiplication) ###############
 y = (p-1)/(2*n)
 z = 1
 w = p-1

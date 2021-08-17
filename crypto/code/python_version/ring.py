@@ -94,3 +94,32 @@ class Ring(object):
     for i in range(n):
       res[i] = self.modBinom(N)
     return res
+
+# Ring multiplication (i.e. convolution)
+  # Polynomials are represented with lowest powers first
+  #   e.g. (1 + 2x + 3x^2) is represented as [1, 2, 3]
+  # Reduce polynomial modulo x^(len(a)) + 1
+  def ringMulSlow(self, a, b):
+    n = self.n
+    #conv = sint.Array(2*n)
+    conv = [0 for i in range(2*n)]
+    #@for_range(2*n)
+    #def range_body_zero(i):
+    for i in range(2*n):
+      #conv[i] = sint(0)
+      conv[i] = 0
+
+    #@for_range(n**2)
+    #def range_body_mul(i):
+    for i in range(n**2):
+      j = i % n
+      k = i // n
+      conv[j+k] = self.get_mod(self.get_mod(conv[j+k]) + self.get_mod(a[j] * b[k]))
+
+    #res = sint.Array(n)
+    res = [0 for i in range(n)]
+    for i in range(n-1):
+      res[i] = self.get_mod(conv[i] - conv[i + n])
+
+    res[n-1] = conv[n-1]
+    return res
