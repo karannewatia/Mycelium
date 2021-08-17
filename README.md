@@ -3,7 +3,7 @@
 This is a partial implementation of Mycelium, a framework for private graph analytics over massive distributed data. This is not a completely distributed end-to-end implementation (we cannot simulate the millions of users required!)
 It instead consists of microbenchmarks for user operations, aggregator operations, and elected committee operations.
 
-## Initial installion:
+## Initial installation:
 - git clone https://github.com/karannewatia/Mycelium
 - cd Mycelium
 
