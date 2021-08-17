@@ -9,7 +9,7 @@ def mpc_dec_input(n):
     #can change the plaintext length/bin ranges/add more bins as needed (though this requires changing the binning logic in source/fhe_test.mpc)
 
     for i in range(2*n):
-        #dummy ciphertext used for benchmark the costs since the costs are input-oblivious
+        #dummy ciphertext used for benchmarking the costs since the costs are input-oblivious
         print(1)
 
 

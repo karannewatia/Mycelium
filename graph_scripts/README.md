@@ -19,11 +19,11 @@ To generate the graph for Figure 5(a):
 
 To generate the graph for Figure 5(b):
 - `python identification_graph.py`
-- script used to generate the data is in `identification.py` (the data generated will be slightly different each time because of the randomization involved).
+- script used to generate the data is in `identification.py` (the data generated will be slightly different each time because of the randomization involved), and can be run using `python identification.py`.
 
 To generate the graph for Figure 5(c):
 - `python goodput_graph.py`
-- script used to generate the data is in `goodput.py`. Change the value of 'r' (number of messages sent per user) in line 9 of `goodput.py` as needed (we tested with r = 1,2,and 3). Note that the data generated will be slightly different each time because of the randomization involved.
+- script used to generate the data is in `goodput.py`, and can be run using `python goodput.py`. Change the value of 'r' (number of messages sent per user) in line 9 of `goodput.py` as needed (we tested with r = 1,2,and 3). Note that the data generated will be slightly different each time because of the randomization involved. It will around 5-10 minutes for each run `goodput.py` (with r=1,2,3).
 
 To generate the graph for Figure 5(d):
 - `python duration.py`
@@ -31,7 +31,7 @@ To generate the graph for Figure 5(d):
 
 To generate the graph for Figure 6:
 - `gnuplot bw-user.plot` (requires data to be in `bw-user.data`)
--  equations are in `user_bandwidth.py`
+-  equations are in `user_bandwidth.py`, and can be run with `python user_bandwidth.py`.
 - Note that the numbers are slightly lower than the ones in the accepted version of the paper
   since we were able to reduce ZKP costs after the submission. So, the graph generated will have slightly
   lower costs than the corresponding graph in the paper.

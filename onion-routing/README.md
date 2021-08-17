@@ -1,6 +1,6 @@
 #### Environment setup:
 - Please use `./install.sh` in the `script` folder to install all required libraries. Previously tried on
-  CloudLab, `ubuntu 20.04`.
+  CloudLab, `ubuntu 20.04`. It will take a while (around an hour) for the installation script to finish.
 
 #### Usage:
 - `cmake .`

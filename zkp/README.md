@@ -3,7 +3,7 @@ Follow instructions here to download zokrates:
 - `cd ZoKrates/`
 - `git checkout 0.7.0`
 - `git pull origin 0.7.0`
-- `cargo +nightly build --release`
+- `cargo +nightly build --release` (this will take around 5 minutes)
 - `cd ..`
 
 Requirements:
@@ -13,7 +13,7 @@ Requirements:
 
 Run the following programs using the command:
 - `./run.sh [prog_name]`
-where [prog_name] can be one of 2 programs (`enc` or `mult`):
+where [prog_name] can be one of 2 programs (`enc` or `mult`). It will take around 10 minutes for the mult run.
 
 This will measure the costs of the two different ZK proofs required for the protocol (one for local encryption, the other for multiplication before the final upload). The times for proof generation and verification are printed out. The size of the proof is the size of the generated `proof.json` file. The costs we got when benchmarking on our machine are in `zkp_costs.txt`. Times may vary slightly based on machine resources.
 

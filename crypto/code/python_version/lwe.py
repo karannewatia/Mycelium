@@ -35,6 +35,7 @@ class LWE(object):
     res = [b,a,s]
     return res
 
+  #Encryption
   # z is plaintext (array) of l elems each modulo m
   # returns ciphertext [v, u]
   def enc(self, b, a, z):
@@ -208,13 +209,13 @@ class LWE(object):
 
       return [c0_new, c1_new]
 
-  #ring addition on two vectors
+  #ring addition on two polynomials
   def add(self, u1, u2):
     r = self.r
     res = r.ringAdd(u1, u2)
     return res
 
-  #ring multiplication two vectors
+  #ring multiplication on polynomials
   def mul(self, u1, u2):
       r = self.r
       res = self.mult(u1, u2)

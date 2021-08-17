@@ -58,7 +58,7 @@ encryption_src = 4509109
 encryption_node1 = 4509034
 encryption_node2 = 4508958
 
-#each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
+#each user will send an encrypted ciphertext to each of their friends, and the corresponding ZKP to the aggregator
 forwarding[0] = num_friends*(encryption_src)
 forwarding[0] = bytesto(forwarding[0], 'm')
 forwarding[0] += enc_proof_size
@@ -92,7 +92,7 @@ encryption_node1 = 4509110
 encryption_node2 = 4509034
 encryption_node3 = 4508958
 
-#each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
+#each user will send an encrypted ciphertext to each of their friends, and the corresponding ZKP to the aggregator
 forwarding[1] = num_friends*(encryption_src)
 forwarding[1] = bytesto(forwarding[1], 'm')
 forwarding[1] += enc_proof_size
@@ -126,7 +126,7 @@ encryption_node2 = 4509110
 encryption_node3 = 4509034
 encryption_node4 = 4508958
 
-#each user will send an encrypted ciphertext + the corresponding ZKP to each of their friends
+#each user will send an encrypted ciphertext to each of their friends, and the corresponding ZKP to the aggregator
 forwarding[2] = num_friends*(encryption_src)
 forwarding[2] = bytesto(forwarding[2], 'm')
 forwarding[2] += enc_proof_size

@@ -28,7 +28,7 @@ forwarding = [0,0,0]
 
 #The onion routing bandwidth costs are obtained from running the
 #onion routing code on CloudLab machines, and are also in 'onion_routing_costs.xlsx'
-#For the aggregator, we only consider the write costs (which corresponds to the read costs on the spreadsheet)
+#We only consider the write costs of the aggregator (which corresponds to the read costs on the spreadsheet)
 
 ##################### 2 hops ######################
 establish_keys_src = 4386

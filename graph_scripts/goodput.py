@@ -6,7 +6,7 @@ import numpy as np
 #senders set up paths for communication and dummy messages are sent along the onion route.
 #The data generated will be slightly different each time because of the randomization involved.
 
-num_copies = 3 #r #this can be 1,2, or 3
+num_copies = 1 #r
 
 results = []
 num_runs = 10 #average over 10 runs

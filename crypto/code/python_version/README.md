@@ -13,13 +13,13 @@ To test the time taken for a ciphertext-ciphertext addition (needed for aggregat
 - `python addition_test.py`
 
 To test the time taken for 10 ciphertext-ciphertext multiplications (needed for user computation):
-- `python multiplication_test.py`
+- `python multiplication_test.py` (this will take around 20 minutes)
 
 To test the time taken to perform a relinearization operation to convert a size-12 ciphertext to a size-2 ciphertext (needed for aggregator computation):
-- `python relin_test.py`
+- `python relin_test.py` (this will take around 90 minutes)
 
 
-The costs we got when benchmarking on our machine are in `crypto_costs.txt`. Times may vary slightly based on machine resources.
+The costs we got when benchmarking on our machine are in `crypto_costs.txt`. Times may vary slightly based on machine resources and due to the randomization involved in the FHE implementation.
 
 To play around with the FHE implementation:
 - change the variables (lgP, lgM, lgN, l) in `input_gen.py` as needed

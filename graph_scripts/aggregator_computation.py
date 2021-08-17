@@ -16,7 +16,7 @@ zkp = 0.010 + 4.532
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)
 
-#last minute is used to perform the relinearization
+#the last minute will be used to perform the relinearization
 total = (addition + zkp)/((3600*hours_to_finish_in)-60) #convert to hours
 
 #time to perform the relin on 4 cores (in seconds) is 2324.
@@ -34,7 +34,7 @@ width = 0.25
 ind = [0,1,2,3]
 
 cores = [total*1e06, total*1e07, total*1e08, total*1e09]
-#aggregation is summing up all the ciphertexts and then performing the relinearization
+#aggregation involves summing up all the ciphertexts and then performing the relinearization
 aggregation_cores = ((cores[0]*add_frac)+relin_cores, (cores[1]*add_frac)+relin_cores, (cores[2]*add_frac)+relin_cores, (cores[3]*add_frac)+relin_cores)
 zkp_cores = (cores[0]*zkp_frac, cores[1]*zkp_frac, cores[2]*zkp_frac, cores[3]*zkp_frac)
 

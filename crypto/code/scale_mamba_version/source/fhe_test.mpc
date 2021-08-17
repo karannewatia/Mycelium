@@ -1,6 +1,8 @@
 execfile('/root/SCALE-MAMBA/Programs/lwe/lwe.mpc')
 
+#ciphertext modulus (the prime used in SCALE-MAMBA)
 #p = 12413837415352346609
+#used in ring multiplication
 w = cint(11667162701519046670)
 
 lgN = 2 #polynomial degree

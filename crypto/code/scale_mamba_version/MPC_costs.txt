@@ -1,6 +1,6 @@
 ###### Committee size = 10 #######
 
-on Amazon EC2:
+on Amazon EC2 (full distributed run):
 Run time (s): 180.49
 Communication Cost (bytes): 4487875435
 
