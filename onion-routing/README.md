@@ -36,4 +36,7 @@ So, up to 6 CloudLab machines are needed to test the protocol.
 - Note that the costs depend on whether the node was the sender, destination, or an intermediate hop.
   Additionally, the costs for the intermediate hops are also different. For example, the first hop has to do more work for telescoping than the other hops.
 
-  The costs we got are in `Mycelium/onion_routing_costs.xlsx`.
+The costs we got are in `Mycelium/onion_routing_costs.xlsx`.
+The measured costs should be very similar, but there may be some slight discrepancies in the numberof bytes communicated --  this is due to the key exchange phase using random shares to establish a secret key. There may also be slight differences in timing based on the hardware used.
+
+
