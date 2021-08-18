@@ -1,6 +1,6 @@
 This is an implementation of the onion routing protocol.
 A source node sends a message to a destination node through x intermediate hops,
-(where x is 2,3, or 4 in our experiments).
+(where x is 2, 3, or 4 in our experiments).
 So, up to 6 CloudLab machines are needed to test the protocol.
 
 #### Environment setup:
@@ -10,9 +10,11 @@ So, up to 6 CloudLab machines are needed to test the protocol.
 #### Usage:
 - `cmake .`
 - `make`
-- Run `./router 0.0.0.0:PORT | tee out.txt` for all nodes one by one.
+- Run `curl ifconfig.me` to get the ip addresses of all nodes, and save these.
+- Pick a PORT number to communicate between nodes
+- Run `./router 0.0.0.0:PORT | tee out.txt` one all nodes one by one, using the same port number.
 
-#### Steps to run (all from the sender node):
+#### Steps to run (only from the designated sender node):
 - Input `0` to start establishing a path.
 - Input total number of nodes in the path (including destination). For example,
    if the sender node wants to establish a path consisting of 2 intermediate nodes/hops between
@@ -20,7 +22,7 @@ So, up to 6 CloudLab machines are needed to test the protocol.
 - IPs can be obtained using `curl ifconfig.me`.
 - Input `IP:PORT` of nodes (including destination) sequentially. You should be
    able to see the path established successfully after you input all `IPs`.
-- Input `1` to start sending message, and then input id of your established
+- Input `1` to start sending message, and then input the id of your established
    path (it is `0` if you only established one path).
 - Choose the size of the message you want to send (in MB). We tested with 4.3 MB based on the ciphertext size.
 
