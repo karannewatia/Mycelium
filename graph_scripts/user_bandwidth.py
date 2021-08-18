@@ -36,7 +36,7 @@ forwarding_forwarder = [0,0,0]
 
 
 #The onion routing bandwidth costs are obtained from running the
-#onion routing code on CloudLab machines, and are also in 'onion_routing_costs.xlsx'
+#onion routing code on CloudLab machines, and are availabe in 'Mycelium/onion-routing/onion_routing_costs.txt'
 #We only consider the write costs for users.
 
 ##################### 2 hops ######################

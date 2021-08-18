@@ -1,0 +1,55 @@
+############# For 2 intermediate hops #############
+
+The columns correspond to the costs/times for the source, hop1, hop2, and the destination node respectively.
+
+Communication cost (in bytes):
+
+#these are the costs for users
+Telescoping (write) - [2176, 5686, 2834, 304]
+Send 4.3 MB (write) - [4509109, 4509034, 4508958, 0]
+
+#these are the costs for the aggregator
+Telescoping (read) - [4386, 4456, 1608, 562]
+Send 4.3 MB (read) - [0, 4509105, 4509030, 4508954]
+
+User times (in seconds):
+Telescoping - [0.0743, 0.020230737, 0.020038083, 0.019142]
+Send 4.3 MB - [0.142117, 0.0437752, 0.0562379, 0.0223418]
+
+
+############# For 3 intermediate hops #############
+
+The columns correspond to the costs/times for the source, hop1, hop2, hop3, and the destination node respectively.
+
+Communication cost (in bytes):
+
+#these are the costs for users
+Telescoping (write) - [3195, 8821, 5691, 2837, 304]
+Send 4.3 MB (write) - [4509185, 4509110, 4509034, 4508958, 0]
+
+#these are the costs for the aggregator
+Telescoping (read) - [6641, 7590, 4463, 1608, 562]
+Send 4.3 MB (read) - [0, 4509181, 4509106, 4509030, 4508954]
+
+User times (in seconds):
+Telescoping - [0.102834, 0.02092421, 0.020948497, 0.019684814999999994, 0.0197593]
+Send 4.3 MB - [0.143451, 0.0431395, 0.0443894, 0.0777283, 0.0220567]
+
+
+############# For 4 intermediate hops #############
+
+The columns correspond to the costs/times for the source, hop1, hop2, hop3, hop4, and the destination node respectively.
+
+Communication cost (in bytes):
+
+#these are the costs for users
+Telescoping (write) - [4344, 12244, 8821, 5691, 2837, 304]
+Send 4.3 MB (write) - [4509260, 4509185, 4509110, 4509034, 4508958]
+
+#these are the costs for the aggregator
+Telescoping (read) - [9029, 10989, 7590, 4463, 1608, 562]
+Send 4.3 MB (read) - [0, 4509256, 4509181, 4509106, 4509030, 4508954]
+
+User times (in seconds):
+Telescoping - [0.130685, 0.020947645, 0.021025801, 0.019912122, 0.020789681, 0.0194365]
+Send 4.3 MB - [0.220451, 0.0596932, 0.043498, 0.0415035, 0.068581, 0.0241647]

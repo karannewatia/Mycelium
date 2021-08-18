@@ -29,9 +29,6 @@ re_sharing:
 onion-routing:
 - all onion routing code
 
-onion_routing_costs.xslx:
-- costs from running the onion routing code on CloudLab machines
-
 
 ## Instructions for Artifact Reviewers at SOSP 2021:
 Our implementation is composed of a series of micro-benchmarks. Please `cd` into each of the above folders for detailed explanations and instructions on evaluating each component separately. We provide a docker for some of the cryptographic operations, but require access to CloudLab to evaluate our onion-routing costs. The remainder of operations can be evaluated without any specialized hardware or access.

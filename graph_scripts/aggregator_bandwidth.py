@@ -27,8 +27,8 @@ telescoping = [0,0,0]
 forwarding = [0,0,0]
 
 #The onion routing bandwidth costs are obtained from running the
-#onion routing code on CloudLab machines, and are also in 'onion_routing_costs.xlsx'
-#We only consider the write costs of the aggregator (which corresponds to the read costs on the spreadsheet)
+#onion routing code on CloudLab machines, and are availabe in 'Mycelium/onion-routing/onion_routing_costs.txt'
+#We only consider the write costs of the aggregator (which corresponds to the read costs in the txt file)
 
 ##################### 2 hops ######################
 establish_keys_src = 4386
