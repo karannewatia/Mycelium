@@ -31,6 +31,6 @@ To play around with the FHE implementation:
 - After changing the inputs to the function in `noise.py`, run using `python noise.py`
  to check whether the desired number of additions and multiplications is possible with the given set of parameters.
 - Copy the variable values (lgP, lgM, lgN, l) from `input_gen.py` to `fhe_test.py`
-- Copy the generated p and w values into lines 13 and 14 respectively of `fhe_test.py`
+- Copy the generated p and w values into lines 13 and 15 respectively of `fhe_test.py`
 - Add/remove FHE operations (using the functions in `lwe.py`) in `fhe_test.py` as needed
 - Run `python fhe_test.py`

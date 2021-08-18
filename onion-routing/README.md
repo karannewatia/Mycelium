@@ -1,3 +1,8 @@
+This is an implementation of the onion routing protocol.
+A source node sends a message to a destination node through x intermediate hops,
+(where x is 2,3, or 4 in our experiments).
+So, up to 6 CloudLab machines are needed to test the protocol.
+
 #### Environment setup:
 - Please use `./install.sh` in the `script` folder to install all required libraries. Previously tried on
   CloudLab, `ubuntu 20.04`. It will take a while (around an hour) for the installation script to finish.

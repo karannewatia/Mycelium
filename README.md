@@ -4,8 +4,8 @@ This is a partial implementation of Mycelium, a framework for private graph anal
 It instead consists of microbenchmarks for user operations, aggregator operations, and elected committee operations.
 
 ## Initial installation:
-- git clone https://github.com/karannewatia/Mycelium
-- cd Mycelium
+- `git clone https://github.com/karannewatia/Mycelium`
+- `cd Mycelium`
 
 ## Summary map of repository contents:
 

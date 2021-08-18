@@ -23,7 +23,7 @@ To generate the graph for Figure 5(b):
 
 To generate the graph for Figure 5(c):
 - `python goodput_graph.py`
-- script used to generate the data is in `goodput.py`, and can be run using `python goodput.py`. Change the value of 'r' (number of messages sent per user) in line 9 of `goodput.py` as needed (we tested with r = 1,2,and 3). Note that the data generated will be slightly different each time because of the randomization involved. It will around 5-10 minutes for each run `goodput.py` (with r=1,2,3).
+- script used to generate the data is in `goodput.py`, and can be run using `python goodput.py`. Change the value of 'r' (number of messages sent per user) in line 9 of `goodput.py` as needed (we tested with r = 1,2,and 3). Note that the data generated will be slightly different each time because of the randomization involved. It will around 5-10 minutes for each run of `goodput.py` (with r=1,2,3).
 
 To generate the graph for Figure 5(d):
 - `python duration.py`
