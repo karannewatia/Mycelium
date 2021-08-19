@@ -4,8 +4,7 @@ A source node sends a message to a destination node through x intermediate hops,
 So, up to 6 CloudLab machines are needed to test the protocol.
 
 #### Environment setup:
-- Please use `./install.sh` in the `script` folder to install all required libraries. Previously tried on
-  CloudLab, `ubuntu 20.04`. It will take a while (around an hour) for the installation script to finish.
+- Please use `./install.sh` in the `script` folder to install all required libraries. It will take a while (around an hour) for the installation script to finish. Previously tried on CloudLab m510 machines (8-core 2 GHz Intel Xeon D-1548 processor and 64 GB RAM) running Ubuntu 20.04.
 
 ### Requirements:
 - python (version v>3, we tested with v 3.8.10)

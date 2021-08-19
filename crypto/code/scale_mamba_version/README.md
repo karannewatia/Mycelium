@@ -14,9 +14,11 @@ In another shell in `Mycelium/crypto/code/scale_mamba_version/`:
 Now, in the docker container:
 - `cd ~/SCALE-MAMBA/`
 - `cp Auto-Test-Data/1/* Data/`
-- `bash ./genCertOptions.sh N 1 | ./Setup.x` (N is the number of committee members, we tested with N=10)
+- `bash ./genCertOptions.sh N 1 | ./Setup.x` (Set N to be the number of committee members, we tested with N=10)
 - mod value we used for benchmarking MPC costs: 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
 - `./Setup.x` -> 2 -> 2 -> mod -> enter the max possible t (threshold value) (t=4 if N=10)
+
+(that is, first run `./Setup.x`, then type 2 when prompted for input, and so on).
 
 
 We first have to set up the shares of the secret key: (this will take around 10 minutes)
@@ -24,7 +26,7 @@ We first have to set up the shares of the secret key: (this will take around 10 
 
 To benchmark MPC decryption (do this after performing the secret key gen):
 - `cd Data`
-- `./decrypt.sh N`, where N is the number of players
+- `./decrypt.sh N` (Set N to be the number of committee members)
 - `cd ..`
 - `./benchmark.sh dec_test 0 1 2 ...N-1`, where N is the number of committee members (this will take around 10 minutes)
 - Communication cost is in `communication.txt`.
@@ -35,6 +37,8 @@ Amazon EC2 t2.xlarge instances with 16 GB of RAM.
 To test/play around with key gen, encryption, and decryption together in SCALE-MAMBA:
 - mod value used in `fhe_test.mpc`: 12413837415352346609
 - `./Setup.x` -> 2 -> 2 -> mod -> enter the max possible t (threshold value) (t=4 if N=10)
+
+(that is, first run `./Setup.x`, then type 2 when prompted for input, and so on).
 - `./benchmark.sh fhe_test 0 1 2 ...N-1`, where N is the number of committee members  (this will take a couple of minutes)
 - Output is in `output_0.txt`
 - See the README in `Mycelium/crypto/code/python_version` for instructions on how to generate a different set of FHE parameters.
