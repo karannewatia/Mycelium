@@ -3,7 +3,6 @@ echo RootCA
 echo 10
 echo IP0
 echo Player0.crt
-echo IP0
 echo IP1
 echo Player1.crt
 echo IP2

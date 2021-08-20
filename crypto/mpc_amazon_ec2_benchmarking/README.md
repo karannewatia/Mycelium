@@ -27,7 +27,6 @@ echo RootCA
 echo 10
 echo IP0
 echo Player0.crt
-echo IP0
 echo IP1
 echo Player1.crt
 echo IP2
@@ -50,6 +49,7 @@ echo Player9.crt`
 For each node $i, change IP$i to 127.0.0.1
 
 Run:
+`cp Auto-Test-Data/1/* Data/`
 `./cert.sh | ./Setup.x`
 `./Setup.x` with inputs: 2 -> 2 -> p -> 4 (p listed below)
 
@@ -66,7 +66,7 @@ Run keygen first:
 
 Then setup and run decrypt:
 `./input.sh >> ~/SCALE-MAMBA/Data/Player${i}_in.txt`
-`cp ~/SCALE-MAMBA/Data/Player${i}_shareout.txt Player${i}_sharein.txt`
+`cp ~/SCALE-MAMBA/Data/Player${i}_shareout.txt ~/SCALE-MAMBA/Data/Player${i}_sharein.txt`
 `./ec2_benchmark.sh $i Programs/dec_test `
 
 
