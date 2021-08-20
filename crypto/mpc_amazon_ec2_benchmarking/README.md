@@ -51,7 +51,6 @@ For each node $i, change IP$i to 127.0.0.1
 
 Run:
 `./cert.sh | ./Setup.x`
-
 `./Setup.x` with inputs: 2 -> 2 -> p -> 4 (p listed below)
 
 p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
@@ -62,17 +61,19 @@ Running computation:
 
 Copy file ec2_benchmark.sh into this folder.
 
+Run keygen first:
 `./ec2_benchmark.sh $i Programs/secret_keygen`
 
-`cd Data &&  cp ../../../decrypt_input.txt Player${i}_in.txt && cp ~/SCALE-MAMBA/Data/Player${i}_shareout.txt Player${i}_sharein.txt && cd .. `
-
+Then setup and run decrypt:
+`./input.sh >> ~/SCALE-MAMBA/Data/Player${i}_in.txt`
+`cp ~/SCALE-MAMBA/Data/Player${i}_shareout.txt Player${i}_sharein.txt`
 `./ec2_benchmark.sh $i Programs/dec_test `
 
 
 - Timing and communication costs will be output to the command line
 
 
-Results we got:
+Results we got (note that distributing the costs over multiple nodes make the costs slightly lower than they are in a simulation on one machine):
 
 With t2.xlarge (16GB RAM)
 
