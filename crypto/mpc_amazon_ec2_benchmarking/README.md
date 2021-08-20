@@ -70,7 +70,7 @@ Set bash variable i=1 -> 10 for corresponding machines
 
 Running computation:
 
-Copy file ec2_benchmark.sh into this folder.
+Copy files input.sh and ec2_benchmark.sh into this folder.
 
 Run keygen first:
 `./ec2_benchmark.sh $i Programs/secret_keygen`

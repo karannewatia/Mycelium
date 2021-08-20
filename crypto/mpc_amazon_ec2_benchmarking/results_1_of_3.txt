@@ -1,2 +1,0 @@
-Run time (s): 0
-Communication Cost (bytes): 0

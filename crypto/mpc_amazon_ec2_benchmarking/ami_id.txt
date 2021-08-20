@@ -1,2 +1,0 @@
-ami-0fbd2ef7f210c6013
-sm_eceg_image: ami-0c155e0d6e5363150
