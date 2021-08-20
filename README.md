@@ -42,7 +42,7 @@ Follow README in graph_scripts/
 ### Figure 6
 Follow READMEs in zkp/ and onion-routing/ to generate all costs. Then generate graph in graph_scripts/
 ### User Computation Costs (Section 6.4)
-Follow READMEs in crypto/code/python_version/, onion-routing, and zkp/ to generate all costs.
+Follow READMEs in crypto/code/python_version/, onion-routing, and zkp/ to generate all costs. The user computation cost includes the costs of encrypting a ciphertext and multiplying 10 ciphertexts (run `encryption_test.py` and `multiplication_test.py` in crypto/code/python_version/), telescoping and sending a message (see onion-routing), and generating the ZK proofs for encryption and multiplication (see zkp/).
 ### Committee Costs (Section 6.5)
 Follow READMEs in crypto/code/scale_mamba_version/ for local simulation and/or single-machine EC2 simulation
 ### Figure 8
