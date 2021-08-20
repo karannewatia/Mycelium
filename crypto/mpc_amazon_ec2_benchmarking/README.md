@@ -1,4 +1,4 @@
-#Rough instructions to run on EC2 with 10 machines:
+### Rough instructions to run on EC2 with 10 machines:
 
 - Create 10 xlarge instances. Make sure to configure your security settings to allow incoming traffic on at least ports 5000-5000+N-1, where N is the number of machines
 
@@ -59,7 +59,9 @@ For each node $i, change IP$i to 127.0.0.1
 
 Run:
 `cp Auto-Test-Data/1/* Data/`
+
 `./cert.sh | ./Setup.x`
+
 `./Setup.x` with inputs: 2 -> 2 -> p -> 4 (p listed below)
 
 p = 3608870760655701536654448303084521404059979435669688520664454167677047564331360806878098945169255539464747077653151390316596266506041127794233364507011499768902844417
@@ -75,14 +77,16 @@ Run keygen first:
 
 Then setup and run decrypt:
 `./input.sh >> ~/SCALE-MAMBA/Data/Player${i}_in.txt`
+
 `cp ~/SCALE-MAMBA/Data/Player${i}_shareout.txt ~/SCALE-MAMBA/Data/Player${i}_sharein.txt`
+
 `./ec2_benchmark.sh $i Programs/dec_test `
 
 
-- Timing and communication costs will be output to the command line
+Timing and communication costs will be output to the command line.
 
 
-Results we got (note that distributing the costs over multiple nodes make the costs slightly lower than they are in a simulation on one machine):
+Results we got (note that distributing the costs over multiple nodes make the costs lower than they are in a simulation on one machine):
 
 With t2.xlarge (16GB RAM)
 
