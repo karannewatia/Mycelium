@@ -1,24 +1,33 @@
-#To run on EC2 with 10 machines:
+#Rough instructions to run on EC2 with 10 machines:
 
 - Create 10 xlarge instances. Make sure to configure your security settings to allow incoming traffic on at least ports 5000-5000+N-1, where N is the number of machines
 
 - SSH into each instance. On each node, do the following:
 
-`curl ifconfig.me` and store the resulting IP address
+`sudo yum install docker`
+`sudo yum install git`
 
 `sudo service docker start`
 
+`git clone https://github.com/karannewatia/Mycelium.git`
+
+`cd Mycelium/crypto/code/scale_mamba_version`
+
 `sudo docker build -t mpc . `
+
+Set bash variables i=1 to i=10 for each corresponding node
 
 `port_id=$(( 5000 + ${i} - 1))`
 
 `sudo docker run -id -p ${port_id}:${port_id} mpc `
 
-(If you close the docker and need  to run it again, run:
+(This will work even if you close the docker and need  to run it again:
 `sudo docker ps`
 Grab the ID and run `sudo docker exec -ti [ID] bash`)
 
 `cd SCALE-MAMBA`
+
+`curl ifconfig.me` and store the resulting IP address
 
 In this folder, create a cert.sh file as follows, with the IP addresses filled in:
 
