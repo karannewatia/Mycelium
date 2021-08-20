@@ -3,26 +3,21 @@ import matplotlib.pyplot as plt
 
 hours_to_finish_in = 10
 
-#time for adding two size-2 ciphertexts (in seconds) on 4 cores is 0.02592297887802124
-#So, to get the time to add two size-12 ciphertexts on 1 core,
-#we multiply the time by 4 and then by 6.
-#See the Mycelium/crypto/code/python_version folder for instructions on how to obtain crypto costs
-addition = 0.02592297887802124 * 4 * 6
+#time for adding two size-2 ciphertexts (in seconds) is 0.02592297887802124
+#So, to get the time to add two size-12 ciphertexts, we multiply by 6.
+addition = 0.02592297887802124 * 6
 
 #time to verify the enc proof + time to verify the mult proof (in seconds)
-#See the Mycelium/zkp folder for instructions on how to obtain ZKP costs
 zkp = 0.010 + 4.532
 
 add_frac = addition/(addition + zkp)
 zkp_frac = zkp/(addition + zkp)
 
 #the last minute will be used to perform the relinearization
-total = (addition + zkp)/((3600*hours_to_finish_in)-60) #convert to hours
+total = (addition + zkp)/((3600*hours_to_finish_in)-60)
 
-#time to perform the relin on 4 cores (in seconds) is 2324.
-#So, to get the number of cores needed to finish the relin in one minute,
-#we multiply the time by 4 and divide by 60.
-relin_cores = 2324 * 4 / 60
+#finish the relin in one minute,
+relin_cores = 2563.052186727524 / 60
 
 font = {'size'   : 17}
 plt.rc('font', **font)
