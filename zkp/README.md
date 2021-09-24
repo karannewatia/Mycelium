@@ -1,7 +1,9 @@
 Requirements:
 - python (version v>3.8, we tested with v 3.8.5)
 
-Run `./install.sh` to set up ZoKrates (this will take around 5 minutes).
+ZoKrates set up instructions:
+- `curl https://sh.rustup.rs -sSf | sh`
+- `./install.sh` (this will take around 5 minutes)
 
 
 Run the following programs using the command:

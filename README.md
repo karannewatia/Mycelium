@@ -50,3 +50,8 @@ Follow READMEs in crypto/code/scale_mamba_version/ for local simulation and/or s
 Follow README in graph_scripts/
 ### Figure 9
 Follow READMEs in crypto/code/python_version/, onion-routing and zkp/ to generate all costs. Then generate graph in graph_scripts/
+
+#List of open-source libraries used
+- ZoKrates [https://github.com/Zokrates/ZoKrates]
+- OpenSSL [https://www.openssl.org/]
+- SCALE-MAMBA [https://github.com/KULeuven-COSIC/SCALE-MAMBA]
