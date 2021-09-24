@@ -1,8 +1,7 @@
 This is an implementation of the BGV FHE crypto-system, used to benchmark FHE costs.
 
 Requirements:
-- python (version v>3, we tested with v 3.8.5)
-- sympy (can be installed using `pip install sympy`)
+- python (version v>3.8, we tested with v 3.8.5)
 - python2 (2.7) (for playing around with the FHE implementation; see below)
 
 

@@ -6,6 +6,7 @@ It instead consists of microbenchmarks for user operations, aggregator operation
 ## Initial installation:
 - `git clone https://github.com/karannewatia/Mycelium`
 - `cd Mycelium`
+- `./install.sh`
 
 ## Summary map of repository contents:
 

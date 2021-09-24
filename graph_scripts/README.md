@@ -1,8 +1,5 @@
 Requirements:
-- python (version v>3, we tested with v 3.8.5)
-- matplotlib (can be installed using `pip install matplotlib`)
-- numpy (can be installed using `pip install numpy`)
-- datetime (can be installed using `pip install datetime`)
+- python (version v>3.8, we tested with v 3.8.5)
 - gnuplot (see http://www.gnuplot.info/download.html)
 
 Raw data used for plotting all graphs is in `graph_data.txt`

@@ -1,17 +1,8 @@
 Requirements:
-- python (version v>3, we tested with v 3.8.5)
-- cargo (can be installed using `curl https://sh.rustup.rs -sSf | sh`)
-- nightly (can be installed using `rustup -v install  nightly`)
+- python (version v>3.8, we tested with v 3.8.5)
 
-Follow instructions here to download zokrates:
-- `git clone https://github.com/ZoKrates/ZoKrates`
-- `cd ZoKrates/`
-- `git checkout 0.7.0`
-- `git pull origin 0.7.0`
-- `rustup default 1.54`
-- `rustup install nightly-2021-06-30`
-- `cargo +nightly-2021-06-30 build --release` (this will take around 5 minutes)
-- `cd ..`
+Run `./install.sh` to set up ZoKrates (this will take around 5 minutes).
+
 
 Run the following programs using the command:
 - `./run.sh [prog_name]`
