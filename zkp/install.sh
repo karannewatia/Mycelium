@@ -1,4 +1,5 @@
 #!/bin/bash
+curl https://sh.rustup.rs -sSf | sh
 git clone https://github.com/ZoKrates/ZoKrates
 cd ZoKrates/
 git checkout 0.7.0

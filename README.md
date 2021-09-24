@@ -6,7 +6,7 @@ It instead consists of microbenchmarks for user operations, aggregator operation
 ## Initial installation:
 - `git clone https://github.com/karannewatia/Mycelium`
 - `cd Mycelium`
-- `./install.sh`
+- `./install.sh` (requires python version v>3.8 and pip)
 
 ## Summary map of repository contents:
 
