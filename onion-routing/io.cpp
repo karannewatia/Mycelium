@@ -48,6 +48,7 @@ private:
         FORWARD_HANDSHAKE,
         QUERY_PK,
         QUERY_RESPONSE,
+        ACK,
     };
 
     void handleErrors() {
@@ -733,7 +734,7 @@ private:
             ROUTER_OUTPUT << "received msg: " << msg << endl;
     }
 
-    void query_pk_handler(int fd, idKey origin_ik, string& msg, string back_ip) {
+    void query_pk_handler(int fd, idKey origin_ik, string& msg, string back_ip, int id, int total_id) {
         interface::Msg query_req;
         if (!query_req.ParseFromString(msg)) {
             ROUTER_OUTPUT << "cannot parse query pk msg\n";
@@ -750,6 +751,32 @@ private:
         string sessionKey = keyInfo[origin_ik].sessionKey;
         int back_fd = fd;
         int back_id = origin_ik.id;
+
+        ROUTER_OUTPUT << "query pk, id: " << id << " total id: " << total_id << endl;
+        // send back an ack first!!!
+        if (id == total_id - 1) {
+            interface::Request ack_req;
+            ack_req.set_request_type(ACK);
+            ack_req.set_msg("ack");
+            string ack_req_str;
+            ack_req.SerializeToString(&ack_req_str);
+            string enc_ack_req_str = sessionEnc(sessionKey, ack_req_str);
+
+            interface::Msg back_msg;
+            back_msg.set_msg(enc_ack_req_str);
+            back_msg.set_addr(back_ip);
+            back_msg.set_id(back_id);
+            string back_msg_str;
+            back_msg.SerializeToString(&back_msg_str);
+            ROUTER_OUTPUT << "\tmsg size: " << back_msg_str.size() << endl;
+
+            string back_str = formatMsg(back_msg_str);
+
+            if (!do_write(back_fd, back_str.c_str(), back_str.size())) {
+                ROUTER_OUTPUT << "ack sending back response failed\n";
+            }
+            ROUTER_OUTPUT << "send ack back succeed!\n";
+        }
 
         interface::Request back_req;
         back_req.set_request_type(FORWARD_BACK);
@@ -870,7 +897,8 @@ private:
 
                 } else if (parsed_req.request_type() == QUERY_PK) {
                     string recv_msg = parsed_req.msg();
-                    query_pk_handler(fd, ik, recv_msg, origin_ip);
+                    assert(parsed_req.has_id() && parsed_req.has_total_id());
+                    query_pk_handler(fd, ik, recv_msg, origin_ip, parsed_req.id(), parsed_req.total_id());
                 } else {
                     assert(0);
                 }
@@ -969,6 +997,8 @@ private:
         interface::Request req;
         req.set_request_type(QUERY_PK);
         req.set_msg(ips[id]);
+        req.set_id(id);
+        req.set_total_id(ips.size());
         string req_str;
         req.SerializeToString(&req_str);
         interface::Msg query_req;
@@ -980,8 +1010,11 @@ private:
         for (int j = id - 1; j >= 0; j--) {
             interface::Request new_req;
             new_req.set_request_type(FORWARD);
-            if (j == id - 1)
+            if (j == id - 1) {
                 new_req.set_request_type(QUERY_PK);
+                new_req.set_id(id);
+                new_req.set_total_id(ips.size());
+            }
             new_req.set_msg(sendReq);
             string new_req_str;
             new_req.SerializeToString(&new_req_str);
@@ -1000,6 +1033,45 @@ private:
             ROUTER_OUTPUT << "send query req failed\n";
             close(fd);
             return;
+        }
+
+        // receive ack
+        if (id == ips.size() - 1) {
+            string response;
+            if (!recv_response(fd, response)) {
+                ROUTER_OUTPUT << "recv response for query pk " << id << " failed" << endl;
+                close(fd);
+                return;
+            }
+
+            ROUTER_OUTPUT << "recved response size: " << response.size() << endl;
+            interface::Msg request;
+            if (!request.ParseFromString(response)) {
+                ROUTER_OUTPUT << "query response parse response fail\n";
+                return;
+            }
+            string decMsg;
+            string encMsg = request.msg();
+            for (int i = 0; i < id; i++) {
+                decMsg = sessionDec(sessions[i], encMsg);
+                // ROUTER_OUTPUT << "enter recv back handler " << i << " req size: " << encMsg.size() << endl;
+                interface::Request parsed_req;
+                if (!parsed_req.ParseFromString(decMsg)) {
+                    ROUTER_OUTPUT << "cannot parse decrypted request msg\n";
+                    return;
+                }
+                assert(parsed_req.request_type() == FORWARD_BACK || parsed_req.request_type() == ACK);
+                interface::Msg back_msg;
+                encMsg = parsed_req.msg();
+                if (i != id - 1) {
+                    if (!back_msg.ParseFromString(encMsg)) {
+                        ROUTER_OUTPUT << "cannot parse Msg type\n";
+                        return;
+                    }
+                    encMsg = back_msg.msg();
+                }
+            }
+            ROUTER_OUTPUT << "receive ack finish!\n";
         }
 
         // recv response

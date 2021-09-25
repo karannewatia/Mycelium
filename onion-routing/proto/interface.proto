@@ -12,6 +12,8 @@ message Msg {
 message Request {
     required int32 request_type = 1;
     required bytes msg = 2;
+    optional int32 id = 3;
+    optional int32 total_id = 4;
 }
 
 message EncMsg {
