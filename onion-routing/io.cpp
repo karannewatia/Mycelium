@@ -955,7 +955,7 @@ private:
         int enc_size = (msg.size() / 16 + 1) * 16;
         unsigned char* ciphertext = (unsigned char*) malloc(enc_size * sizeof(unsigned char));
         unsigned char iv_str[16];
-        assert(BN_num_bytes(iv) == 16);
+        assert(BN_num_bytes(iv) <= 16);
         BN_bn2bin(iv, iv_str);
         unsigned char tag[16];
         int enc_len = AESencrypt((unsigned char*)msg.c_str(), msg.size(), (unsigned char*)sessionKey.c_str(), iv_str, ciphertext, tag);
