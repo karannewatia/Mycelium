@@ -49,6 +49,7 @@ private:
         QUERY_PK,
         QUERY_RESPONSE,
         ACK,
+        COMMIT,
     };
 
     void handleErrors() {
@@ -776,6 +777,34 @@ private:
                 ROUTER_OUTPUT << "ack sending back response failed\n";
             }
             ROUTER_OUTPUT << "send ack back succeed!\n";
+
+            // receive commit
+            string commit_str;
+            if (recv_response_blocking(fd, commit_str) != true) {
+                ROUTER_OUTPUT << "[" << fd << "] receive response failed\n";
+                assert(0);
+            }
+            start = system_clock::now();
+            interface::Msg request;
+            if (!request.ParseFromString(commit_str)) {
+                ROUTER_OUTPUT << "cannot parse response correctly\n";
+                ROUTER_OUTPUT << "msg size: " << commit_str.size() << endl;
+                ROUTER_OUTPUT << "msg: " << commit_str << endl;
+                close(fd);
+                assert(0);
+            }
+            string encMsg = request.msg();
+            string decMsg = sessionDec(sessionKey, encMsg);
+            ROUTER_OUTPUT << decMsg.size() << endl;
+            interface::Request parsed_req;
+            if (!parsed_req.ParseFromString(decMsg)) {
+                ROUTER_OUTPUT << "cannot parse decrypted request msg\n";
+                close(fd);
+                assert(0);
+            }
+            // magic num.. as we use 1024 as size of commit
+            assert(parsed_req.msg().size() == 1024);
+            ROUTER_OUTPUT << "finish receive commit!\n";
         }
 
         interface::Request back_req;
@@ -1071,7 +1100,41 @@ private:
                     encMsg = back_msg.msg();
                 }
             }
+            ROUTER_OUTPUT << "ack msg: " << encMsg << endl; 
             ROUTER_OUTPUT << "receive ack finish!\n";
+
+            // send commit
+            // magic num... for commit msg
+            string ackReq = string(1024, 0);
+            for (int j = id - 1; j >= 0; j--) {
+                interface::Request ack_req;
+                ack_req.set_request_type(FORWARD);
+                if (j == id - 1) {
+                    ack_req.set_request_type(COMMIT);
+                    ack_req.set_id(id);
+                    ack_req.set_total_id(ips.size());
+                }
+                ack_req.set_msg(ackReq);
+                string ack_req_str;
+                ack_req.SerializeToString(&ack_req_str);
+                string encMsg = sessionEnc(sessions[j], ack_req_str);
+                interface::Msg new_handshake_req;
+                new_handshake_req.set_msg(encMsg);
+                new_handshake_req.set_addr(ips[j]);
+                if (j == 0)
+                    new_handshake_req.set_id(id_with_first_router);
+                string new_handshake_req_str;
+                new_handshake_req.SerializeToString(&new_handshake_req_str);
+                ackReq = new_handshake_req_str;
+            }
+            string sendMsg = formatMsg(ackReq);
+            if (do_write(fd, sendMsg.c_str(), sendMsg.size()) != true) {
+                ROUTER_OUTPUT << "send commit req failed\n";
+                close(fd);
+                return;
+            }
+            ROUTER_OUTPUT << "send commit finish!\n";
+
         }
 
         // recv response
