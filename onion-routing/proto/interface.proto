@@ -7,6 +7,7 @@ message Msg {
     required bytes addr = 2;
     optional int32 id = 3;
     optional int32 id_place_holder = 4;
+    optional bool nodst = 5;
 }
 
 message Request {
