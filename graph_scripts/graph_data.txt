@@ -70,11 +70,11 @@ Number of hops in the communication path:
 
 Y axis:
 Number of C-rounds needed for telescoping:
-[6, 12, 20]
+[8, 15, 24]
 Number of C-rounds needed for message forwarding:
-[4, 6, 8]
+[6, 8, 10]
 Total number of C-rounds (telescoping + message forwarding):
-[10, 18, 28]
+[14, 23, 34]
 
 
 ###################### Figure 6 #########################
