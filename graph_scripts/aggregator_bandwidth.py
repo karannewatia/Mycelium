@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 def bytesto(bytes, to, bsize=1024):
     """convert bytes to megabytes, etc.
        sample code:

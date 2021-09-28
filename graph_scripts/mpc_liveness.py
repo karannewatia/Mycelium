@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import math
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 #fg is the malice+churn rate
 #C is the size of the committee
 def liveness(fg, C):

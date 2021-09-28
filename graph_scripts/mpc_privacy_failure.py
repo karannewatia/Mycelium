@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import math
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 #f is the malice rate
 #C is the size of the Committee
 def privacy_failure(f, C):

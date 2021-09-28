@@ -1,13 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 N = 3
 hops = [2,3,4]
 
-# if number of hops = k, telescoping takes k^2+k C-rounds,
-# and message forwarding takes 2k C-rounds (for 1-hop queries)
-telescoping = (2**2 + 2, 3**2 + 3, 4**2 + 4)
-message_forwarding_1hop = (2*2, 2*3, 2*4)
+# if number of hops = k, telescoping takes k^2+2k  C-rounds,
+# and message forwarding takes 2(k+1) C-rounds (for 1-hop queries)
+telescoping = (2**2 + 2*2, 3**2 + 2*3, 4**2 + 2*4)
+message_forwarding_1hop = (2*(2+1), 2*(3+1), 2*(4+1))
+
 
 font = {'size'   : 17}
 plt.rc('font', **font)
@@ -20,6 +24,6 @@ p2 = plt.bar(ind, message_forwarding_1hop, width, bottom=telescoping, color='tab
 plt.xlabel('Number of hops in the communication path', fontsize='large')
 plt.ylabel('Number of C-rounds', fontsize='large')
 plt.xticks(ind, ('2', '3', '4'))
-plt.yticks(np.arange(0, 35, 5))
+plt.yticks(np.arange(0, 45, 5))
 plt.legend((p1[0], p2[0]), ('Telescoping', 'Message forwarding'))
 plt.savefig('../new_graphs/Duration.pdf', format='pdf')

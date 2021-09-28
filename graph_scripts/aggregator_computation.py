@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 hours_to_finish_in = 10
 
 #time for adding two size-2 ciphertexts (in seconds) is 0.02592297887802124

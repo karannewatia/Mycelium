@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import math
 
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
 k_vals = [2,3,4] #number of hops in the communication path
 r = [1,2,3] #number of copies sent
 c_vals = [ 0.01, 0.02, 0.04] #fractions of malicious users who collude with the aggregator
