@@ -48,6 +48,7 @@ private:
         FORWARD_HANDSHAKE,
         QUERY_PK,
         QUERY_RESPONSE,
+        ACK,
     };
 
     void handleErrors() {
@@ -149,6 +150,208 @@ private:
 
         /* Set expected tag value. Works in OpenSSL 1.0.1d and later */
         if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, tag))
+            handleErrors();
+
+        /*
+         * Finalise the decryption. Further plaintext bytes may be written at
+         * this stage.
+         */
+        if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
+            handleErrors();
+        plaintext_len += len;
+
+        /* Clean up */
+        EVP_CIPHER_CTX_free(ctx);
+
+        return plaintext_len;
+    }
+
+    int Chacha20encrypt(unsigned char *plaintext, int plaintext_len,
+                        unsigned char *key, unsigned char *iv,
+                        unsigned char *ciphertext) {
+        EVP_CIPHER_CTX *ctx;
+
+        int len;
+
+        int ciphertext_len;
+
+        /* Create and initialise the context */
+        if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+        /*
+         * Initialise the encryption operation. IMPORTANT - ensure you use a key
+         * and IV size appropriate for your cipher
+         * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+         * IV size for *most* modes is the same as the block size. For AES this
+         * is 128 bits
+         */
+        if (1 != EVP_EncryptInit_ex(ctx, EVP_chacha20(), NULL, key, iv))
+            handleErrors();
+
+        /*
+         * Provide the message to be encrypted, and obtain the encrypted output.
+         * EVP_EncryptUpdate can be called multiple times if necessary
+         */
+        if (1 !=
+            EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+            handleErrors();
+        ciphertext_len = len;
+
+        /*
+         * Finalise the encryption. Further ciphertext bytes may be written at
+         * this stage.
+         */
+        if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
+            handleErrors();
+        ciphertext_len += len;
+
+        /* Clean up */
+        EVP_CIPHER_CTX_free(ctx);
+
+        return ciphertext_len;
+    }
+
+    int Chacha20decrypt(unsigned char *ciphertext, int ciphertext_len,
+                        unsigned char *key, unsigned char *iv,
+                        unsigned char *plaintext) {
+        EVP_CIPHER_CTX *ctx;
+
+        int len;
+
+        int plaintext_len;
+
+        /* Create and initialise the context */
+        if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+        /*
+         * Initialise the decryption operation. IMPORTANT - ensure you use a key
+         * and IV size appropriate for your cipher
+         * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+         * IV size for *most* modes is the same as the block size. For AES this
+         * is 128 bits
+         */
+        if (1 != EVP_DecryptInit_ex(ctx, EVP_chacha20(), NULL, key, iv))
+            handleErrors();
+
+        /*
+         * Provide the message to be decrypted, and obtain the plaintext output.
+         * EVP_DecryptUpdate can be called multiple times if necessary.
+         */
+        if (1 !=
+            EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+            handleErrors();
+        plaintext_len = len;
+
+        /*
+         * Finalise the decryption. Further plaintext bytes may be written at
+         * this stage.
+         */
+        if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
+            handleErrors();
+        plaintext_len += len;
+
+        /* Clean up */
+        EVP_CIPHER_CTX_free(ctx);
+
+        return plaintext_len;
+    }
+
+    int Chacha20polyencrypt(unsigned char *plaintext, int plaintext_len,
+                   unsigned char *key, unsigned char *iv,
+                   unsigned char *ciphertext, unsigned char* tag) {
+        int iv_len = 12;
+        EVP_CIPHER_CTX *ctx;
+
+        int len;
+
+        int ciphertext_len;
+
+        /* Create and initialise the context */
+        if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+        /*
+         * Initialise the encryption operation. IMPORTANT - ensure you use a key
+         * and IV size appropriate for your cipher
+         * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+         * IV size for *most* modes is the same as the block size. For AES this
+         * is 128 bits
+         */
+        if(1 != EVP_EncryptInit_ex(ctx, EVP_chacha20_poly1305(), NULL, NULL, NULL))
+            handleErrors();
+
+        /*
+        * Set IV length if default 12 bytes (96 bits) is not appropriate
+        */
+        if(1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, iv_len, NULL))
+            handleErrors();
+
+        /* Initialise key and IV */
+        if(1 != EVP_EncryptInit_ex(ctx, NULL, NULL, key, iv))
+            handleErrors();
+
+        /*
+         * Provide the message to be encrypted, and obtain the encrypted output.
+         * EVP_EncryptUpdate can be called multiple times if necessary
+         */
+        if (1 !=
+            EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+            handleErrors();
+        ciphertext_len = len;
+
+        /*
+         * Finalise the encryption. Further ciphertext bytes may be written at
+         * this stage.
+         */
+        if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
+            handleErrors();
+        ciphertext_len += len;
+
+        /* Get the tag */
+        if(1 != EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_GET_TAG, 16, tag))
+            handleErrors();
+
+        /* Clean up */
+        EVP_CIPHER_CTX_free(ctx);
+
+        return ciphertext_len;
+    }
+
+    int Chacha20polydecrypt(unsigned char *ciphertext, int ciphertext_len,
+                   unsigned char *key, unsigned char *iv,
+                   unsigned char *plaintext, unsigned char* tag) {
+        int iv_len = 12;
+        EVP_CIPHER_CTX *ctx;
+
+        int len;
+
+        int plaintext_len;
+
+        /* Create and initialise the context */
+        if (!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+        /* Initialise the decryption operation. */
+        if(!EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), NULL, NULL, NULL))
+            handleErrors();
+
+        /* Set IV length. Not necessary if this is 12 bytes (96 bits) */
+        if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, iv_len, NULL))
+            handleErrors();
+
+        /* Initialise key and IV */
+        if(!EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv))
+            handleErrors();
+
+        /*
+         * Provide the message to be decrypted, and obtain the plaintext output.
+         * EVP_DecryptUpdate can be called multiple times if necessary.
+         */
+        if (1 !=
+            EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+            handleErrors();
+        plaintext_len = len;
+
+        /* Set expected tag value. Works in OpenSSL 1.0.1d and later */
+        if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, 16, tag))
             handleErrors();
 
         /*
@@ -733,7 +936,7 @@ private:
             ROUTER_OUTPUT << "received msg: " << msg << endl;
     }
 
-    void query_pk_handler(int fd, idKey origin_ik, string& msg, string back_ip) {
+    void query_pk_handler(int fd, idKey origin_ik, string& msg, string back_ip, int id, int total_id) {
         interface::Msg query_req;
         if (!query_req.ParseFromString(msg)) {
             ROUTER_OUTPUT << "cannot parse query pk msg\n";
@@ -750,6 +953,32 @@ private:
         string sessionKey = keyInfo[origin_ik].sessionKey;
         int back_fd = fd;
         int back_id = origin_ik.id;
+
+        ROUTER_OUTPUT << "query pk, id: " << id << " total id: " << total_id << endl;
+        // send back an ack first!!!
+        if (id == total_id - 1) {
+            interface::Request ack_req;
+            ack_req.set_request_type(ACK);
+            ack_req.set_msg("ack");
+            string ack_req_str;
+            ack_req.SerializeToString(&ack_req_str);
+            string enc_ack_req_str = sessionEnc(sessionKey, ack_req_str);
+
+            interface::Msg back_msg;
+            back_msg.set_msg(enc_ack_req_str);
+            back_msg.set_addr(back_ip);
+            back_msg.set_id(back_id);
+            string back_msg_str;
+            back_msg.SerializeToString(&back_msg_str);
+            ROUTER_OUTPUT << "\tmsg size: " << back_msg_str.size() << endl;
+
+            string back_str = formatMsg(back_msg_str);
+
+            if (!do_write(back_fd, back_str.c_str(), back_str.size())) {
+                ROUTER_OUTPUT << "ack sending back response failed\n";
+            }
+            ROUTER_OUTPUT << "send ack back succeed!\n";
+        }
 
         interface::Request back_req;
         back_req.set_request_type(FORWARD_BACK);
@@ -848,7 +1077,14 @@ private:
                 string sessionKey = keyInfo[ik].sessionKey;
                 assert(fd == keyInfo[ik].fd);
                 string encMsg = request.msg();
-                string decMsg = sessionDec(sessionKey, encMsg);
+                string decMsg;
+                // not dst node, use chacha20 for dec
+                if (request.has_nodst()) {
+                    decMsg = sessionDec_chacha20(sessionKey, encMsg);
+                }
+                else {
+                    decMsg = sessionDec(sessionKey, encMsg);
+                }
                 interface::Request parsed_req;
                 if (!parsed_req.ParseFromString(decMsg)) {
                     ROUTER_OUTPUT << "cannot parse decrypted request msg\n";
@@ -870,7 +1106,8 @@ private:
 
                 } else if (parsed_req.request_type() == QUERY_PK) {
                     string recv_msg = parsed_req.msg();
-                    query_pk_handler(fd, ik, recv_msg, origin_ip);
+                    assert(parsed_req.has_id() && parsed_req.has_total_id());
+                    query_pk_handler(fd, ik, recv_msg, origin_ip, parsed_req.id(), parsed_req.total_id());
                 } else {
                     assert(0);
                 }
@@ -921,24 +1158,75 @@ private:
         return new_key;
     }
 
-    string sessionEnc(string& sessionKey, string& msg) {
+    string sessionEnc_chacha20(string& sessionKey, string& msg) {
+        int iv_len = 16; // 128 bits for chacha20, following the openssl iv_len of chacha...
+        int tag_len = 16;
         BIGNUM* iv = BN_new();
-        assert(BN_rand(iv, 128, -1, 0) == 1);
+        assert(BN_rand(iv, iv_len * 8, -1, 0) == 1);
         int enc_size = (msg.size() / 16 + 1) * 16;
         unsigned char* ciphertext = (unsigned char*) malloc(enc_size * sizeof(unsigned char));
-        unsigned char iv_str[16];
-        assert(BN_num_bytes(iv) == 16);
+        unsigned char iv_str[iv_len];
+        assert(BN_num_bytes(iv) <= iv_len);
         BN_bn2bin(iv, iv_str);
-        unsigned char tag[16];
-        int enc_len = AESencrypt((unsigned char*)msg.c_str(), msg.size(), (unsigned char*)sessionKey.c_str(), iv_str, ciphertext, tag);
+        unsigned char tag[tag_len];
+        // int enc_len = AESencrypt((unsigned char*)msg.c_str(), msg.size(), (unsigned char*)sessionKey.c_str(), iv_str, ciphertext, tag);
+        int enc_len = Chacha20encrypt((unsigned char*)msg.c_str(), msg.size(), (unsigned char*)sessionKey.c_str(), iv_str, ciphertext);
         if (enc_len > enc_size) {
             ROUTER_OUTPUT << "enc_len: " << enc_len << ", enc_size: " << enc_size << ", msg size: " << msg.size() << endl;
         }
         assert(enc_len <= enc_size);
         interface::EncMsg enc;
-        enc.set_iv(string((const char*)iv_str, 16));
+        enc.set_iv(string((const char*)iv_str, iv_len));
         enc.set_enc_msg(string((const char*)ciphertext, enc_len));
-        enc.set_tag(string((const char*)tag, 16));
+        enc.set_tag(string((const char*)tag, tag_len));
+        string enc_msg;
+        enc.SerializeToString(&enc_msg);
+        BN_free(iv);
+        free(ciphertext);
+        return enc_msg;
+    }
+
+    string sessionDec_chacha20(string& sessionKey, string& msg) {
+        interface::EncMsg enc;
+        if (!enc.ParseFromString(msg)) {
+            ROUTER_OUTPUT << "decryption cannot parse encrypted msg\n";
+            return msg;
+        }
+        string iv_str = enc.iv();
+        string ciphertext = enc.enc_msg();
+        // not used in chacha20
+        string tag = enc.tag();
+        unsigned char* dec_msg = (unsigned char*) malloc(msg.size() * sizeof(unsigned char));
+        // int dec_len = AESdecrypt((unsigned char*)ciphertext.c_str(),
+        // ciphertext.size(), (unsigned char*)sessionKey.c_str(), (unsigned
+        // char*)iv_str.c_str(), dec_msg, (unsigned char*)tag.c_str());
+        int dec_len = Chacha20decrypt((unsigned char*)ciphertext.c_str(), ciphertext.size(), (unsigned char*)sessionKey.c_str(), (unsigned char*)iv_str.c_str(), dec_msg);
+        assert(dec_len <= msg.size());
+        string res = string((const char*)dec_msg, dec_len);
+        free(dec_msg);
+        return res;
+    }
+
+    string sessionEnc(string& sessionKey, string& msg) {
+        int iv_len = 12; // 96 bits for chacha20poly
+        int tag_len = 16;
+        BIGNUM* iv = BN_new();
+        assert(BN_rand(iv, iv_len * 8, -1, 0) == 1);
+        int enc_size = (msg.size() / 16 + 1) * 16;
+        unsigned char* ciphertext = (unsigned char*) malloc(enc_size * sizeof(unsigned char));
+        unsigned char iv_str[iv_len];
+        assert(BN_num_bytes(iv) <= iv_len);
+        BN_bn2bin(iv, iv_str);
+        unsigned char tag[tag_len];
+        int enc_len = Chacha20polyencrypt((unsigned char*)msg.c_str(), msg.size(), (unsigned char*)sessionKey.c_str(), iv_str, ciphertext, tag);
+        if (enc_len > enc_size) {
+            ROUTER_OUTPUT << "enc_len: " << enc_len << ", enc_size: " << enc_size << ", msg size: " << msg.size() << endl;
+        }
+        assert(enc_len <= enc_size);
+        interface::EncMsg enc;
+        enc.set_iv(string((const char*)iv_str, iv_len));
+        enc.set_enc_msg(string((const char*)ciphertext, enc_len));
+        enc.set_tag(string((const char*)tag, tag_len));
         string enc_msg;
         enc.SerializeToString(&enc_msg);
         BN_free(iv);
@@ -956,7 +1244,9 @@ private:
         string ciphertext = enc.enc_msg();
         string tag = enc.tag();
         unsigned char* dec_msg = (unsigned char*) malloc(msg.size() * sizeof(unsigned char));
-        int dec_len = AESdecrypt((unsigned char*)ciphertext.c_str(), ciphertext.size(), (unsigned char*)sessionKey.c_str(), (unsigned char*)iv_str.c_str(), dec_msg, (unsigned char*)tag.c_str());
+        int dec_len = Chacha20polydecrypt((unsigned char*)ciphertext.c_str(),
+        ciphertext.size(), (unsigned char*)sessionKey.c_str(), (unsigned
+        char*)iv_str.c_str(), dec_msg, (unsigned char*)tag.c_str());
         assert(dec_len <= msg.size());
         string res = string((const char*)dec_msg, dec_len);
         free(dec_msg);
@@ -969,6 +1259,8 @@ private:
         interface::Request req;
         req.set_request_type(QUERY_PK);
         req.set_msg(ips[id]);
+        req.set_id(id);
+        req.set_total_id(ips.size());
         string req_str;
         req.SerializeToString(&req_str);
         interface::Msg query_req;
@@ -980,8 +1272,11 @@ private:
         for (int j = id - 1; j >= 0; j--) {
             interface::Request new_req;
             new_req.set_request_type(FORWARD);
-            if (j == id - 1)
+            if (j == id - 1) {
                 new_req.set_request_type(QUERY_PK);
+                new_req.set_id(id);
+                new_req.set_total_id(ips.size());
+            }
             new_req.set_msg(sendReq);
             string new_req_str;
             new_req.SerializeToString(&new_req_str);
@@ -1000,6 +1295,45 @@ private:
             ROUTER_OUTPUT << "send query req failed\n";
             close(fd);
             return;
+        }
+
+        // receive ack
+        if (id == ips.size() - 1) {
+            string response;
+            if (!recv_response(fd, response)) {
+                ROUTER_OUTPUT << "recv response for query pk " << id << " failed" << endl;
+                close(fd);
+                return;
+            }
+
+            ROUTER_OUTPUT << "recved response size: " << response.size() << endl;
+            interface::Msg request;
+            if (!request.ParseFromString(response)) {
+                ROUTER_OUTPUT << "query response parse response fail\n";
+                return;
+            }
+            string decMsg;
+            string encMsg = request.msg();
+            for (int i = 0; i < id; i++) {
+                decMsg = sessionDec(sessions[i], encMsg);
+                // ROUTER_OUTPUT << "enter recv back handler " << i << " req size: " << encMsg.size() << endl;
+                interface::Request parsed_req;
+                if (!parsed_req.ParseFromString(decMsg)) {
+                    ROUTER_OUTPUT << "cannot parse decrypted request msg\n";
+                    return;
+                }
+                assert(parsed_req.request_type() == FORWARD_BACK || parsed_req.request_type() == ACK);
+                interface::Msg back_msg;
+                encMsg = parsed_req.msg();
+                if (i != id - 1) {
+                    if (!back_msg.ParseFromString(encMsg)) {
+                        ROUTER_OUTPUT << "cannot parse Msg type\n";
+                        return;
+                    }
+                    encMsg = back_msg.msg();
+                }
+            }
+            ROUTER_OUTPUT << "receive ack finish!\n";
         }
 
         // recv response
@@ -1243,13 +1577,22 @@ public:
             req.set_msg(finalMsg);
             string tmpReq;
             req.SerializeToString(&tmpReq);
-            string encMsg = sessionEnc(eInfo.keys[i], tmpReq);
+            string encMsg;
+            if (i == ips.size() - 1) {
+                encMsg = sessionEnc(eInfo.keys[i], tmpReq);
+            }
+            else {
+                encMsg = sessionEnc_chacha20(eInfo.keys[i], tmpReq);
+            }
 
             interface::Msg m;
             m.set_msg(encMsg);
             m.set_addr(ips[i]);
             if (i == 0) {
                 m.set_id(eInfo.id);
+            }
+            if (i != ips.size() -1) {
+                m.set_nodst(true);
             }
             m.SerializeToString(&finalMsg);
         }
