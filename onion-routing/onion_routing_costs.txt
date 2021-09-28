@@ -5,16 +5,16 @@ The columns correspond to the costs/times for the source, hop1, hop2, and the de
 Communication cost (in bytes):
 
 #these are the costs for users
-Telescoping (write) - [2176, 5686, 2834, 304]
+Telescoping (write) - [2193, 5835, 2909, 304]
 Send 4.3 MB (write) - [4509109, 4509034, 4508958, 0]
 
 #these are the costs for the aggregator
-Telescoping (read) - [4386, 4456, 1608, 562]
+Telescoping (read) - [4527, 4548, 1616, 562]
 Send 4.3 MB (read) - [0, 4509105, 4509030, 4508954]
 
 User times (in seconds):
-Telescoping - [0.0743, 0.020230737, 0.020038083, 0.019142]
-Send 4.3 MB - [0.142117, 0.0437752, 0.0562379, 0.0223418]
+Telescoping - [0.072432, 0.018282463, 0.019983161, 0.019552500000000004]
+Send 4.3 MB - [0.134706, 0.043765, 0.0423397, 0.0222335]
 
 
 ############# For 3 intermediate hops #############
@@ -24,16 +24,16 @@ The columns correspond to the costs/times for the source, hop1, hop2, hop3, and 
 Communication cost (in bytes):
 
 #these are the costs for users
-Telescoping (write) - [3195, 8821, 5691, 2837, 304]
+Telescoping (write) - [3221, 9051, 5842, 2913, 304]
 Send 4.3 MB (write) - [4509185, 4509110, 4509034, 4508958, 0]
 
 #these are the costs for the aggregator
-Telescoping (read) - [6641, 7590, 4463, 1608, 562]
+Telescoping (read) - [6854, 7759, 4556, 1616, 562]
 Send 4.3 MB (read) - [0, 4509181, 4509106, 4509030, 4508954]
 
 User times (in seconds):
-Telescoping - [0.102834, 0.02092421, 0.020948497, 0.019684814999999994, 0.0197593]
-Send 4.3 MB - [0.143451, 0.0431395, 0.0443894, 0.0777283, 0.0220567]
+Telescoping - [0.106703, 0.021412394, 0.025299338000000005, 0.0207812690000000054, 0.018403700000000002]
+Send 4.3 MB - [0.178739, 0.0428963, 0.0443036, 0.043197, 0.0220941]
 
 
 ############# For 4 intermediate hops #############
@@ -43,13 +43,13 @@ The columns correspond to the costs/times for the source, hop1, hop2, hop3, hop4
 Communication cost (in bytes):
 
 #these are the costs for users
-Telescoping (write) - [4344, 12244, 8821, 5691, 2837, 304]
-Send 4.3 MB (write) - [4509260, 4509185, 4509110, 4509034, 4508958]
+Telescoping (write) - [4389, 12545, 9056, 5845, 2913, 304]
+Send 4.3 MB (write) - [4509261, 4509186, 4509110, 4509034, 0]
 
 #these are the costs for the aggregator
-Telescoping (read) - [9029, 10989, 7590, 4463, 1608, 562]
-Send 4.3 MB (read) - [0, 4509256, 4509181, 4509106, 4509030, 4508954]
+Telescoping (read) - [9319, 11252, 7767, 4556, 1616, 562]
+Send 4.3 MB (read) - [0, 4509257, 4509182, 4509106, 4509030, 4508954]
 
 User times (in seconds):
-Telescoping - [0.130685, 0.020947645, 0.021025801, 0.019912122, 0.020789681, 0.0194365]
-Send 4.3 MB - [0.220451, 0.0596932, 0.043498, 0.0415035, 0.068581, 0.0241647]
+Telescoping - [0.129639, 0.021635331, 0.021283411999999995, 0.021645374999999994, 0.018615501, 0.018330199999999998]
+Send 4.3 MB - [0.131293, 0.0432258, 0.0439126, 0.0428403, 0.0417716, 0.0222602]
